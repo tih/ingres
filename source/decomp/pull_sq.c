@@ -13,7 +13,6 @@
 **
 */
 
-
 pull_sq(tree1, sqlist, locrang, sqrange, buf)
 struct querytree	*tree1;
 struct querytree	*sqlist[];
@@ -24,6 +23,7 @@ char			*buf;
 	register struct querytree 	*q, *tree, *r;
 	struct querytree 		*s;
 	int 				anysq, j, badvar;
+	extern struct querytree		*makroot();
 
 	tree = tree1;
 
@@ -36,7 +36,7 @@ char			*buf;
 	for (j = 0; j < MAXRANGE; j++)
 		sqlist[j] = 0;
 
-	if (tree->tvarc == 1)
+	if (((struct qt_root *)tree)->tvarc == 1)
 		return;
 
 	/* detach all one variable clauses except:
@@ -49,14 +49,14 @@ char			*buf;
 	*/
 
 	badvar = 0;
-	if (tree->lvarc == 1)
+	if (((struct qt_root *)tree)->lvarc == 1)
 	{
-		badvar = tree->lvarm;	/* get bit position of var */
+		badvar = ((struct qt_root *)tree)->lvarm; /* get bit position of var */
 
 		/* look for a two variable clause involving badvar */
 		for (r = tree->right; r->sym.type != QLEND; r = r->right)
 		{
-			if (r->lvarc > 1 && (r->lvarm & badvar))
+			if (((struct qt_root *)r)->lvarc > 1 && (((struct qt_root *)r)->lvarm & badvar))
 			{
 				badvar = 0;
 				break;
@@ -75,9 +75,9 @@ char			*buf;
 #		endif
 		q = r;
 		r = r->right;
-		if (r->lvarc == 1)
+		if (((struct qt_root *)r)->lvarc == 1)
 		{
-			j = bitpos(r->lvarm);
+			j = bitpos(((struct qt_root *)r)->lvarm);
 #			ifdef xDTR1
 			if (tTf(10, 4))
 			{
@@ -85,7 +85,7 @@ char			*buf;
 				printree(r->left, "clause");
 			}
 #			endif
-			if (r->lvarm == badvar)
+			if (((struct qt_root *)r)->lvarm == badvar)
 			{
 #				ifdef xDTR1
 				if (tTf(10, 5))
@@ -106,14 +106,14 @@ char			*buf;
 			/* MODIFY `AND` NODE OF DETACHED CLAUSE */
 
 			r->right = s->right;
-			r->rvarm = s->rvarm;
-			r->tvarc = 1;
+			((struct qt_root *)r)->rvarm = ((struct qt_root *)s)->rvarm;
+			((struct qt_root *)r)->tvarc = 1;
 
 			/* ADD CLAUSE TO SUB-QUERY */
 
 			s->right = r;
-			s->rvarm = r->lvarm;
-			s->tvarc = 1;
+			((struct qt_root *)s)->rvarm = ((struct qt_root *)r)->lvarm;
+			((struct qt_root *)s)->tvarc = 1;
 
 #			ifdef xDTR1
 			if (tTf(10, 6))
@@ -156,7 +156,6 @@ char			*buf;
 	}
 }
 
-
 dfind(tree1, buf, sqlist)
 struct querytree *tree1;
 char		 *buf;
@@ -164,6 +163,7 @@ struct querytree *sqlist[];
 {
 	register int			varno;
 	register struct querytree	*tree, *sq;
+	extern struct querytree		*ckvar();
 
 	tree = tree1;
 	if (!tree) 
@@ -175,7 +175,7 @@ struct querytree *sqlist[];
 	if (tree->sym.type == VAR)
 	{
 		tree = ckvar(tree);
-		varno = tree->varno;
+		varno = ((struct qt_var *)tree)->varno;
 		if (sq = sqlist[varno])
 			maktl(tree, buf, sq, varno);
 		return;
@@ -189,7 +189,6 @@ struct querytree *sqlist[];
 }
 
 
-
 maktl(node, buf, sq1, varno)
 struct querytree	*node;
 char			*buf;
@@ -198,9 +197,10 @@ int			varno;
 {
 	register struct querytree 	*resdom, *tree, *sq;
 	int				domno, map;
+	extern struct querytree		*makresdom(), *copytree();
 
 	sq = sq1;
-	domno = node->attno;
+	domno = ((struct qt_var *)node)->attno;
 
 #	ifdef xDTR1
 	if (tTf(10, 12))
@@ -209,7 +209,7 @@ int			varno;
 	/* CHECK IF NODE ALREADY CREATED FOR THIS DOMAIN */
 
 	for (tree = sq->left; tree->sym.type != TREE; tree = tree->left)
-		if (tree->right->attno == domno)
+		if (((struct qt_var *)tree->right)->attno == domno)
 		{
 #			ifdef xDTR1
 			if (tTf(10, 13))
@@ -234,15 +234,15 @@ int			varno;
 
 	sq->left = resdom;
 	map = 1 << varno;
-	if (!(sq->lvarm & map))
+	if (!(((struct qt_root *)sq)->lvarm & map))
 	{
 		/* var not currently in tl */
-		sq->lvarm =| map;
-		sq->lvarc++;
+		((struct qt_root *)sq)->lvarm |= map;
+		((struct qt_root *)sq)->lvarc++;
 
 		/* if var is not in qualification then update total count */
-		if (!(sq->rvarm & map))
-			sq->tvarc++;
+		if (!(((struct qt_root *)sq)->rvarm & map))
+			((struct qt_root *)sq)->tvarc++;
 #		ifdef xDTR1
 		if (tTf(10, 15))
 		{

@@ -5,7 +5,7 @@
 **	The keyword table MUST be in sorted order.
 **	The operator table does not need to be sorted
 */
-struct optab	Keyword[]
+struct optab	Keyword[] =
 {
 	"abs",			FOP,			opABS,
 	"all",			ALL,			0,
@@ -73,9 +73,9 @@ struct optab	Keyword[]
 	"view",			VIEW,			0,
 	"where",		WHERE,			0,
 };
-int	Keyent		sizeof Keyword / sizeof Keyword[0];
+int	Keyent		= sizeof Keyword / sizeof Keyword[0];
 
-struct optab	Optab[]
+struct optab	Optab[] =
 {
 	/* PUNCTUATION */
 	",",			COMMA,			0,
@@ -109,7 +109,7 @@ struct optab	Optab[]
 };
 
 /* constant operators table for lookup */
-struct constop	Coptab[]
+struct constop	Coptab[] =
 {
 	"dba",		opDBA,		CHAR,		2,
 	"usercode",	opUSERCODE,	CHAR,		2,
@@ -126,7 +126,7 @@ struct constop	Coptab[]
 ** yacc generated tokens for the indicated
 ** terminal symbols.
 */
-struct special	Tokens
+struct special	Tokens =
 {
 	SCONST,
 	BGNCMNT,

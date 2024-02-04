@@ -1,5 +1,6 @@
 #
-# include	"../fileio.h"
+# include	<stdio.h>
+
 # include	"constants.h"
 # include	"globals.h"
 
@@ -49,7 +50,6 @@
 **
 **	Files:
 **		globals.h - for globals
-**		../fileio.h
 **		constants.h
 **
 **	Diagnostics:
@@ -71,6 +71,8 @@ char		chr;
 	register char		*cp;
 	register char		c;
 	struct optab		*op;
+	extern struct optab	*getkey();
+	extern struct cvar	*getcvar();
 
 	c = chr;
 	cp = wbuf;

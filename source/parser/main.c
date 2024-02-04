@@ -65,7 +65,7 @@ char	*argv1[];
 	**	structure is initialized.  The 'Qrymod' flag is set when
 	**	the database has query modification turned on.
 	*/
-	Qrymod = ((Admin.adflags & A_QRYMOD) == A_QRYMOD);
+	Qrymod = ((Admin.adhdr.adflags & A_QRYMOD) == A_QRYMOD);
 	setexit();
 
 	/* EXECUTE */

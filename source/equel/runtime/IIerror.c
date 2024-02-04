@@ -26,7 +26,7 @@
 */
 
 int						IIret_err();
-extern		(*IIprint_err)()		IIret_err;
+extern		(*IIprint_err)()		= IIret_err;
 
 
 IIerror(errno, argc, argv)

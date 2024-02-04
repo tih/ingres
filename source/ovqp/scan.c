@@ -78,7 +78,7 @@ scan()
 	** Tlist=no	Alist=yes	Bylist=no
 	** Tlist=no	Alist=yes	Bylist=yes
 	*/
-	rlist = (Tlist? Tlist: Alist);
+	rlist = (char *) (Tlist? Tlist: Alist);
 	if (Bylist)
 		rlist = 0;
 
@@ -98,7 +98,7 @@ scan()
 		for (domno = 2; domno <= Result->relatts - Agcount; domno++)
 			Result->relgiven[domno] = 1;
 
-		Counter = Outtup;	/* first four bytes of Outtup is counter for Bylist */
+		Counter = (long *) Outtup;	/* first four bytes of Outtup is counter for Bylist */
 	}
 
 	/*

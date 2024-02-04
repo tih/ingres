@@ -24,13 +24,13 @@
 
 struct pipfrmt Inpipe;
 
-readqry()
+struct querytree *readqry()
 {
 	register struct symbol 		*s;
 	register struct querytree	*q;
 	register int			mark;
 	int				i;
-	struct querytree		*readnod();
+	struct querytree		*readnode();
 
 #	ifdef xDTR1
 	if (tTf(1, -1))
@@ -43,14 +43,14 @@ readqry()
 	for (;;)
 	{
 		freebuf(Qbuf, mark);
-		q = readnod(Qbuf);
+		q = readnode(Qbuf);
 		s = &(q->sym);
 #		ifdef xDTR1
 		if (tTf(1, 1))
 		{
 			printf("%d, %d, %d/", s->type, s->len, s->value[0] & 0377);
 			if (s->type == SOURCEID)
-				printf("%.12s", s->srcname);
+				printf("%.12s", ((struct srcid *)s)->srcname);
 			printf("\n");
 		}
 #		endif
@@ -65,8 +65,8 @@ readqry()
 			break;
 
 		  case SOURCEID:
-			i = s->srcvar;
-			Rangev[i].relnum = rnum_assign(s->srcname);
+			i = ((struct srcid *)s)->srcvar;
+			Rangev[i].relnum = rnum_assign(((struct srcid *)s)->srcname);
 			break;
 
 		  case TREE:
@@ -84,6 +84,7 @@ char	*buf;
 {
 	register int			len, user;
 	register struct querytree	*q;
+	extern struct querytree		*need();
 
 	q = need(buf, 6);	/* space for left,right ptrs + type & len */
 
@@ -110,7 +111,7 @@ char	*buf;
 	  case AGHEAD:
 		len = 8;
 		need(buf, len);
-		q->rootuser = user;
+		((struct qt_root *)q)->rootuser = user;
 		break;
 
 	  case AND:
@@ -137,7 +138,7 @@ char	*buf;
 
 	do
 	{
-		nod = readnod(buf);
+		nod = readnode(buf);
 #		ifdef xDTR1
 		if (tTf(1, 2))
 		{

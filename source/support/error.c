@@ -1,6 +1,7 @@
+# include	<stdio.h>
+
 # include	"../ingres.h"
 # include	"../aux.h"
-# include	"../fileio.h"
 
 # define	ERRDELIM	'~'
 
@@ -21,7 +22,6 @@ int	number;
 char	*argvect;
 {
 	FILE		*iop;
-	char		iob[IOBUFSIZ];
 	char		**pv;
 	int		i;
 	register char	*p;
@@ -32,7 +32,7 @@ char	*argvect;
 
 	pv = &argvect;
 	err = number;
-	if ((iop = fopen(errfilen(5), "r", iob)) == NULL)
+	if ((iop = fopen(errfilen(5), "r")) == NULL)
 		syserr("error: open");
 
 	/* read in the code and check for correct */

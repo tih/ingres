@@ -4,7 +4,7 @@
 # include	"decomp.h"
 
 
-
+extern struct querytree		*need();
 
 
 struct querytree *copytree(root, buf)
@@ -82,7 +82,7 @@ char 	*buf;
 	s = need(buf, 14);
 	s->right = Qle;
 	s->left = Tr;
-	s->rootuser = s->lvarm = s->rvarm = s->tvarc = s->lvarc = 0;
+	((struct qt_root *)s)->rootuser = ((struct qt_root *)s)->lvarm = ((struct qt_root *)s)->rvarm = ((struct qt_root *)s)->tvarc = ((struct qt_root *)s)->lvarc = 0;
 	s->sym.type = ROOT;
 	s->sym.len = 8;
 	return (s);
@@ -101,13 +101,13 @@ struct querytree	*node;
 	res->sym.len = 4;
 	if (n->sym.type == AOP)
 	{
-		res->frmt = n->agfrmt;
-		res->frml = n->agfrml;
+		((struct qt_var *)res)->frmt = ((struct qt_ag *)n)->agfrmt;
+		((struct qt_var *)res)->frml = ((struct qt_ag *)n)->agfrml;
 	}
 	else
 	{
-		res->frmt = n->frmt;
-		res->frml = n->frml;
+		((struct qt_var *)res)->frmt = ((struct qt_var *)n)->frmt;
+		((struct qt_var *)res)->frml = ((struct qt_var *)n)->frml;
 	}
 	return (res);
 }
@@ -119,15 +119,15 @@ int			varnum, attnum;
 	register struct querytree *avar, *n;
 
 	n = node;
-
 	avar = need(Qbuf, 12);
-	avar->left = avar->right = avar->valptr = 0;
+	avar->left = avar->right = (struct querytree *) 0;
+	((struct qt_var *)avar)->valptr = (char *) 0;
 	avar->sym.type = VAR;
 	avar->sym.len = 6;
-	avar->frmt = n->frmt;
-	avar->frml = n->frml;
-	avar->varno = varnum;
-	avar->attno = attnum;
+	((struct qt_var *)avar)->frmt = ((struct qt_var *)n)->frmt;
+	((struct qt_var *)avar)->frml = ((struct qt_var *)n)->frml;
+	((struct qt_var *)avar)->varno = varnum;
+	((struct qt_var *)avar)->attno = attnum;
 #	ifdef xDTR1
 	if (tTf(14, 3))
 	{

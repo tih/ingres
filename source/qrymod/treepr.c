@@ -181,16 +181,27 @@ QTREE	*tree;
 	switch (ty)
 	{
 	  case VAR:
-		printf("%d.%d [%d/%d]", t->varno, t->attno, t->frmt, t->frml & I1MASK);
+		printf("%d.%d [%d/%d]",
+			((struct qt_var *)t)->varno,
+			((struct qt_var *)t)->attno,
+			((struct qt_var *)t)->frmt,
+			((struct qt_var *)t)->frml & I1MASK);
 		break;
 
 	  case RESDOM:
-		printf("%d [%d/%d]", t->resno, t->frmt, t->frml);
+		printf("%d [%d/%d]",
+			((struct qt_res *)t)->resno,
+			((struct qt_var *)t)->frmt,
+			((struct qt_var *)t)->frml);
 		break;
 
 	  case AOP:
-		printf("%d [%d/%d] [%d/%d]", t->resno, t->frmt, t->frml,
-		    t->agfrmt, t->agfrml);
+		printf("%d [%d/%d] [%d/%d]",
+			((struct qt_res *)t)->resno,
+			((struct qt_var *)t)->frmt,
+			((struct qt_var *)t)->frml,
+			((struct qt_ag *)t)->agfrmt,
+			((struct qt_ag *)t)->agfrml);
 		break;
 
 	  case UOP:
@@ -205,17 +216,17 @@ QTREE	*tree;
 			break;
 		
 		  case 4:
-			printf("%s", locv(t->sym.value->i4type));
+			printf("%s", locv(i4deref(t->sym.value)));
 			break;
 		}
 		break;
 
 	  case FLOAT:
-		printf("%.10f", t->sym.value->i4type);
+		printf("%.10f", i4deref(t->sym.value));
 		break;
 
 	  case CHAR:
-		cp = t->sym.value;
+		cp = (char *) t->sym.value;
 		while (l--)
 			putchar(*cp++);
 		break;

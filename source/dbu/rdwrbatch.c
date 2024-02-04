@@ -30,9 +30,9 @@ int	count;
 		else
 			size = BATCHSIZE - Batch_cnt;
 		bmove(&Batchbuf.bbuf[Batch_cnt], c, size);
-		Batch_cnt =+ size;
-		cnt =- size;
-		c =+ size;
+		Batch_cnt += size;
+		cnt -= size;
+		c += size;
 		/* flush the buffer if full */
 		if (Batch_cnt == BATCHSIZE)
 			batchflush();	/* re-write buffer if necessary */
@@ -62,9 +62,9 @@ int	count;
 		else
 			size = cnt;
 		bmove(c, &Batchbuf.bbuf[Batch_cnt], size);
-		c =+ size;
-		Batch_cnt =+ size;
-		cnt =- size;
+		c += size;
+		Batch_cnt += size;
+		cnt -= size;
 		if (Batch_cnt == BATCHSIZE)
 		{
 			batchflush();

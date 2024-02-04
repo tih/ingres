@@ -146,6 +146,7 @@ char	func;
 d_tree()
 {
 	extern		pipetrrd();
+	QTREE		*readqry();
 
 	Treeroot = readqry(&pipetrrd, TRUE);
 	rdpipe(P_SYNC, &Pipe, R_up);

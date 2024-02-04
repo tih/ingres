@@ -1,6 +1,7 @@
+# include	<stdio.h>
+
 # include	"../ingres.h"
 # include	"../aux.h"
-# include	"../fileio.h"
 # include	"monitor.h"
 
 
@@ -51,18 +52,18 @@ struct retcode	*retcode;
 char		*name;
 {
 	register FILE	*iop;
-	char		bufx[IOBUFSIZ];
-	static char	bufy[IOBUFSIZ];
 	static int	first;
 	register char	*sp, c;
 	int		timevec[2];
-	extern		getc();
+	extern		fgetc();
+	char		*ctime();
+	char		*locv();
 
 	if (first < 0)
 		return;
 	if (Trapfile == NULL)
 	{
-		if ((Trapfile = fopen(name, "a", bufy)) == NULL)
+		if ((Trapfile = fopen(name, "a")) == NULL)
 		{
 			printf("can't trap query in %s\n", name);
 			first = -1;
@@ -78,9 +79,9 @@ char		*name;
 		first++;
 	}
 
-	if ((iop = fopen(Qbname, "r", bufx)) == NULL)
+	if ((iop = fopen(Qbname, "r")) == NULL)
 		syserr("go: open 1");
-	macinit(&getc, iop, 1);
+	macinit(&fgetc, iop, 1);
 
 	while ((c = macgetch()) > 0)
 		putc(c, Trapfile);

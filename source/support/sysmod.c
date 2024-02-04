@@ -8,9 +8,9 @@ extern int	Status;
 
 
 char	*Fileset;
-char	Noupdt		FALSE;
+char	Noupdt		= FALSE;
 char	*Dummy;
-char	**Xparams	&Dummy;
+char	**Xparams	= &Dummy;
 
 struct modtabl
 {
@@ -21,48 +21,48 @@ struct modtabl
 	int	optn;
 };
 
-char	*Relpar[]
+char	*Relpar[] =
 {
 	"relation",	"hash",		"name",
-	"relid",	-1
+	"relid",	(char *) -1
 };
 
-char	*Attpar[]
+char	*Attpar[] =
 {
 	"attribute",	"hash",		"name",
 	"attrelid",	"attowner",	"#attid",
-	-1
+	(char *) -1
 };
 
-char	*Indpar[]
+char	*Indpar[] =
 {
 	"indexes",	"hash",		"name",
 	"irelidp",	"iownerp",	"",
-	"minpages",	"5",		-1
+	"minpages",	"5",		(char *) -1
 };
 
-char	*Trepar[]
+char	*Trepar[] =
 {
 	"tree",		"hash",		"name",
 	"treerelid",	"treeowner",	"treetype",
-	-1
+	(char *) -1
 };
 
-char	*Propar[]
+char	*Propar[] =
 {
 	"protect",	"hash",		"name",
 	"prorelid",	"proowner",	"",
-	"minpages",	"4",		-1
+	"minpages",	"4",		(char *) -1
 };
 
-char	*Intpar[]
+char	*Intpar[] =
 {
 	"integrities",	"hash",		"name",
 	"intrelid",	"intrelowner",	"",
-	"minpages",	"4",		-1
+	"minpages",	"4",		(char *) -1
 };
 
-struct modtabl Modtabl[]
+struct modtabl Modtabl[] =
 {
 	"relation",	&Relpar[0],	FALSE,	TRUE,	FALSE,
 	"attribute",	&Attpar[0],	FALSE,	TRUE,	FALSE,
@@ -213,7 +213,7 @@ char	*argv[];
 			j++;
 			av++;
 		}
-		j =+ 3;
+		j += 3;
 		smove(Fileset, Batchbuf.file_id);
 		if (retval = modify(j, Modtabl[i].parvec))
 		{

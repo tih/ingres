@@ -6,29 +6,17 @@ CFLAGS=-O
 LDFLAGS=-i
 YACC=$(BIN)/yyyacc
 YFLAGS=-s
-MODE=4700
-LIBMOD=644
 AR= ar
-OBJS= 	attfcn.o\
-	xdot.o\
-	main.o\
-	rngfcn.o\
-	tree.o\
-	norml.o\
-	call_p.o\
-	call_tree.o\
-	control.o\
-	format.o\
-	p_util.o\
-	getscr.o
+
+OBJS=	attfcn.o xdot.o main.o rngfcn.o tree.o norml.o call_p.o call_tree.o \
+	control.o format.o p_util.o getscr.o
 
 parser: y.tab.o parlib
-	$(CC) $(LDFLAGS) y.tab.o parlib $(LIBS) -o parser
+	$(CC) $(LDFLAGS) -o parser y.tab.o parlib $(LIBS)
 
 parlib: $(OBJS)
 	-$(AR) rvuc parlib $(OBJS)
-	cp parlib $(LIB)/parlib
-	chmod $(LIBMOD) $(LIB)/parlib
+	ranlib parlib
 
 y.tab.c: grammar.y yyerror.y tables.y
 	$(YACC) $(YFLAGS) grammar.y
@@ -36,9 +24,10 @@ y.tab.c: grammar.y yyerror.y tables.y
 grammar.y: master.grammar
 	grep -v "DDD" master.grammar > grammar.y 
 
-install: parser
-	cp parser $(BIN)/parser
-	chmod $(MODE) $(BIN)/parser
+install: parlib parser
+	install -c -m 644  parlib $(LIB)/parlib
+	ranlib $(LIB)/parlib
+	install -c -m 700 parser $(BIN)/parser
 
 clean:
-	rm *.o
+	rm -f parser parlib grammar.y y.tab.c *.o *.core a.out

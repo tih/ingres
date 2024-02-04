@@ -1,7 +1,5 @@
 .rs
-.sp 4
-.if n \!.
-.sp 15
+.sp 19
 .ce 50
 .if t .ig
 .tr % 

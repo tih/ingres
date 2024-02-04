@@ -15,7 +15,7 @@ int	l;
 
 	p = a;
 	q = b;
-	for (m = l; m > 0; m =- 1)
+	for (m = l; m > 0; m -= 1)
 		if (*p++ != *q++)
 			return(0);
 	return(1);

@@ -1,3 +1,6 @@
+# include	<sys/types.h>
+# include	<sys/dir.h>
+
 # include	"../ingres.h"
 # include	"../aux.h"
 # include	"../unix.h"
@@ -30,7 +33,7 @@ extern char	Ask;
 extern char	Superuser;
 extern char	All;
 extern char	Qrymod;
-int		Direc		CLOSEFILES - 1;
+int		Direc = CLOSEFILES - 1;
 extern int	Wait_action;
 
 /*
@@ -39,13 +42,6 @@ extern int	Wait_action;
 */
 int		Dburetflag;
 struct retcode	Dburetcode;
-
-struct direc
-{
-	int	inumber;
-	char	fname[15];
-};
-
 
 
 main(argc, argv)
@@ -63,6 +59,7 @@ char	*argv[];
 	char		**avp;
 	char		**fvp;
 	extern char	*Flagvect[];
+	char		*getnxtdb();
 
 	Proc_name = "RESTORE";
 
@@ -84,16 +81,16 @@ char	*argv[];
 		setexit();
 		if (Error)	/* if set, will cause skip to next database */
 			continue;
-		printf("\nRestoring database: %s\t", dbname);
+		printf("Restoring database \"%s\", ", dbname);
 
 		acc_init();
-		printf("owner: %s\n", lookucode(Admin.adowner));
+		printf("owner %s.\n", lookucode(Admin.adhdr.adowner));
 
 		/* set exclusive lock on data base */
 		db_lock(M_EXCL);
 
 		restore();	/* recover batch update and modify files */
-		printf("\tRecovery of batch files complete.\n");
+		printf("Recovery of batch files complete.\n");
 
 		/*
 		** second restart point for this database
@@ -103,7 +100,7 @@ char	*argv[];
 		setexit();
 		if (Error)		/* again, may cause skipping to next database */
 			continue;
-		printf("\tChecking system relations\n");
+		printf("Checking system relations.\n");
 
 
 		/*
@@ -123,7 +120,7 @@ char	*argv[];
 		**	handled else where in the system is in the correct
 		**	order.  All the other catalogs need to be reverse checked.
 		*/
-		checkatt();
+		checkatts();
 
 		/* only check the qrymod catalogs if qrymod is turned on */
 		if (Qrymod)
@@ -151,7 +148,8 @@ char	*argv[];
 		/* call PURGE if no errors */
 		if (!Berror && !Error)
 		{
-			printf("\tCalling purge: ");
+			printf("Calling purge:\n");
+
 			if ((i = fork()) == -1)
 				printf("Can't fork\n");
 			else if (!i)
@@ -187,19 +185,18 @@ char	*argv[];
 */
 restore()
 {
-	struct direc		dir;
+	DIR			*dirp;
+	struct direct		*directp;
 	DESC			descr;
-	register struct direc	*d;
-	register int		dfd;
 	register int		i;
 	extern char		*Fileset;
 	extern 			uperr(), (*Exitfn)();
 	int			(*tmpfn)();
 
-	d = &dir;
-	if ((dfd = open(".", 0)) < 0)
+	if ((dirp = opendir(".")) == NULL)
 		syserr("cannot open database directory");
-	d->fname[14] = 0;
+	readdir(dirp);	/* skip "." */
+	readdir(dirp);	/* skip ".." */
 	bmove(Usercode, Utemp, 2);
 	Batch_recovery = 1;
 	tmpfn = Exitfn;
@@ -207,17 +204,15 @@ restore()
 
 	/* restart point */
 	setexit();
-	while (read(dfd, d, 16) == 16)
+	while ((directp = readdir(dirp)) != NULL)
 	{
-		if (d->inumber == 0)
-			continue;
-		if (bequal("_SYSbatch", d->fname, 9))
+		if (bequal("_SYSbatch", directp->d_name, 9))
 		{
-			Fileset = &d->fname[9];
+			Fileset = &directp->d_name[9];
 			Batch_fp = open(batchname(), 0);
 			Batch_cnt = BATCHSIZE;
 			getbatch(&Batchhd, sizeof(Batchhd));
-			printf("\tFound batch file:  %s\n", d->fname);
+			printf("\tFound batch file:  %s\n", directp->d_name);
 			printf("\tRelation: %s\tUser: %s\n", Batchhd.rel_name,
 				lookucode(Batchhd.userid));
 			close(Batch_fp);
@@ -225,12 +220,12 @@ restore()
 			if(ask("\tUpdate? "))
 				update();
 		}
-		if (bequal(MODBATCH, d->fname, sizeof(MODBATCH) - 1))
+		if (bequal(MODBATCH, directp->d_name, sizeof(MODBATCH) - 1))
 		{
 
-			Fileset = &d->fname[sizeof(MODBATCH) - 1];
-			if ((Batch_fp = open(d->fname, 0)) < 0)
-				syserr("Can't open %s", d->fname);
+			Fileset = &directp->d_name[sizeof(MODBATCH) - 1];
+			if ((Batch_fp = open(directp->d_name, 0)) < 0)
+				syserr("Can't open %s", directp->d_name);
 			Batch_cnt = 0;
 			if((i = getbatch(&descr, sizeof(descr))) != sizeof(descr))
 				syserr(" cant read %d",i);
@@ -245,7 +240,8 @@ restore()
 	}
 	bmove(Utemp, Usercode, 2);
 	Exitfn = tmpfn;
-	close(dfd);
+
+	closedir(dirp);
 }
 
 
@@ -299,7 +295,7 @@ rubproc()
 /*
 ** looks up user by usercode in users file
 */
-lookucode(ucode)
+char *lookucode(ucode)
 char	ucode[2];
 {
 	static char	buf[MAXLINE + 1];
@@ -497,7 +493,7 @@ checkrel()
 				if (ask("\tAdjust? "))
 				{
 					/* fix the bit */
-					rel.relstat =& ~S_PROTUPS;
+					rel.relstat &= ~S_PROTUPS;
 					if (i = replace(&Reldes, &rtid, &rel, FALSE))
 						syserr("CHECKREL: replace=%d", i);
 				}
@@ -512,7 +508,7 @@ checkrel()
 				if (ask("\tAdjust? "))
 				{
 					/* fix up the bit */
-					rel.relstat =& ~S_INTEG;
+					rel.relstat &= ~S_INTEG;
 					if (i = replace(&Reldes, &rtid, &rel, FALSE))
 						syserr("CHECKREL: replace=%d", i);
 				}
@@ -665,7 +661,7 @@ char	own[2];
 			printup(&Reldes, &rel);
 			if (ask("\tMark as indexed? "))
 			{
-				rel.relstat =| S_INDEX;
+				rel.relstat |= S_INDEX;
 				rel.relindxd = SECBASE;
 				if (i = replace(&Reldes, &rtid, &rel, FALSE))
 					syserr("ISNDX: replace=%d", i);
@@ -975,7 +971,7 @@ checkprotect()
 					{
 						if (i = delete(&Prodes, &pent))
 							syserr("CHECKPROTECT: delete=%d", i);
-						rel.relstat =& ~S_PROTUPS;
+						rel.relstat &= ~S_PROTUPS;
 						if (i = replace(&Reldes, &rtid, &rel, FALSE))
 							syserr("CHECKPROTECT: replace=%d", i);
 						continue;	/* go on to next tuple */
@@ -989,7 +985,7 @@ checkprotect()
 				printup(&Reldes, &rel);
 				if (ask("\tAdjust? "))
 				{
-					rel.relstat =| S_PROTUPS;
+					rel.relstat |= S_PROTUPS;
 					if (i = replace(&Reldes, &rtid, &rel, FALSE))
 						syserr("CHECKPROTECT: replace=%d", i);
 					continue;	/* go on to next tuple */
@@ -1025,7 +1021,7 @@ checkinteg()
 		opencatalog("relation", 2);
 		clearkeys(&Reldes);
 		setkey(&Reldes, &rkey, inent.intrelid, RELID);
-		setkey(&Reldes, &rkey, inent.intrelown, RELOWNER);
+		setkey(&Reldes, &rkey, inent.intrelowner, RELOWNER);
 
 		/* fetch the tuple if possible */
 		if (i = getequal(&Reldes, &rkey, &rel, &rtid))
@@ -1053,7 +1049,7 @@ checkinteg()
 			/* 'relation' entry exists, check for the tree entry */
 			if (inent.inttree >= 0)
 			{
-				if (!havetree(inent.intrelid, inent.intrelown, mdINTEG))
+				if (!havetree(inent.intrelid, inent.intrelowner, mdINTEG))
 				{
 					/* no tuples in 'tree' */
 					printf("\tNo tree for:\n\t");
@@ -1062,7 +1058,7 @@ checkinteg()
 					{
 						if (i = delete(&Intdes, &inent))
 							syserr("CHECKINTEG: delete=%d", i);
-						rel.relstat =& ~S_INTEG;
+						rel.relstat &= ~S_INTEG;
 						if (i = replace(&Reldes, &rtid, &rel, FALSE))
 							syserr("CHECKINTEG: replace=%d", i);
 						continue;	/* go on to next tuple */
@@ -1076,7 +1072,7 @@ checkinteg()
 				printup(&Reldes, &rel);
 				if (ask("\tAdjust? "))
 				{
-					rel.relstat =| S_INTEG;
+					rel.relstat |= S_INTEG;
 					if (i = replace(&Reldes, &rtid, &rel, FALSE))
 						syserr("CHECKINTEG: replace=%d", i);
 					continue;	/* go on to next tuple */

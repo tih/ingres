@@ -22,6 +22,7 @@ struct tup_id		*tid;
 	register struct accbuf		*b;
 	struct accbuf			*b1;
 	int				lk;		/* lock condition*/
+	struct accbuf			*choose_buf();
 
 	d = d1;
 #	ifdef xATR3
@@ -127,7 +128,7 @@ struct accbuf	*buf;
 				printf("pg %s:", locv(b->thispage));
 				syserr("pgflush mainpg %s", locv(b->mainpg));
 			}
-			b->bufstatus =& ~BUF_DIRTY;
+			b->bufstatus &= ~BUF_DIRTY;
 			if (lseek(b->filedesc, b->thispage * PGSIZE, 0) < 0 ||
 			    (write(b->filedesc, b, PGSIZE) != PGSIZE))
 			{

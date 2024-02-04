@@ -87,7 +87,7 @@ char	**pv;
 	opencatalog("attribute", 2);
 	setkey(&Attdes, &attkey, primary, ATTRELID);
 	setkey(&Attdes, &attkey, pridesc.relowner, ATTOWNER);
-	pc =- 2;
+	pc -= 2;
 	p = &pv[2];
 	dom = domain;
 	for (i = 0; i < pc; i++)
@@ -138,7 +138,7 @@ char	**pv;
 	}
 	newpv[newpc++] = "tidp";
 	newpv[newpc++] = "i4";
-	newpv[newpc] = -1;
+	newpv[newpc] = (char *) -1;
 #	ifdef xZTR1
 	if (tTf(5, 1))
 	{
@@ -168,7 +168,7 @@ char	**pv;
 		for (i = j = 0; j < ndoms; j++)
 		{
 			bmove(&primtup[dom->off], &systup[i], dom->frml);
-			i =+ dom->frml;
+			i += dom->frml;
 			dom++;
 		}
 		bmove(&tid, &systup[i], sizeof tid);		/* move in pointer */

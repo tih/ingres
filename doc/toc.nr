@@ -1,4 +1,4 @@
-.th "TABLE OF CONTENTS" INGRES 3/23/79
+.th "TABLE OF CONTENTS" INGRES 1995/04/27
 .s3
 .i0
 .in +4
@@ -105,18 +105,18 @@ qual\c
 DESTROY(QUEL) \- destroy existing relation(s)
 .br
 .bd destroy 
-relname {, relname}
+relname { , relname }
 .br
 .bd destroy 
-[\c
+[
 .bd permit
 |
-.bd integrity\c
+.bd integrity
 ] relname
-[\c
-integer {, integer}\c
+[
+integer { , integer }
 |
-.bd all\c
+.bd all
 ]
 .s3
 .i0
@@ -125,10 +125,10 @@ integer {, integer}\c
 HELP(QUEL) \- get information about how to use \*(II or about relations in the database.
 .br
 .bd help 
-[\c
-relname\c
-] [\c
-"section"\c
+[
+relname
+] [
+"section"
 ] 
 {, relname}{, "section"}
 .br
@@ -324,6 +324,18 @@ qual ]
 .i0
 .in +4
 .ti -4
+COPYDB(UNIX) \- create batch files to copy out a data base and restore it.
+.br
+.bd copydb
+[
+.bd \-u\c
+.it name
+] database full-path-name-of-directory
+[ relation ... ]
+.s3
+.i0
+.in +4
+.ti -4
 CREATDB(UNIX) \- create a data base
 .br
 .bd creatdb
@@ -365,6 +377,26 @@ EQUEL(UNIX) \- Embedded QUEL interface to C
 ] [ 
 .bd \-r
 ] file.q ...
+.s3
+.i0
+.in +4
+.ti -4
+GEO-QUEL(UNIX) \- \*(GQ data display system
+.br
+.bd geoquel
+[
+.bd \-s
+] [
+.bd \-d
+] [
+.bd \-a
+] [
+.bd \-t\c
+.it T
+] [ 
+.bd \-tn\c
+.it T
+] dbname
 .s3
 .i0
 .in +4
@@ -459,6 +491,25 @@ SYSMOD(UNIX) \- modify system relations to predetermined storage structures.
 .i0
 .in +4
 .ti -4
+TIMEFIX(UNIX) \- patch \*(II binary code for correct timezone.
+.br
+.bd timefix
+[
+.bd \-u
+] [
+.bd \-s\c
+.it N
+] [
+.bd \-t\c
+.it yyyzzz
+] [
+.bd \-d\c
+.it X
+] filename ...
+.s3
+.i0
+.in +4
+.ti -4
 USERSETUP(UNIX) \- setup users file
 .br
 .bd \&.../bin/usersetup
@@ -485,6 +536,12 @@ ERROR(FILES) \- files with \*(II errors
 .i0
 .in +4
 .ti -4
+GRAFILE(FILES) \- \*(GQ login message
+.br
+.s3
+.i0
+.in +4
+.ti -4
 LIBQ(FILES) \- Equel run-time support library
 .br
 .s3
@@ -498,6 +555,12 @@ PROCTAB(FILES) \- \*(II runtime configuration information
 .in +4
 .ti -4
 STARTUP(FILES) \- \*(II startup file
+.br
+.s3
+.i0
+.in +4
+.ti -4
+TTYTYPE(FILES) \- \*(GQ terminal type database
 .br
 .s3
 .i0
@@ -553,3 +616,10 @@ Error numbers 4500 \- 4999.
 DBU(ERROR) \- Data Base Utility error message summary
 .br
 Error numbers 5000 \- 5999
+.s3
+.i0
+.in +4
+.ti -4
+GEOQUEL(ERROR) \- \s-2GEO-QUEL\s0 error message summary
+.br
+Error numbers 30000 \- 30999.

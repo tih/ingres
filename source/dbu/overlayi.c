@@ -3,7 +3,7 @@ extern	create();
 extern	display();
 extern  dest_const();
 
-int	(*Func[])()
+int	(*Func[])() =
 {
 	&index,
 	&create,

@@ -43,7 +43,7 @@ int	type;
 
         ret = &IIr_sym;
 
-	if (ret->len =& 0377)
+	if (ret->len &= 0377)
 		if (IIrdpipe(P_NORM, &IIeinpipe, IIr_front, temp, 
 		    ret->len & 0377) != ret->len & 0377)
 			IIsyserr("IIn_ret: bad rdpipe-1 %d", ret->len &
@@ -60,7 +60,7 @@ int	type;
 #	endif
 
 
-	IIdomain++;
+	IIdomains++;
 	switch (type)
 	{
 
@@ -100,7 +100,7 @@ int	type;
 	  case FLOAT:
 		if (type == CHAR)
 		{
-			s = IIitos(IIdomain);
+			s = IIitos(IIdomains);
 			IIerrflag = 1000;
 			IIerror(1000, 1, &s);
 			return (0);
@@ -108,7 +108,7 @@ int	type;
 		if (IIconvert(temp, IIerrflag ? temp : addr,
 		   ret->type, ret->len & 0377, type, length) < 0)
 		{
-				s = IIitos(IIdomain);
+				s = IIitos(IIdomains);
 				IIerrflag = 1001;
 				IIerror(1001, 1, &s);
 		}
@@ -117,7 +117,7 @@ int	type;
 	  case CHAR:
 		if (type != CHAR)
 		{
-			s = IIitos(IIdomain);
+			s = IIitos(IIdomains);
 			IIerrflag = 1002;
 			IIerror(1002, 1, &s);
 			return (0);

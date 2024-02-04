@@ -17,7 +17,6 @@
 **
 **	Files:
 **		constants.h -- for globals.h
-**		.../fileio.h -- for globals.h
 **		globals.h -- for globals
 **
 **	History:
@@ -25,9 +24,14 @@
 **		8/28/78 -- (marc) modified for structure vars
 */
 
-# include	"../fileio.h"
+# include	<stdio.h>
+
 # include	"constants.h"
 # include	"globals.h"
+
+struct cvar	*dec_var(), *get_var();
+char		*nalloc(), *salloc();
+
 /*
 **  DECL_CVAR -- Declare a C variable
 **
@@ -123,7 +127,7 @@ int		block_level;
 **		8/24/78 -- (marc) written
 */
 
-dec_var(name, type, indir_level, block_level, local_tree, global_tree)
+struct cvar *dec_var(name, type, indir_level, block_level, local_tree, global_tree)
 char		*name;
 int		type, indir_level, block_level;
 struct cvar	**local_tree, **global_tree;
@@ -131,7 +135,7 @@ struct cvar	**local_tree, **global_tree;
 	register struct cvar		*cvarp;
 	register			i;
 
-	cvarp = nalloc(sizeof *cvarp);
+	cvarp = (struct cvar *) nalloc(sizeof *cvarp);
 	if (!cvarp)
 	{
 		yysemerr("unable to allocate space for a variable", name);
@@ -278,7 +282,7 @@ struct cvar	*local_tree, *global_tree;
 		}
 		if (!flag)
 		{
-			flag =+ 1;
+			flag += 1;
 			tree = global_tree;
 		}
 		else
@@ -306,7 +310,7 @@ struct cvar	*local_tree, *global_tree;
 **		6/1/78 -- (marc) written
 **
 */
-getcvar(id)
+struct cvar *getcvar(id)
 char		*id;
 {
 	return (get_var(id, C_locals, C_globals));
@@ -323,7 +327,7 @@ char		*id;
 */
 
 
-getfield(id)
+struct cvar *getfield(id)
 char		*id;
 {
 	return (get_var(id, F_locals, F_globals));

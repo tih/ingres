@@ -1,8 +1,11 @@
+# include	<stdio.h>
+# include	<sys/types.h>
+# include	<sys/dir.h>
+
 # include	"../ingres.h"
 # include	"../aux.h"
 # include	"../access.h"
 # include	"../lock.h"
-# include	"../fileio.h"
 
 /*
 ** These are subroutines common to RESTORE and PURGE.
@@ -15,8 +18,8 @@ char		Ask;
 char		Purge;
 char		Clean;
 char		Lastflag;
-FILE		*Direc;
-char		Direcbuf[IOBUFSIZ];
+DIR		*dirp;
+struct direct	*directp;
 extern int	Status;
 extern char	*Usercode;
 char		**Dblist;
@@ -111,13 +114,13 @@ char	**argv;
 		tTfp(40, 3, "doing all\n");
 #		endif
 		All++;
-		Direc = fopen(datadir, "read", Direcbuf);
-		if (Direc == NULL)
+		dirp = opendir(datadir);
+		if (dirp == NULL)
 		{
 			syserr("cannot read .../data/base");
 		}
-		l = 32;		/* fseek needs a long address */
-		fseek(Direc, l, 0);
+		readdir(dirp);	/* skip "." */
+		readdir(dirp);	/* skip ".." */
 	}
 #	ifdef	xTTR2
 	tTfp(40, 0, "leaving initialize\n");
@@ -142,13 +145,6 @@ sucheck()
 }
 
 
-struct directory
-{
-	int	inumber;
-	char	fname[14];
-	char	null;
-};
-
 /*
 **  GET NEXT DATABASE
 **
@@ -158,15 +154,13 @@ struct directory
 **	Getnxtdb() leaves the user in the database directory.
 */
 
-getnxtdb()
+char *getnxtdb()
 {
-	static struct directory	buf;
 	register char		*db;
 	register FILE		*fd;
 	register int		i;
 	extern struct admin	Admin;
 	static char		dbpbuf[MAXLINE];
-	char			fdbuf[IOBUFSIZ];
 
 #	ifdef	xTTR2
 	tTfp(41, 0, "entered getnxtdb\n");
@@ -175,18 +169,11 @@ getnxtdb()
 	{
 		if (All)
 		{
-			i = fread(Direc, &buf, 16);
-			if (i < 16)
+			directp = readdir(dirp);
+			if (directp == NULL)
 				db = NULL;
 			else
-			{
-				if (buf.inumber == 0)
-				{
-					continue;
-				}
-				db = buf.fname;
-			}
-			buf.null = 0;
+				db = directp->d_name;
 		}
 		else
 		{
@@ -223,13 +210,13 @@ getnxtdb()
 #		ifdef	xTTR2
 		tTfp(41, 4, "chdir ok, Superuser: %d\n", Superuser);
 #		endif
-		fd = fopen("admin", "r", fdbuf);
+		fd = fopen("admin", "r");
 		if (fd == NULL)
 		{
 			printf("Cannot open %s/admin\n", dbpbuf);
 			continue;
 		}
-		fread(fd, &Admin.adhdr, sizeof Admin.adhdr);
+		fread(&Admin.adhdr, sizeof Admin.adhdr, 1, fd);
 		fclose(fd);
 #		ifdef	xTTR2
 		tTfp(41, 5, "user: %.2s\n", Admin.adhdr.adowner);

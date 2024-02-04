@@ -47,7 +47,7 @@ struct querytree
 **	active VAR node for this VAR.
 */
 
-struct
+struct qt_var
 {
 	char	filler[6];
 	char	varno;
@@ -67,7 +67,7 @@ struct
 **	It is TRUE only in the original ROOT node of the query.
 */
 
-struct
+struct qt_root
 {
 	char	filler[6];
 	char	tvarc;		/* total of var's in sub-tree */
@@ -77,7 +77,7 @@ struct
 	int	rootuser;	/* flag: TRUE if root of user generated query */
 };
 
-struct					/* RESDOM and AOP nodes */
+struct qt_res					/* RESDOM and AOP nodes */
 {
 	char	filler[6];
 	int	resno;			/* result domain number */
@@ -85,19 +85,19 @@ struct					/* RESDOM and AOP nodes */
 					** frmt and frml */
 };
 
-struct
+struct qt_ag
 {
 	char	filler[6];
 	char	filler2[4];		/* fill in over aop_type, frmt, and frml */
 	char	agfrmt, agfrml;		/* result format type and length for agg's */
 };
-struct
+struct qt_op
 {
 	char	filler[6];
 	int	opno;			/* operator number */
 };
 
-struct
+struct qt_v
 {
 	int	fill[2];
 	char	vtype;	/* variable type */
@@ -112,7 +112,8 @@ struct
 */
 struct srcid
 {
-	char	filler3[2];		/* type, length */
+	char	type;			/* type codes in symbol.h */
+	char	len;			/* length in bytes of value field */
 	int	srcvar;			/* variable number */
 	char	srcname[MAXNAME];	/* relation name */
 	char	srcown[2];		/* relation owner usercode */

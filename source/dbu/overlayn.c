@@ -5,7 +5,7 @@ null()
 }
 
 extern int	openr(), closer();
-int	(*Func[])()
+int	(*Func[])() =
 {
 	&null,
 	&null,

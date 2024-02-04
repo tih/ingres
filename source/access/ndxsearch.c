@@ -61,6 +61,7 @@ int			keyok;
 	struct accessparam		relparm;
 	int				top;
 	register			bottom;
+	char				*get_addr();
 
 	tid = tidx;
 	pagerr = 0;
@@ -95,7 +96,7 @@ int			keyok;
 		{
 			if (pagerr = get_page(d, tid))
 				break;	/* fatal error */
-			Acc_head->bufstatus =| BUF_DIRECT;  /* don't get confused */
+			Acc_head->bufstatus |= BUF_DIRECT;  /* don't get confused */
 			bottom = 0;
 			top = Acc_head->nxtlino - 1;
 			if (top >= SEARCHFUDGE)  /* we are past breakeven */
@@ -108,7 +109,7 @@ int			keyok;
 						keylen = d->relfrml[dno] & I1MASK;
 						if (i = icompare(&tuple[d->reloff[dno]], p, d->relfrmt[dno], keylen))
 							break;
-						p =+ keylen;
+						p += keylen;
 					}
 					/* if key is below directory, then we are in the bottom half */
 					if (i < 0 || (i == 0 && partialkey && mode < 0))
@@ -132,7 +133,7 @@ int			keyok;
 						keylen = d->relfrml[dno] & I1MASK;
 						if (j = icompare(&tuple[d->reloff[dno]], p, d->relfrmt[dno], keylen))
 							break;
-						p =+ keylen;
+						p += keylen;
 					}
 					/* if key is below directory, then we have passed the position */
 					if (j < 0)

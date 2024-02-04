@@ -118,7 +118,7 @@ char	**argv;
 #	endif
 	initproc("QRYMOD", argv);
 	acc_init();
-	Qbuf = qbufbuf;
+	Qbuf = (char *) qbufbuf;
 
 	/* determine user's terminal for protection algorithm */
 #	ifndef xV7_UNIX
@@ -128,6 +128,8 @@ char	**argv;
 #	endif
 #	ifdef xV7_UNIX
 	tty = ttyname(1);
+	if (bequal(tty, "/dev/", 5))
+		tty = &tty[5];
 	if (bequal(tty, "tty", 3))
 		tty = &tty[3];
 	pmove(tty, Terminal, 2, ' ');

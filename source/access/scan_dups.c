@@ -107,8 +107,8 @@ char			*tuple1;
 					/* not duplicates */
 					break;
 				}
-				tup1 =+ len;
-				tup2 =+ len;
+				tup1 += len;
+				tup2 += len;
 			}
 			if (tups_equal)
 				return (1);	/* duplicate */

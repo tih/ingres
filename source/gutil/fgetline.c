@@ -1,4 +1,4 @@
-# include	"../fileio.h"
+# include	<stdio.h>
 
 /*
 **  FGETLINE -- get line from file
@@ -41,7 +41,7 @@
 **		8/2/78 (eric) -- written
 */
 
-fgetline(buf, maxch, iop)
+char *fgetline(buf, maxch, iop)
 char	*buf;
 int	maxch;
 FILE	*iop;

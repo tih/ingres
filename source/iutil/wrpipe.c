@@ -48,7 +48,7 @@
 */
 
 extern int	write();		/* standard write function */
-int		(*Pi_wr_fn)()	&write;	/* pipe write function */
+int		(*Pi_wr_fn)() = &write;	/* pipe write function */
 
 wrpipe(mode, buf1, des, msg, n)
 int		mode;

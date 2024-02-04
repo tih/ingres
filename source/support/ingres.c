@@ -178,10 +178,10 @@ char		Fileset[10];
 char		*Database;
 extern char	*Dbpath;		/* defined in initucode */
 struct admin	Admin;			/* set in initucode */
-char		Fdesc[10]	{'?','?','?','?','?','?','?','?','?','?'};
+char		Fdesc[10] = {'?','?','?','?','?','?','?','?','?','?'};
 struct lockreq	Lock;
 char		Ptbuf[PTSIZE + 1];
-char		*Ptptr		Ptbuf;	/* ptr to freespace in Ptbuf */
+char		*Ptptr = Ptbuf;		/* ptr to freespace in Ptbuf */
 char		*Opt[MAXOPTNS + 1];
 int		Nopts;
 int		No_exec;		/* if set, don't execute */
@@ -285,7 +285,7 @@ char	**argv;
 		doflag(p, 0);
 
 	/* check for query modification specified for this database */
-	if ((Admin.adflags & A_QRYMOD) == 0)
+	if ((Admin.adhdr.adflags & A_QRYMOD) == 0)
 		doflag("-q", -1);
 
 	/* do the -u flag processing */
@@ -454,7 +454,7 @@ struct flag
 # define	F_INTERNAL	8	/* internal flag, e.g., -q */
 # define	F_EQUEL		9	/* EQUEL flag */
 
-struct flag	Flagok[]
+struct flag	Flagok[] =
 {
 	'a',		F_PLD|F_PLOK,	F_ACCPT,	0,
 	'b',		F_PLD|F_PLOK,	F_ACCPT,	U_DRCTUPDT,
@@ -485,7 +485,7 @@ struct flag	Flagok[]
 };
 
 /* list of valid retrieve into or index modes */
-char	*Relmode[]
+char	*Relmode[] =
 {
 	"isam",
 	"cisam",
@@ -531,7 +531,7 @@ int	where;
 	if ((f->flagperm != 0 && (Status & f->flagperm) == 0 &&
 	     (((f->flagstat & F_PLD) == 0) ? (p[0] == '+') : (p[0] == '-'))) ||
 	    ((f->flagstat & F_DBA) != 0 && (Status & U_SUPER) == 0 &&
-	     !bequal(Usercode, Admin.adowner, 2)))
+	     !bequal(Usercode, Admin.adhdr.adowner, 2)))
 	{
 		printf("You are not authorized to use the %s flag\n", p);
 		No_exec++;
@@ -728,6 +728,7 @@ buildint()
 	int			i;
 	int			j;
 	struct param		*pp;
+	char			*getptline();
 
 	/* scan the template */
 	pr = Proctab;
@@ -1021,7 +1022,7 @@ char	delim;
 **		1/8/77 -- written by eric
 */
 
-getptline()
+char *getptline()
 {
 	register char	c;
 	register char	*line;
@@ -1036,7 +1037,7 @@ getptline()
 		{
 			/* arrange to return zero next time too */
 			Ptptr--;
-			return (0);
+			return ((char *) 0);
 		}
 	}
 
@@ -1092,7 +1093,7 @@ getptline()
 **		1/8/78 -- written by eric
 */
 
-expand(s1, intflag)
+char *expand(s1, intflag)
 char	*s1;
 int	intflag;
 {

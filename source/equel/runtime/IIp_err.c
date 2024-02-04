@@ -119,6 +119,7 @@ char	*buf;
 {
 	register char	*cp;
 	char		ver[12];
+	char		*IIconcatv();
 
 	IIconcatv(ver, VERSION, 0);
 

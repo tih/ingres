@@ -1,9 +1,13 @@
 CC = cc
-LIBES =
+CFLAGS = -O
+LDFLAGS = -i
 OBJS = yyy0.o yyy1.o yyy2.o yyy3.o y4.o y5.o
 
 yyyacc: $(OBJS)
-	$(CC) $(OBJS) $(LIBES) -o yyyacc
+	$(CC) $(LDFLAGS) -o yyyacc $(OBJS)
 
 install: yyyacc
-	mv yyyacc ../../bin/yyyacc
+	install -c -m 751 yyyacc ../../bin/yyyacc
+
+clean:
+	rm -f yyyacc $(OBJS) *.core a.out

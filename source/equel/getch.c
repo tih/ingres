@@ -1,5 +1,6 @@
 #
-# include	"../fileio.h"
+# include	<stdio.h>
+
 # include	"constants.h"
 # include       "globals.h"
 
@@ -18,7 +19,6 @@
 **
 **	Files:
 **		globals.h
-**		.../fileio.h
 **
 **	Compilation Flags:
 **		xDEBUG -- to test Chardebug for 
@@ -56,7 +56,6 @@
 **		then a newline will be appended.
 **
 **	Requires:
-**		EOF - from .../fileio.h
 **		getc() - from utility library
 **		tst_include() - [include.c]
 **
@@ -78,7 +77,7 @@
 
 
 /* initializes peek buffer to be empty */
-int		Peekc [2]	{-1, -1};
+int		Peekc [2]	= {-1, -1};
 
 getch()
 {
@@ -93,7 +92,7 @@ getch()
 		/* have a backed up character */
 		ch = Peekc [0];
 		if (ch == '\n')
-			yyline =+ 1;
+			yyline += 1;
 		Peekc [0] = Peekc [1];
 		Peekc [1] = -1;
 	}
@@ -154,7 +153,7 @@ getch()
 			if (*cp == '\n')
 			{
 				Line_pos = 0;
-				yyline =+ 1;
+				yyline += 1;
 			}
 			else
 				Line_pos++;
@@ -162,7 +161,7 @@ getch()
 			break;
 		}
 	}
-	ch =& 0377;
+	ch &= 0377;
 
 #	ifdef xDEBUG
 	if (Chardebug)

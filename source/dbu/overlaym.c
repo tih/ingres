@@ -3,7 +3,7 @@ extern	create();
 extern	destroy();
 extern	resetrel();
 
-int	(*Func[])()
+int	(*Func[])() =
 {
 	&modify,
 	&create,

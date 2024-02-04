@@ -38,7 +38,6 @@ char		Phase;		/* set if in processing phase */
 
 /* query buffer stuff */
 FILE		*Qryiop;	/* the query buffer */
-char		Qryxxx[IOBUFSIZ];
 char		Newline;	/* set if last character was a newline */
 
 /* other stuff */

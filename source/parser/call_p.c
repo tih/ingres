@@ -37,6 +37,7 @@ char	*msg;
 {
 	register char	*p;
 	register char	*s;
+	char		*need();
 
 	s = msg;
 	p = need(Pbuffer, length(s) + 1);
@@ -47,11 +48,13 @@ char	*msg;
 	if (Pc >= PARGSIZE)
 		syserr("SETP: oflo args=%d", Pc);
 }
+
 initp()
 {
 	extern int	neederr();
+	char		*need();
 
 	initbuf(Pbuffer, PARBUFSIZ, PBUFOFLO, &neederr);
-	Pv = need(Pbuffer, PARGSIZE * (sizeof(*Pv)));
+	Pv = (char **) need(Pbuffer, PARGSIZE * (sizeof(*Pv)));
 	Pc = 0;
 }

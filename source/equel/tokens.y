@@ -18,7 +18,7 @@
 */
 
 
-struct optab	Kwrdtab []
+struct optab	Kwrdtab [] =
 {
 	"all",			ALL,			0,
 	"and",			LBOP,			0,
@@ -98,9 +98,9 @@ struct optab	Kwrdtab []
 ** Kwrdtab, which is only known here
 */
 
-int	Kwrdnum		sizeof Kwrdtab / sizeof Kwrdtab [0];
+int	Kwrdnum		= sizeof Kwrdtab / sizeof Kwrdtab [0];
 
-struct optab	Optab []
+struct optab	Optab [] =
 {
 	/* PUNCTUATION */
 	",",			COMMA,			0,
@@ -143,7 +143,7 @@ struct optab	Optab []
 };
 
 
-struct special Tokens
+struct special Tokens =
 {
 	NAME,
 	SCONST,

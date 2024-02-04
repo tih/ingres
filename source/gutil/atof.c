@@ -87,8 +87,8 @@ double	*val;
 			c = *++p;
 			if (c < '0' || c > '9')
 				break;
-			fact =* 0.1;
-			v =+ (c - '0') * fact;
+			fact *= 0.1;
+			v += (c - '0') * fact;
 			gotmant++;
 		}
 	}
@@ -110,7 +110,7 @@ double	*val;
 		if (!gotmant)
 			v = 1.0;
 		fact = expon;
-		v =* pow(10.0, fact);
+		v *= pow(10.0, fact);
 	}
 	else
 	{

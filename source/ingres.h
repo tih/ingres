@@ -131,7 +131,9 @@
 
 # define	TRUE		1		/* logical one, true, yes, ok, etc.*/
 # define	FALSE		0		/* logical zero, false, no, nop, etc. */
-# define	NULL		0		/* the null pointer or null character */
+# ifndef	NULL
+# define	NULL		0
+# endif
 
 # define	i_1		char
 # define	i_2		int
@@ -152,6 +154,13 @@
 
 # define	RELID		1	/* domain for setkey */
 # define	RELOWNER	2
+
+/*
+**	Note carefully!
+**
+**	Do not change this struct without changing the exact copy
+**	of it occuring at the beginning of the descriptor struct!
+*/
 
 struct relation
 {
@@ -213,9 +222,25 @@ struct attribute
 
 struct descriptor
 {
-	struct relation	reldum;
+	c_12	relid[MAXNAME];	/* relation name	*/
+	c_2	relowner[2];	/* code of relation owner */
+	i_1	relspec;	/* storage mode of relation	*/
+				/* M_HEAP  unsorted paged heap	*/
+				/* -M_HEAP compressed heap	*/
+				/* M_ISAM  isam			*/
+				/* -M_ISAM compressed isam	*/
+				/* M_HASH  hashed		*/
+				/* -M_HASH compressed hash	*/
+	i_1	relindxd;	/* -1 rel is an index, 0 not indexed, 1 indexed */
+	i_2	relstat;	/* relation status bits */
+	i_4	relsave;	/*unix time until which relation is saved*/
+	i_4	reltups;	/*number of tuples in relation	*/
+	i_2	relatts;	/*number of attributes in relation	*/
+	i_2	relwid;		/*width (in bytes) of relation	*/
+	i_4	relprim;	/*no. of primary pages in relation*/
+	i_4	relspare;	/*not used yet*/
 		/*the above part of the descriptor struct is identical
-		  to the relation struct and the inormation in this
+		  to the relation struct and the information in this
 		  part of the struct is read directly from the
 		  relation tuple by openr.  the rest of the descriptor
 		  struct is calculated by openr.

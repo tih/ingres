@@ -66,14 +66,14 @@ struct querytree	*root;
 	int				attcnt, anyagg, attoff, twidth;
 	struct querytree		*makavar(), *agspace();
 
-	al = &alist;
+	al = alist;
 	Aggnext = al;
 
 	findagg(&root, root);	/* generate list of all aggregates */
 	Aggnext->agpoint = 0;	/* mark end of the list */
 	anyagg = 0;
 
-	varmap = root->lvarm | root->rvarm;
+	varmap = ((struct qt_root *)root)->lvarm | ((struct qt_root *)root)->rvarm;
 
 	/* process each aggregate */
 	for (;agg = al->agpoint; al++)
@@ -85,7 +85,7 @@ struct querytree	*root;
 		mapvar(agg, 0);	/* map the aggregate tree */
 		anyagg++;
 
-		Sourcevar = bitpos(agg->lvarm | agg->rvarm);
+		Sourcevar = bitpos(((struct qt_root *)agg)->lvarm | ((struct qt_root *)agg)->rvarm);
 #		ifdef xDTR1
 		if (tTf(6, 4))
 			printf("Sourcevar=%d,rel=%s\n", Sourcevar, rangename(Sourcevar));
@@ -101,11 +101,11 @@ struct querytree	*root;
 		{
 			/* simple aggregate */
 			rlist[0] = agspace(aop);
-			twidth = aop->frml & I1MASK;	/* init width to the width of the aggregate */
+			twidth = ((struct qt_var *)aop)->frml & I1MASK;	/* init width to the width of the aggregate */
 		}
 		else
 		{
-			attoff = agg->left->left->resno + 2;
+			attoff = ((struct qt_res *)agg->left->left)->resno + 2;
 			aop = aop->right;	/* find the AOP node */
 			/* assign  new source variable for aggregate */
 			al->agvarno = getrange(&varmap);
@@ -288,11 +288,11 @@ struct querytree	*aop;
 	struct querytree		*need();
 
 	a = aop;
-	length = a->frml & I1MASK;
+	length = ((struct qt_var *)a)->frml & I1MASK;
 
 	r = need(Qbuf, length + 6);
 	r->left = r->right = 0;
-	r->sym.type = a->frmt;
+	r->sym.type = ((struct qt_var *)a)->frmt;
 	r->sym.len = length;
 
 	return (r);
@@ -321,7 +321,7 @@ int			domno;
 		printf("agg width %d,dom %d\n", width, domno);
 #	endif
 
-	width =+ (aop->frml & I1MASK);
+	width += (((struct qt_var *)aop)->frml & I1MASK);
 
 	if (width > MAXTUP || domno > MAXDOM - 1)
 		return (1);
@@ -376,7 +376,7 @@ int	*varmap;
 		if ((bit = 1 << i) & map)
 			continue;
 
-		map =| bit;	/* "or" bit into the map */
+		map |= bit;	/* "or" bit into the map */
 		*varmap = map;
 
 #		ifdef xDTR1
@@ -424,9 +424,9 @@ struct querytree	*aop2;
 		else
 			ok = FALSE;
 	/* The two aggregates must range over the same variables */
-	if ((agg1->lvarm | agg1->rvarm) != (aghead2->lvarm | aghead2->rvarm))
+	if ((((struct qt_root *)agg1)->lvarm | ((struct qt_root *)agg1)->rvarm)
+		!= (((struct qt_root *)aghead2)->lvarm | ((struct qt_root *)aghead2)->rvarm))
 		ok = FALSE;
-
 
 	/* check the qualifications */
 	if (ok)
@@ -478,9 +478,10 @@ struct querytree	*root;
 	struct querytree		**tpr, *tree, *lnodv[MAXDOM+2];
 	struct hitlist			hlist[30];
 	int				anyop, i, usedmap, vars, treemap;
+	extern struct querytree		*makavar();
 
 	/* compute bitmap of all possible vars in tree (can include xtra vars) */
-	treemap = root->lvarm | root->rvarm;
+	treemap = ((struct qt_root *)root)->lvarm | ((struct qt_root *)root)->rvarm;
 	anyop = FALSE;
 
 	/* scan the list of aggregates looking for one nested in root */
@@ -535,8 +536,8 @@ struct querytree	*root;
 					/* if it is already a var, just change it */
 					if (tree->sym.type == VAR)
 					{
-						tree->varno = al->agvarno;
-						tree->attno = i + 2;
+						((struct qt_var *)tree)->varno = al->agvarno;
+						((struct qt_var *)tree)->attno = i + 2;
 					}
 					else
 						*tpr = makavar(lnodv[i], al->agvarno, i + 2);
@@ -591,17 +592,17 @@ int			*replmap;
 			Hnext->trepr = pnode;
 			Hnext->byno = i;
 			Hnext++;
-			*replmap =| vars;
+			*replmap |= vars;
 			return (0);
 		}
 	}
 	if (tree->sym.type == VAR)
-		return (01 << tree->varno);
+		return (01 << ((struct qt_var *)tree)->varno);
 
 	/* try the subtrees */
 	vars = modtree(&(tree->left), lnodv, replmap);
 	if ((vars & *replmap) == 0)
-		vars =| modtree(&(tree->right), lnodv, replmap);
+		vars |= modtree(&(tree->right), lnodv, replmap);
 
 	return (vars);
 }
@@ -617,7 +618,7 @@ struct querytree	*root;
 	for (r = last->right; r->sym.type != QLEND; r = r->right)
 	{
 		/* if this is an EQ node then check for an unnecessary compare */
-		if ((b = r->left)->sym.type == BOP && b->opno == opEQ)
+		if ((b = r->left)->sym.type == BOP && ((struct qt_op *)b)->opno == opEQ)
 		{
 			if (sameafcn(b->left, b->right))
 			{
@@ -698,7 +699,7 @@ struct querytree	*aghead;
 	}
 
 	if (type == VAR)
-		return (1 << tree->varno);
+		return (1 << ((struct qt_var *)tree)->varno);
 
 	return (varfind(tree->left, aghead) | varfind(tree->right, aghead));
 }

@@ -1,6 +1,9 @@
+# include	<stdio.h>
+# include	<sys/types.h>
+# include	<sys/dir.h>
+
 # include	"../ingres.h"
 # include	"../aux.h"
-# include	"../fileio.h"
 # include	"../access.h"
 
 /*
@@ -37,8 +40,6 @@ char	*argv[];
 	register int	i;
 	register char	*dbase;
 	int		superuser, mounted;
-	char		dbdbuf[IOBUFSIZ];
-	FILE		*iop;
 	char		**av;
 	register char	*p;
 	char		*q;
@@ -115,7 +116,7 @@ char	*argv[];
 
 	if (!superuser)
 	{
-		if (!bequal(Admin.adowner, Usercode, 2))
+		if (!bequal(Admin.adhdr.adowner, Usercode, 2))
 		{
 			printf("You are not the DBA for %s\n", dbase);
 			exit(-1);
@@ -125,11 +126,7 @@ char	*argv[];
 	if (chdir(Dbpath) < 0)
 		syserr("chdir %s", Dbpath);
 
-	iop = fopen(".", "r", dbdbuf);
-	if (iop == NULL)
-		syserr("Cannot open dot in %s", Dbpath);
-	clean(iop);
-	fclose(iop);
+	clean(".");
 
 	if (!mounted)
 	{
@@ -146,35 +143,24 @@ char	*argv[];
 
 
 
-clean(filep)
-FILE	*filep;
+clean(dirname)
+char	*dirname;
 {
-	struct direc
-	{
-		int	inum;
-		char	name[14];
-		char	null;
-	};
-	struct direc	cur;
-	register FILE	*f;
+	DIR		*dirp;
+	struct direct	*directp;
 
-	f = filep;
+	if ((dirp = opendir(dirname)) == NULL)
+		syserr("can't open \".\" for cleaning");
 
-	cur.null = 0;
-
-	/* skip "." and ".." entries */
-	fread(f, &cur, 16);
-	fread(f, &cur, 16);
-
-	/* scan directory */
-	while (fread(f, &cur, 16) == 16)
-	{
-		/* skip null entries */
-		if (cur.inum == 0)
+	while ((directp = readdir(dirp)) != NULL) {
+		if (!strcmp(directp->d_name, "."))
 			continue;
-
-		unlink(cur.name);
+		if (!strcmp(directp->d_name, ".."))
+			continue;
+		unlink(directp->d_name);
 	}
+
+	closedir(dirp);
 }
 
 

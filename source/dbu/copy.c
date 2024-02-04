@@ -1,9 +1,11 @@
+#include	<stdio.h>
+
 # include	"../ingres.h"
 # include	"../aux.h"
 # include	"../access.h"
 # include	"../symbol.h"
 # include	"../lock.h"
-# include	"../fileio.h"
+
 # define	BUFSIZE		1024
 # define	WBUFSIZE	512
 # define	MAXMAP		3 * MAXDOM
@@ -35,7 +37,6 @@ struct descriptor Des;		/* descriptor for copied relation     */
 extern struct out_arg	Out_arg;	/* user defined formats for numeric output */
 
 FILE	*File_iop;		/* i/o file pointer */
-char	Iobuf[IOBUFSIZ];	/* buffer for file i/o */
 char	*Filename;		/* pointer to file name */
 
 int	Into;			/* into is one if this is a copy into file */
@@ -49,7 +50,7 @@ long	Duptuple;		/* number of duplicate tuples */
 long	Baddoms;		/* number of domains with control chars */
 long	Truncount;		/* number of truncations on a c0 field */
 int	Piped[2];		/* pipe descriptor for copy communication */
-char	*Cpdomains[]		/* dummy domain names for copy "into" */
+char	*Cpdomains[] =		/* dummy domain names for copy "into" */
 {
 	"nl",		"\n",
 	"tab",		"\t",
@@ -64,7 +65,7 @@ char	*Cpdomains[]		/* dummy domain names for copy "into" */
 	0
 };
 
-char	Delimitor[]	",\n\t";	/* default delims for c0 & d0 */
+char	Delimitor[] =	",\n\t";	/* default delims for c0 & d0 */
 
 
 /*
@@ -190,7 +191,7 @@ char	**pv;
 		rubon();
 		/* if stat is != 0 then add on 5800 for error */
 		if (stat)
-			stat =+ 5800;
+			stat += 5800;
 		return (stat);	/* done */
 	}
 
@@ -203,7 +204,7 @@ char	**pv;
 #	endif
 	if (Into)	/* from relation into file */
 	{
-		if ((File_iop = fopen(Filename, "write", Iobuf)) == NULL) /* create file for user */
+		if ((File_iop = fopen(Filename, "w")) == NULL) /* create file for user */
 			i = error(5806, Filename, 0);	/* cant create file */
 		else
 		{
@@ -214,7 +215,7 @@ char	**pv;
 	}
 	else		/* from UNIX file into relation */
 	{
-		if ((File_iop = fopen(Filename, "read", Iobuf)) == NULL)
+		if ((File_iop = fopen(Filename, "r")) == NULL)
 			i = error(5805, Filename, 0);	/* cant open user file */
 		else
 		{
@@ -292,11 +293,11 @@ rel_file()
 				return (error(j, mp->paramname, &Inbuf[mp->roffset], locv(Tupcount), Relname, Filename, 0));
 			}
 			*cp = save;	/* restore the saved character */
-			offset =+ mp->flen;
+			offset += mp->flen;
 			mp++;
 		}
 		Tupcount++;
-		if (fwrite(File_iop, Outbuf, offset) != offset)
+		if (fwrite(Outbuf, 1, offset, File_iop) != offset)
 			syserr("copy:cant write to user file %s", Filename);
 	}
 	if (i < 0)
@@ -479,7 +480,7 @@ int	doff;	/* destination offset */
 			i = dl;
 		if (charmove(inp, outp, i))
 			Baddoms++;
-		for (outp =+ i; i<dl; i++)
+		for (outp += i; i<dl; i++)
 			*outp++ = ' ';
 		return (0);
 
@@ -573,6 +574,8 @@ char	**aptr;
 	struct	attribute	att;
 	struct tup_id		tid, limtid;
 	int			given, cnt;
+	char			*zcheck();
+	char			*dumvalue();
 
 	Mapcount = 0;
 	mp = Map;
@@ -757,7 +760,7 @@ char	**aptr;
 	mp = Map;
 	for (i = Mapcount; i--; mp++)
 	{
-		cnt =+ mp->flen;
+		cnt += mp->flen;
 		if (mp->ftype == DUMMY)
 			continue;
 		if (!mp->used)
@@ -786,7 +789,7 @@ struct map	*mp;
 	if (count)
 	{
 		/* block mode. read characters */
-		i = fread(File_iop, inp, count);
+		i = fread(inp, 1, count, File_iop);
 
 		/* null terminate */
 		*(inp + count) = '\0';
@@ -877,6 +880,7 @@ char	*param;
 
 {
 	register char	*np, *ret;
+	char *dumvalue();
 
 	np = param;
 	ret = Delimitor;	/* assume default delimitors */
@@ -916,7 +920,7 @@ char	*name;
 {
 	register char	**dp, *np, *ret;
 
-	dp = Cpdomain;	/* get list of valid dummy names */
+	dp = Cpdomains;	/* get list of valid dummy names */
 	np = name;
 	ret = 0;
 

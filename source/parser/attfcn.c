@@ -10,12 +10,12 @@
 **	these are provided by the system to a program only for debugging
 **	the system source and do not have well defined (over time) meanings.
 */
-struct atstash	Faketid
+struct atstash	Faketid =
 {
 	0,	INT,	4,	"tid",	0
 };
 #ifdef	DISTRIB
-struct atstash	Fakesid
+struct atstash	Fakesid =
 {
 	0,	INT,	4,	"sid",	0
 };
@@ -33,7 +33,7 @@ struct rngtab	*rptr1;
 char		*attrib;
 {
 	register struct rngtab		*rptr;
-	register struct atstash		*current;
+	register struct atstash		*current, *sp;
 	int				ik;
 	struct attribute		tuple;
 	register struct attribute	*ktuple;
@@ -57,8 +57,8 @@ char		*attrib;
 #	endif
 
 	/* check to see if attrib is in stash */
-	if ((ik = attfind(rptr, attrib)) != 0)
-		return (ik);
+	if ((sp = attfind(rptr, attrib)) != 0)
+		return (sp);
 
 #	ifdef	xPTR2
 	tTfp(10, 2, "getting att info from relation\n");

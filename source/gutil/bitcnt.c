@@ -12,7 +12,7 @@ int	var;
 
 	j = var;
 
-	for (ret = 0, i = 1; i; i =<< 1)
+	for (ret = 0, i = 1; i; i <<= 1)
 		if (i & j)
 			ret++;
 

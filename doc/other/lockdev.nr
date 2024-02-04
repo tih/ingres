@@ -1,4 +1,5 @@
-.de sh			*** section heading
+.\"	*** section heading
+.de sh
 .if \\n(.$ .@d \\$1
 .ds @@ #\\n(#0
 .nr \\*(@@ +1
@@ -11,7 +12,8 @@
 .if !\\n(#0 .in 0
 .if \\n(#0 .@p
 ..
-.de @d			change section depth
+.\"	change section depth
+.de @d
 .nr #0 \\$1
 .if \\n(#0 .if !\\n(#1 .nr #1 0
 .if !\\n(#0 .nr #1 0
@@ -26,30 +28,36 @@
 .if \\n(#0-5 .if !\\n(#6 .nr #6 0
 .if !\\n(#0-5 .nr #6 0
 ..
-.de @p			print section heading
+.\"	print section heading
+.de @p
 .in \\n(#i*\\n(#0u
 .sp
 .ti -\\n(#i
 \\*(@n\&.\ \ \c
 ..
-.de up			*** move up heading number (2.1.1 -> 2.2)
+.\"	*** move up heading number (2.1.1 -> 2.2)
+.de up
 .sh -1
 ..
-.de ux			*** heading up, no increment (2.1.1 -> 2.1)
+.\"	*** heading up, no increment (2.1.1 -> 2.1)
+.de ux
 .nr _9 \\n(#0-1
 .if \\n(.$ .nr _9 +1
 .if \\n(.$ .nr _9 \\$1
 .@d \\n(_9
 .in \\n(#i*\\n(#0u
 ..
-.de dn			*** move down heading number (2.1.1 -> 2.1.1.1)
+.\"	*** move down heading number (2.1.1 -> 2.1.1.1)
+.de dn
 .sh +1
 ..
-.de gs			*** get section number
+.\"	*** get section number
+.de gs
 .ds ,\\$1 \\*(@n
 ..
 .nr #i 4
-.de PS			*** space after a section title
+.\"	*** space after a section title
+.de PS
 .sp 1
 ..
 .po 5
@@ -72,19 +80,19 @@ December 20, 1977
 INGRES version 6.1 has a fully implemented concurrency control
 mechanism.
 The INGRES system sets and clears locks by writing to
-a device called "/dev/lock".
+a device called "/dev/ingreslock".
 If the device cannot be opened for writing, INGRES
 runs without any concurrency control.
 
 Initially it is advisable to bring up INGRES without
 the concurrency device.
 If planned usage of the INGRES system requires concurrency
-control then the device "/dev/lock" must be installed
+control then the device "/dev/ingreslock" must be installed
 into your UNIX system.
 
 This document describes the procedure for installing
 the UNIX driver for
-"/dev/lock".
+"/dev/ingreslock".
 
 .sh 1
 Log in as root.
@@ -353,7 +361,7 @@ after unix has been rebooted.
 Execute the command:
 
 .nf
-	/etc/mknod  /dev/lock  c  major  0
+	/etc/mknod  /dev/ingreslock  c  major  0
 
 .fi
 where "major" is the major device number.
@@ -367,13 +375,13 @@ Now change the mode of the device to be writable by
 owner and owned by INGRES:
 
 .nf
-	chown ingres /dev/lock
-	chmod 200 /dev/lock
+	chown ingres /dev/ingreslock
+	chmod 200 /dev/ingreslock
 .fi
 .sh 1
 Done.
 .PS
-INGRES will now use the /dev/lock device for its
+INGRES will now use the /dev/ingreslock device for its
 concurrency control.
 A simple way to verify this is to try running
 (for example) "purge" on a data base while

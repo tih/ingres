@@ -1,6 +1,7 @@
+# include	<stdio.h>
+
 # include	"../ingres.h"
 # include	"../aux.h"
-# include	"../fileio.h"
 # include	"monitor.h"
 
 /*

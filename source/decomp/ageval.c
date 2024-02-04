@@ -43,13 +43,16 @@ struct querytree	*result[];	/* space for results */
 	char				agbuf[AGBUFSIZ];
 	int				temp_relnum, i;
 	extern int			derror();
+	extern struct querytree		*makroot();
+	extern struct querytree		*makresdom();
+	extern struct querytree		*makavar();
 
 	aghead = tree;
 	aop = aghead->left;
 	temp_relnum = NORESULT;
 
 	/* if PRIME or multi-var, form aggregate domain in temp relation */
-	if (prime(aop) || aghead->tvarc > 1)
+	if (prime(aop) || ((struct qt_root *) aghead)->tvarc > 1)
 	{
 		initbuf(agbuf, AGBUFSIZ, AGBUFFULL, &derror);
 
@@ -67,7 +70,7 @@ struct querytree	*result[];	/* space for results */
 
 			/* create resdom for new tree */
 			resdom = makresdom(agbuf, aop);
-			resdom->resno = ++i;
+			((struct qt_res *) resdom)->resno = ++i;
 			resdom->right = aop->right;
 
 			/* connect it to newtree */
@@ -79,7 +82,7 @@ struct querytree	*result[];	/* space for results */
 		}
 
 		/* make result relation */
-		temp_rel = mak_t_rel(newtree, "a", -1);
+		temp_relnum = mak_t_rel(newtree, "a", -1);
 
 		/* prepare for query */
 		mapvar(newtree, 0);

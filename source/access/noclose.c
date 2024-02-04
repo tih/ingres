@@ -51,7 +51,7 @@ struct descriptor	*d;
 		get_tuple(&Admin.adreld, &dx->reltid, &rel);
 
 		/* update the reltups field */
-		rel.reltups =+ dx->reladds;
+		rel.reltups += dx->reladds;
 		dx->reltups = rel.reltups;
 
 		/* put the tuple back */

@@ -1,4 +1,4 @@
-locv(lg)
+char *locv(lg)
 long	lg;
 {
 	register char	*a;
@@ -16,7 +16,7 @@ long	lg;
 	do
 	{
 		*j-- = lg % 10 + '0';
-		lg =/ 10;
+		lg /= 10;
 	} while (lg);
 	do
 	{

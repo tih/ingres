@@ -20,6 +20,7 @@ int		width;
 	char		*endpt;
 	int		cnt, offset, nextline;
 	int		linenum;
+	char		*get_addr();
 
 	linenum = tid->line_id & I1MASK;
 	offset = Acc_head->linetab[-linenum];
@@ -27,7 +28,7 @@ int		width;
 
 	startpt = get_addr(tid);
 	midpt = startpt + width;
-	endpt = &Acc_head->acc_buf[0] + Acc_head->linetab[-nextline];
+	endpt = &((struct raw_accbuf *)Acc_head)->acc_buf[0] + Acc_head->linetab[-nextline];
 
 	cnt = endpt - midpt;
 
@@ -38,11 +39,11 @@ int		width;
 	for (i = 0; i <= nextline; i++)
 	{
 		if (Acc_head->linetab[-i] > offset)
-			Acc_head->linetab[-i] =- width;
+			Acc_head->linetab[-i] -= width;
 	}
 
 	/* compact the space */
 	while (cnt--)
 		*startpt++ = *midpt++;
-	Acc_head->bufstatus =| BUF_DIRTY;
+	Acc_head->bufstatus |= BUF_DIRTY;
 }

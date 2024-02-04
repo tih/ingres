@@ -62,7 +62,7 @@ char	**parmv;
 	if (tTf(8, -1) || tTf(0, 8))
 		printf("entering print\n");
 #	endif
-	mode = parmv[parmc] + 2;
+	mode = (int) parmv[parmc] + 2;
 	opencatalog("attribute", 0);
 
 	for (pc = 0; pc < parmc; pc++)
@@ -103,7 +103,7 @@ char	**parmv;
 			if (mode == 0)
 				putchar('\014');	/* form feed */
 			printf("\n%s relation\n", name);
-			lineno =- 2;
+			lineno -= 2;
 		}
 	
 		find(&d, NOKEY, &tid, &limtid);
@@ -122,7 +122,7 @@ char	**parmv;
 				}
 				printeol();
 				printeh();
-				lineno =- 3;
+				lineno -= 3;
 			}
 	
 #			ifdef xZTM

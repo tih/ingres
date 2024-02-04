@@ -130,6 +130,8 @@ char	**argv;
 	**  '--' flag for later use.
 	*/
 
+	funcflag = NULL; /* tih */
+
 	for (vp = vect; *vp != NULL; vp++)
 	{
 		sp = *vp;
@@ -207,9 +209,9 @@ char	**argv;
 
 		/* read the parameters */
 		/*** this should check for overflow of stringbuf ***/
-		for (sp = stringbuf; j = rdpipe(P_NORM, &Pbuf, R_up, sp, 0); sp =+ j)
+		for (sp = stringbuf; j = rdpipe(P_NORM, &Pbuf, R_up, sp, 0); sp += j)
 			parmv[i++] = sp;
-		parmv[i] = -1;
+		parmv[i] = (char *) -1;
 #		ifdef xZTR1
 		if (tTf(1, 4))
 		{
@@ -235,7 +237,7 @@ char	**argv;
 #		endif
 		j = Funcid - '0';
 		if (Funcid >= 'A')
-			j =- 'A' - '9' -1;
+			j -= 'A' - '9' -1;
 		Dburetflag = FALSE;
 		i = (*Func[j])(i, parmv);
 #		ifdef xZTR1

@@ -125,12 +125,12 @@ char			*name;
 		/* can't open a view */
 		if (d->relstat & S_VIEW)
 		{
-			retval = acc_error(AMOPNVIEW_ERR);	/* view */
+			retval = acc_err(AMOPNVIEW_ERR);	/* view */
 			break;
 		}
 		if ((d->relfp = open(filename, filemode)) < 0)
 		{
-			retval = acc_error(AMNOFILE_ERR);	/* can't open file */
+			retval = acc_err(AMNOFILE_ERR);	/* can't open file */
 			break;
 		}
 		d->relopn = (d->relfp + 1) * 5;
@@ -263,7 +263,7 @@ struct descriptor	*dx;
 		if (d->relfrmt[dom] == 0)
 			numatts = 1;	/* force an error */
 	if (numatts)
-		i = acc_error(AMNOATTS_ERR);
+		i = acc_err(AMNOATTS_ERR);
 
 	flush_rel(&Admin.adattd, TRUE);
 

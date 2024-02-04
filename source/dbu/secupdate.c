@@ -79,8 +79,8 @@ struct descriptor	*rel;
 		}
 
 		/* the last domain is the "tidp" field */
-		keys[domcnt].pt_old = &oldtid;
-		keys[domcnt].pt_new = &newtid;
+		keys[domcnt].pt_old = (char *) &oldtid;
+		keys[domcnt].pt_new = (char *) &newtid;
 
 		/*
 		** Start reading the batch file and updating

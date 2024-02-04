@@ -1,5 +1,6 @@
 #
-# include	"../fileio.h"
+# include	<stdio.h>
+
 # include	"constants.h"
 # include	"globals.h"
 # include	"../unix.h"
@@ -141,7 +142,7 @@ char	**argv;
 
 	/* initializations for a new file */
 
-	C_code_flag = Pre_proc_flag = 0;
+	C_code_flg = Pre_proc_flg = 0;
 	yyline = Newline = Lineout = 1;
 	Block_level = Indir_level = In_string = Fillmode = 0;
 	Charcnt = Lastc = In_quote = 0;
@@ -239,7 +240,6 @@ char	**argv;
 equel(filename)
 char		*filename;
 {
-	char		in_buf [IOBUFSIZ];
 	char		o_file [100];
 	register	l;
 
@@ -259,12 +259,11 @@ char		*filename;
 	bmove(".c", bmove(filename, o_file, l - 2), 3);
 	Input_file_name = filename;
 	In_file = Out_file = NULL;
-	Ibuf = in_buf;
 
 
-	if ((In_file = fopen(filename, "read", in_buf)) == NULL)
+	if ((In_file = fopen(filename, "r")) == NULL)
 		printf("can't read file \"%s\"\n", filename);
-	else if ((Out_file = fopen(o_file, "write", Out_buf)) == NULL)
+	else if ((Out_file = fopen(o_file, "w")) == NULL)
 		printf("can't write file \"%s\"\n", o_file);
 	else if (!setjmp(Env))
 		yyparse();

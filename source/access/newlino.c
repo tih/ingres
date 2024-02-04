@@ -21,7 +21,7 @@ int	len;
 		{
 			/* found a free line number */
 			*lp = Acc_head->linetab[-nextlno];
-			Acc_head->linetab[-nextlno] =+ len;
+			Acc_head->linetab[-nextlno] += len;
 			return (newlno);
 		}
 		lp--;

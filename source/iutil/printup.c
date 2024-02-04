@@ -1,8 +1,9 @@
+# include	<stdio.h>
+
 # include	"../ingres.h"
 # include	"../aux.h"
 # include	"../access.h"
 # include	"../symbol.h"
-# include	"../fileio.h"
 
 # define	PAGELGTH	56
 
@@ -53,21 +54,21 @@ char	*value1;
 	{
 
 	  case INT:
-		value = valbuf;
+		value = (char *) valbuf;
 		bmove(value1, value, length);
 		switch (length)
 		{
 
 		  case 1:
-			printfatt(Out_arg.i1width, iocv(value->i1type));
+			printfatt(Out_arg.i1width, iocv(i1deref(value)));
 			break;
 
 		  case 2:
-			printfatt(Out_arg.i2width, iocv(value->i2type));
+			printfatt(Out_arg.i2width, iocv(i2deref(value)));
 			break;
 
 		  case 4:
-			printfatt(Out_arg.i4width, locv(value->i4type));
+			printfatt(Out_arg.i4width, locv(i4deref(value)));
 			break;
 
 		  default:
@@ -77,18 +78,18 @@ char	*value1;
 		return (0);
 
 	  case FLOAT:
-		value = valbuf;
+		value = (char *) valbuf;
 		bmove(value1, value, length);
 		switch (length)
 		{
 
 		  case 4:
-			ftoa(value->f4type, buf, Out_arg.f4width, Out_arg.f4prec, Out_arg.f4style);
+			ftoa(f4deref(value), buf, Out_arg.f4width, Out_arg.f4prec, Out_arg.f4style);
 			printfatt(Out_arg.f4width, buf);
 			break;
 
 		  case 8:
-			ftoa(value->f8type, buf, Out_arg.f8width, Out_arg.f8prec, Out_arg.f8style);
+			ftoa(f8deref(value), buf, Out_arg.f8width, Out_arg.f8prec, Out_arg.f8style);
 			printfatt(Out_arg.f8width, buf);
 			break;
 
@@ -99,15 +100,15 @@ char	*value1;
 		return (0);
 
 	  case CHAR:
-		length =& 0377;
-		fwrite(stdout, value1, length);
+		length &= 0377;
+		fwrite(value1, 1, length, stdout);
 		if ((length = Out_arg.c0width - length) > 0)
 			while (length--)
 				putc(' ', stdout);
 		return (0);
 
 	  case BINARY:
-		length =& 0377;
+		length &= 0377;
 		value = value1;
 		while (length--)
 			xputchar(*value++);
@@ -135,7 +136,7 @@ int	value;
 	register int	v;
 
 	w = width;
-	p = value;
+	p = (char *) value;
 	v = length(p);
 
 	if (v > w)
@@ -147,9 +148,9 @@ int	value;
 	}
 
 	/* output the field */
-	for (w =- v; w > 0; w--)
+	for (w -= v; w > 0; w--)
 		putc(' ', stdout);
-	fwrite(stdout, p, v);
+	fwrite(p, 1, v, stdout);
 }
 
 
@@ -242,7 +243,7 @@ char	*value1;
 	for ( ; i < length; i++)
 		putc(' ', stdout);
 
-	Printlgth =+ length + 1;
+	Printlgth += length + 1;
 }
 
 beginhdr()

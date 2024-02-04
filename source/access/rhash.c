@@ -35,13 +35,13 @@ char			key[MAXTUP];
 					addabyte(tmp, &bucket, knt++);
 		}
 	/* remove sign bit from bucket the hard way */
-	k = &bucket;
-	*k =& 077777;
+	k = (int *) &bucket;
+	*k &= 077777;
 #	ifdef xATR3
 	if (tTf(92, 8))
 		printf("rhash:hval=%s", locv(bucket));
 #	endif
-	bucket =% d->relprim;
+	bucket %= d->relprim;
 #	ifdef xATR3
 	if (tTf(92, 8))
 		printf(",returning %s\n", locv(bucket));
@@ -65,7 +65,7 @@ int	knt1;
 
 	knt = knt1;
 	i = ch & 0377;	/*get rid of any sign extension*/
-	knt =+ 8 * (knt & 3);	/*alternately add 0, 8, 16 or 24 to knt */
-	knt =& 037;
-	*word =^ (i << (knt) | i >> (32 - knt));
+	knt += 8 * (knt & 3);	/*alternately add 0, 8, 16 or 24 to knt */
+	knt &= 037;
+	*word ^= (i << (knt) | i >> (32 - knt));
 }

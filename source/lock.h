@@ -11,6 +11,7 @@
 # define	A_SLP		2
 # define	A_RLS1		3
 # define	A_RLSA		4
+# define	A_ABT		5
 # define	KEYSIZE		12
 struct lockreq
 {
@@ -30,6 +31,7 @@ struct lockreq
 					 *	=1 exclusive lock
 					 *	=2 shared lock
 					*/
+	char	lpad;			/* padding to align the key */
 					/* key for the lock */
 	char	dbnode[4];		/* inode of data base */
 	char	lrel[4];		/* relation tid */

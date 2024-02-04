@@ -6,7 +6,7 @@
 /* tTf flag 87	TTF	put_tuple() */
 
 put_tuple(tid, tuple, length)
-struct tud_id	*tid;
+struct tup_id	*tid;
 char		*tuple;
 int		length;
 
@@ -34,7 +34,7 @@ int		length;
 	bmove(tuple, tp, length);
 
 	/* mark page as dirty */
-	Acc_head->bufstatus =| BUF_DIRTY;
+	Acc_head->bufstatus |= BUF_DIRTY;
 }
 
 

@@ -1,8 +1,9 @@
+# include	<stdio.h>
+
 # include	"../ingres.h"
 # include	"../aux.h"
 # include	"../access.h"
 # include	"../lock.h"
-# include	"../fileio.h"
 
 
 extern int	Status;
@@ -185,7 +186,7 @@ char 	*argv[];
 
 	for (nc = 1; Parmvect[nc] != NULL; nc++)
 		continue;
-	Parmvect[nc] = mode;
+	Parmvect[nc] = (char *) mode;
 
 	/*
 	**  Check for usage errors.
@@ -213,7 +214,6 @@ char 	*argv[];
 	/* initialize access methods (and Admin struct) for user_ovrd test */
 	acc_init();
 
-	set_so_buf();
 #	ifdef xTTR1
 	if (tTf(1, 1))
 		printf("printing %s\n", p);

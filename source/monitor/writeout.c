@@ -1,6 +1,7 @@
+# include	<stdio.h>
+
 # include	"../ingres.h"
 # include	"../aux.h"
-# include	"../fileio.h"
 # include	"monitor.h"
 
 /*
@@ -19,6 +20,7 @@ writeout()
 	register int	source;
 	int		dest;
 	char		buf[512];
+	char		*getfilename();
 
 	file = getfilename();
 	if (file[0] == 0 || file[0] == '-')

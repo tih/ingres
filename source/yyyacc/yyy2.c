@@ -94,7 +94,7 @@ setup(argc,argv) int argc; char *argv[];
 						fprintf(Fout,  "#define yyclearin yychar = -1\n" );
 						fprintf(Fout,  "#define yyerrok yyerrflag = 0\n" );
 						fprintf(Fout,  "extern int yychar, yyerrflag;\n" );
-						fprintf(Fout, "\nint yyval 0;\nint *yypv;\nint yylval 0;");
+						fprintf(Fout, "\nint yyval = 0;\nint *yypv;\nint yylval = 0;");
 						fprintf(Fout, "\nyyactr(__np__){\n");
 						}
 					break;
@@ -140,7 +140,7 @@ setup(argc,argv) int argc; char *argv[];
 			mem++;
 			if(i==0) error("missing :");
 			continue;
-	case '=':		levprd[nprod] =| 04;
+	case '=':		levprd[nprod] |= 04;
 				if( i==0 ) error("semicolon preceeds action");
 			fprintf(Fout,  rflag?"\n%d ":"\ncase %d:", nprod );
 			cpyact();
@@ -289,7 +289,7 @@ begin:
 	reserve = 0;
         if( peekc>=0 ) {
 		c = peekc;
-		lineno =+ peekline;
+		lineno += peekline;
 		peekc = -1;
 		peekline = 0;
 		}
@@ -392,7 +392,7 @@ begin:
 
 	if( peekc != ':' ) return( IDENTIFIER );
 	peekc = -1;
-	lineno =+ peekline;
+	lineno += peekline;
 	peekline = 0;
 	return( C_IDENTIFIER );
 }

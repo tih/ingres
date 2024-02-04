@@ -24,6 +24,7 @@ struct lpage
 	char	lpg0, lpgx;
 	char	lpg2, lpg1;
 };
+
 /* pluck_page extracts the three byte page_id from the tup_id struct
 ** and puts it into a long variable with proper allignment.
 */
@@ -32,10 +33,11 @@ pluck_page(tid, var)
 struct tup_id	*tid;
 long		*var;
 {
-	register char	*t, *v;
+	register struct tup_id	*t;
+	register struct lpage	*v;
 
 	t = tid;
-	v = var;
+	v = (struct lpage *) var;
 	v->lpg0 = t->pg0;
 	v->lpg1 = t->pg1;
 	v->lpg2 = t->pg2;
@@ -44,13 +46,15 @@ long		*var;
 }
 
 /*	stuff_page is the reverse of pluck_page	*/
+
 stuff_page(tid, var)
 struct tup_id	*tid;
 long		*var;
 {
-	register char	*v, *t;
+	register struct tup_id	*t;
+	register struct lpage	*v;
 
-	v = var;
+	v = (struct lpage *) var;
 	t = tid;
 	t->pg0 = v->lpg0;
 	t->pg1 = v->lpg1;

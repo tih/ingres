@@ -53,11 +53,11 @@ char			*buf;
 	register struct querytree	**qp;
 	register struct complist	*clist;
 	register int			ovlapvar;
-	struct complist			*cp;
+	struct complist			*cp, *buildlist(), *order();
 	int				i, onepiece, qtrue, map;
 	int				mark, mark1, cand_map;
-	struct querytree		*tree, *newtree;
-	struct querytree		*qlist[MAXRANGE];
+	struct querytree		*tree, *newtree, *construct();
+	struct querytree		*qlist[MAXRANGE], *copy_ands();
 	int				newqmode;
 	int				ovlaprelnum, newr;
 	int				locrange[MAXRANGE];
@@ -65,11 +65,11 @@ char			*buf;
 #	ifdef xDTR1
 	if (tTf(15, -1))
 	{
-		printf("DECISION root=%l,vc=%d,res=%d\n", root, root->tvarc, result_num);
+		printf("DECISION root=%l,vc=%d,res=%d\n", root, ((struct qt_root *)root)->tvarc, result_num);
 	}
 #	endif
 	mark = markbuf(buf);
-	if (root->tvarc < 3)
+	if (((struct qt_root *)root)->tvarc < 3)
 	{
 		/* setup to do as one single piece */
 		onepiece = TRUE;
@@ -86,7 +86,7 @@ char			*buf;
 #		endif
 
 		/* is query completely connected or disjoint */
-		map = root->lvarm | root->rvarm;
+		map = ((struct qt_root *)root)->lvarm | ((struct qt_root *)root)->rvarm;
 		onepiece = algorithm(clist, map);
 #		ifdef xDTR1
 		if (tTf(15, 1))
@@ -106,11 +106,11 @@ char			*buf;
 			*/
 
 			cand_map = map;
-			for (i = 1; cand_map; i =<< 1)
+			for (i = 1; cand_map; i <<= 1)
 			{
 				if ((cand_map & i) == 0)
 					continue;
-				cand_map =& ~i;
+				cand_map &= ~i;
 				freebuf(buf, mark);
 				clist = buildlist(root, buf);
 				if (algorithm(clist, map & ~i) == 0)
@@ -346,11 +346,11 @@ char			*buf;
 	/* for each piece, if it redefines ovlapvar, then fix up rest */
 	for (qp = qlist; piece = *qp++; )
 	{
-		if (piece->lvarm & ovmap)
+		if (((struct qt_root *)piece)->lvarm & ovmap)
 		{
 			for (qp1 = qp; next = *qp1++; )
 			{
-				if ((next->lvarm | next->rvarm) & ovmap)
+				if ((((struct qt_root *)next)->lvarm | ((struct qt_root *)next)->rvarm) & ovmap)
 				{
 					tempvar(next, mksqlist(piece, ovlapvar), buf);
 					buf = NULL;	/* do not allocate on subsequent refs */
@@ -418,12 +418,12 @@ char			*buf;
 	** if the last tree referenced the overlap variable then
 	** try to fix next tree
 	*/
-	if (tree->rvarm & map)
+	if (((struct qt_root *)tree)->rvarm & map)
 	{
 		qp = qp1;
 		while (next = *qp++)
 		{
-			if ((next->lvarm | next->rvarm) & map)
+			if ((((struct qt_root *)next)->lvarm | ((struct qt_root *)next)->rvarm) & map)
 				dfind(next, buf, mksqlist(tree, var));
 		}
 	}

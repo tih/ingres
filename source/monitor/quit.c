@@ -1,6 +1,7 @@
+# include	<stdio.h>
+
 # include	"../ingres.h"
 # include	"../aux.h"
-# include	"../fileio.h"
 # include	"../pipes.h"
 # include	"monitor.h"
 
@@ -19,7 +20,7 @@
 */
 
 /* list of fatal signals */
-char	*Siglist[]
+char	*Siglist[] =
 {
 	"Signal 0",
 	"hangup",

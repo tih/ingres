@@ -91,18 +91,18 @@ struct querytree	*root1;
 
 	root = root1;
 
-	map = root->lvarm | root->rvarm;
+	map = ((struct qt_root *)root)->lvarm | ((struct qt_root *)root)->rvarm;
 
 	min = -1;
 	lx = 0;
 	rx = NULL;
 
-	for (i = 1, var = 0; map; i =<< 1, var++)
+	for (i = 1, var = 0; map; i <<= 1, var++)
 	{
 		if ((map & i) == 0)
 			continue;
 
-		map =& ~i;
+		map &= ~i;
 		rt = &Rangev[var];
 		if (rx == NULL)
 		{
@@ -181,9 +181,9 @@ struct rang_tab		*rx;
 		l = rel_pages(r->rtcnt, r->rtwid);
 
 		/* if not in target list, assume 1/4 */
-		if ((root->lvarm & (01 << i)) == 0)
+		if ((((struct qt_root *)root)->lvarm & (01 << i)) == 0)
 		{
-			l =>> 2;
+			l >>= 2;
 			if (l == 0)
 				l = 1;
 		}

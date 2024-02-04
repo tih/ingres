@@ -27,7 +27,7 @@ char	mod;
 	for (i = 0; i < 4; i++)
 			/* zero out page id */
 		*r++ = 0;
-	i = write(Alockdes, &Lock, KEYSIZE+3);
+	i = write(Alockdes, &Lock, sizeof(struct lockreq));
 	return(i);
 }
 /*
@@ -52,6 +52,6 @@ long	rtid;
 	for (i = 0; i < 4; i++)
 			/* zero out pageid */
 		*r++ = 0;
-	i = write(Alockdes, &Lock, KEYSIZE + 3);
+	i = write(Alockdes, &Lock, sizeof(struct lockreq));
 	return (i);
 }

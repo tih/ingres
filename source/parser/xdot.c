@@ -26,6 +26,8 @@ struct rngtab	*rptr;
 	register struct querytree	*vnode;
 	int				ik;
 	register struct atstash		*aptr;
+	struct querytree		*tree();
+	struct querytree		*addresdom();
 
 #	ifdef	xPTR2
 	tTfp(15, 0, "ALL being processed for %s\n", rptr->relnm);

@@ -13,8 +13,8 @@ char	*ax, *bx, frmt, frml;
 	length = frml & I1MASK;
 	if (frmt == CHAR)
 		return (scompare(ax, length, bx, length));
-	a = atemp;
-	b = btemp;
+	a = (char *) atemp;
+	b = (char *) btemp;
 	bmove(ax, a, length);
 	bmove(bx, b, length);
 	if (bequal(a, b, length))
@@ -25,20 +25,20 @@ char	*ax, *bx, frmt, frml;
 		switch (length)
 		{
 		  case 1:
-			return (a->i1type - b->i1type);
+			return (i1deref(a) - i1deref(b));
 		  case 2:
-			return (a->i2type - b->i2type);
+			return (i2deref(a) - i2deref(b));
 		  case 4:
-			return (a->i4type > b->i4type ? 1 : -1);
+			return (i4deref(a) > i4deref(b) ? 1 : -1);
 		};
 	  case FLOAT:
 		if (frml == 4)
 		{
-			return (a->f4type > b->f4type ? 1 : -1);
+			return (f4deref(a) > f4deref(b) ? 1 : -1);
 		}
 		else
 		{
-			return (a->f8type > b->f8type ? 1 : -1);
+			return (f8deref(a) > f8deref(b) ? 1 : -1);
 		}
 	};
 }

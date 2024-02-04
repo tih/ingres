@@ -1,5 +1,6 @@
 #
-# include	"../fileio.h"
+# include	<stdio.h>
+
 # include	"constants.h"
 # include	"globals.h"
 
@@ -26,7 +27,6 @@
 **
 **	Files:
 **		globals.h
-**		../fileio.h
 **		constants.h
 **
 **	History:

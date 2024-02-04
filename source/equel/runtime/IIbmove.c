@@ -11,6 +11,7 @@
 **
 */
 
+char *
 IIbmove(s, d, l)
 char	*s, *d;
 int	l;

@@ -40,7 +40,7 @@ char			*buf;
 {
 	register struct querytree	*v, *sq, *nod;
 	int				attno;
-	struct querytree		*ckvar();
+	struct querytree		*ckvar(), *need();
 
 	if ((nod = node) == NULL)
 		return;
@@ -48,17 +48,17 @@ char			*buf;
 	if (nod->sym.type == VAR )
 	{
 		nod = ckvar(nod);
-		if (sq = sqlist[nod->varno])
+		if (sq = sqlist[((struct qt_var *)nod)->varno])
 		{
 			/* This var has a subquery on it */
 
 			/* allocate a new VAR node */
 			if (buf)
 			{
-				v = nod->valptr = need(buf, 12);
-				v->left = v->right = v->valptr = 0;
+				v = (struct querytree *) (((struct qt_var *)nod)->valptr = (char *) need(buf, 12));
+				v->left = v->right = (struct querytree *) (((struct qt_var *)v)->valptr = (char *) 0);
 				bmove(&nod->sym, &v->sym, 6);
-				nod->varno = -1;
+				((struct qt_var *)nod)->varno = -1;
 			}
 			else
 				v = nod;
@@ -66,10 +66,10 @@ char			*buf;
 			/* search for the new attno */
 			for (sq = sq->left; sq->sym.type != TREE; sq = sq->left)
 			{
-				if (ckvar(sq->right)->attno == nod->attno) 
+				if (((struct qt_var *)ckvar(sq->right))->attno == ((struct qt_var *)nod)->attno) 
 				{
 	
-					v->attno = sq->resno;
+					((struct qt_var *)v)->attno = ((struct qt_res *)sq)->resno;
 #					ifdef xDTR1
 					if (tTf(12, 3))
 					{
@@ -81,7 +81,7 @@ char			*buf;
 					return;
 				}
 			}
-			syserr("tempvar:dom %d of %s missing", nod->attno, rangename(nod->varno));
+			syserr("tempvar:dom %d of %s missing", ((struct qt_var *)nod)->attno, rangename(((struct qt_var *)nod)->varno));
 		}
 		return;
 	}
@@ -111,13 +111,13 @@ struct querytree	*sqlist[];
 	t = node;
 	if (!t)
 		return;
-	if (t->sym.type == VAR && t->varno < 0)
+	if (t->sym.type == VAR && ((struct qt_var *)t)->varno < 0)
 	{
-		for (; t->valptr->varno<0; t=t->valptr);
-		if (sqlist[v=t->valptr->varno])
+		for (; ((struct qt_var *)((struct qt_var *)t)->valptr)->varno<0; t=(struct querytree *)(((struct qt_var *)t)->valptr));
+		if (sqlist[v=((struct qt_var *)((struct qt_var *)t)->valptr)->varno])
 		{
-			t->varno = v;
-			t->valptr = 0;
+			((struct qt_var *)t)->varno = v;
+			((struct qt_var *)t)->valptr = 0;
 		}
 		return;
 	}
@@ -145,7 +145,7 @@ struct querytree *node;
 	{
 		syserr("ckvar: not a VAR %d", t->sym.type);
 	}
-	while (t->varno < 0)
-		t = t->valptr;
+	while (((struct qt_var *)t)->varno < 0)
+		t = (struct querytree *)(((struct qt_var *)t)->valptr);
 	return(t);
 }

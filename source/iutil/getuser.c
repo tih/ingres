@@ -1,6 +1,7 @@
+# include	<stdio.h>
+
 # include	"../ingres.h"
 # include	"../aux.h"
-# include	"../fileio.h"
 
 /*
 **  GET LINE FROM USER FILE
@@ -21,7 +22,6 @@ char	*code;
 char	buf[];
 {
 	static FILE	*userf;
-	auto char	userbuf[IOBUFSIZ];
 	register char	c;
 	register char	*bp;
 	
@@ -39,14 +39,13 @@ char	buf[];
 	}
 	if (userf == NULL)
 	{
-		userf = fopen(ztack(Pathname, "/files/users"), "r", userbuf);
+		userf = fopen(ztack(Pathname, "/files/users"), "r");
 		if (userf == NULL)
 			syserr("getuser: open err");
 	}
 	else
 	{
 		rewind(userf);
-		setbuf(userf, userbuf, IOBUFSIZ);
 	}
 	
 	for (;;)
@@ -54,18 +53,15 @@ char	buf[];
 		bp = buf;
 		if (fgetline(bp, MAXLINE, userf) == NULL)
 		{
-			setbuf(userf, NULL);
 			return (1);
 		}
 		while ((c = *bp++) != ':')
 			if (c == '\0')
 			{
-				setbuf(userf, NULL);
 				return (1);
 			}
 		if (bequal(bp, code, 2))
 		{
-			setbuf(userf, NULL);
 			return (0);
 		}
 	}

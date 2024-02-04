@@ -1,13 +1,12 @@
 .de @h
 'sp 4
-'tl ''''
+'tl ''''
 'sp 2
 .ns
 ..
 .wh 0 @h
 .po 5
 .rs
-
 .sp 4
 .ce
 A TUTORIAL ON INGRES
@@ -84,7 +83,7 @@ Regents of the University of California and
 may not be reproduced or disclosed without
 the prior written permission of the owner.
 
-go
+go
 *
 
 .fi
@@ -121,24 +120,31 @@ The following then appears:
 
 parts relation
 
-|pnum  |pname               |color   |weight|qoh   |
-|--------------------------------------------------|
-|     1|central processor   |pink    |    10|     1|
-|     2|memory              |gray    |    20|    32|
-|     3|disk drive          |black   |   685|     2|
-|     4|tape drive          |black   |   450|     4|
-|     5|tapes               |gray    |     1|   250|
-|     6|line printer        |yellow  |   578|     3|
-|     7|l-p paper           |white   |    15|    95|
-|     8|terminals           |blue    |    19|    15|
-|    13|paper tape reader   |black   |   107|     0|
-|    14|paper tape punch    |black   |   147|     0|
-|     9|terminal paper      |white   |     2|   350|
-|    10|byte-soap           |clear   |     0|   143|
-|    11|card reader         |gray    |   327|     0|
-|    12|card punch          |gray    |   427|     0|
-|--------------------------------------------------|
-
+.fi
+.TS
+tab (@);
+|r|l|l|r|r|
+|r|l|l|r|r|.
+pnum@pname@color@weight@qoh
+_
+1@central processor@pink@10@1
+2@memory@gray@20@32
+3@disk drive@black@685@2
+4@tape drive@black@450@4
+5@tapes@gray@1@250
+6@line printer@yellow@578@3
+7@l-p paper@white@15@95
+8@terminals@blue@19@15
+13@paper tape reader@black@107@0
+14@paper tape punch@black@147@0
+9@terminal paper@white@2@350
+10@byte-soap@clear@0@143
+11@card reader@gray@327@0
+12@card punch@gray@427@0
+_
+.TE
+.nf
+
 continue
 *
 
@@ -218,25 +224,30 @@ Type the command:
 * \\g
 Executing . . .
 
+.fi
+.TS
+tab (@);
+|l|.
+pname
+_
+central processor
+memory
+disk drive
+tape drive
+tapes
+line printer
+l-p paper
+terminals
+paper tape reader
+paper tape punch
+terminal paper
+byte-soap
+card reader
+card punch
+_
+.TE
+.nf
 
-|pname               |
-|--------------------|
-|central processor   |
-|memory              |
-|disk drive          |
-|tape drive          |
-|tapes               |
-|line printer        |
-|l-p paper           |
-|terminals           |
-|paper tape reader   |
-|paper tape punch    |
-|terminal paper      |
-|byte-soap           |
-|card reader         |
-|card punch          |
-|--------------------|
-
 continue
 *
 
@@ -310,25 +321,30 @@ The correct query is:
 * \\g
 Executing . . .
 
+.fi
+.TS
+tab (@);
+|l|l|.
+pname@color
+_
+central processor|pink
+memory@gray
+disk drive@black
+tape drive@black
+tapes@gray
+line printer@yellow
+l-p paper@white
+terminals@blue
+paper tape reader@black
+paper tape punch@black
+terminal paper@white
+byte-soap@clear
+card reader@gray
+card punch@gray
+_
+.TE
+.nf
 
-|pname               |color   |
-|-----------------------------|
-|central processor   |pink    |
-|memory              |gray    |
-|disk drive          |black   |
-|tape drive          |black   |
-|tapes               |gray    |
-|line printer        |yellow  |
-|l-p paper           |white   |
-|terminals           |blue    |
-|paper tape reader   |black   |
-|paper tape punch    |black   |
-|terminal paper      |white   |
-|byte-soap           |clear   |
-|card reader         |gray    |
-|card punch          |gray    |
-|-----------------------------|
-
 continue
 *
 
@@ -344,15 +360,21 @@ only those parts which are gray, type:
 * \\g
 Executing . . .
 
+.fi
+.bp
+.TS
+tab (@);
+|l|l|.
+pname@color
+_
+memory@gray
+tapes@gray
+card reader@gray
+card punch@gray
+_
+.TE
+.nf
 
-|pname               |color   |
-|-----------------------------|
-|memory              |gray    |
-|tapes               |gray    |
-|card reader         |gray    |
-|card punch          |gray    |
-|-----------------------------|
-
 continue
 *
 
@@ -418,16 +440,21 @@ Now run the query:
 * \\g
 Executing . . .
 
+.fi
+.TS
+tab (@);
+|l|l|.
+pname@color
+_
+central processor@pink
+memory@gray
+tapes@gray
+card reader@gray
+card punch@gray
+_
+.TE
+.nf
 
-|pname               |color   |
-|-----------------------------|
-|central processor   |pink    |
-|memory              |gray    |
-|tapes               |gray    |
-|card reader         |gray    |
-|card punch          |gray    |
-|-----------------------------|
-
 continue
 *
 
@@ -474,7 +501,7 @@ Executing . . .
 
 2500: syntax error on line 1
 last symbol read was: *
-
+
 continue
 *
 
@@ -518,25 +545,31 @@ query for us.
 * \\g
 Executing . . .
 
+.fi
+.TS
+tab (@);
+|l|l|l|
+|l|r|r|.
+pname@pnum@tot
+_
+central processor@1@10
+memory@2@640
+disk drive@3@1370
+tape drive@4@1800
+tapes@5@250
+line printer@6@1734
+l-p paper@7@1425
+terminals@8@285
+paper tape reader@13@0
+paper tape punch@14@0
+terminal paper@9@700
+byte-soap@10@0
+card reader@11@0
+card punch@12@0
+_
+.TE
+.nf
 
-|pname               |pnum  |tot   |
-|----------------------------------|
-|central processor   |     1|    10|
-|memory              |     2|   640|
-|disk drive          |     3|  1370|
-|tape drive          |     4|  1800|
-|tapes               |     5|   250|
-|line printer        |     6|  1734|
-|l-p paper           |     7|  1425|
-|terminals           |     8|   285|
-|paper tape reader   |    13|     0|
-|paper tape punch    |    14|     0|
-|terminal paper      |     9|   700|
-|byte-soap           |    10|     0|
-|card reader         |    11|     0|
-|card punch          |    12|     0|
-|----------------------------------|
-
 continue
 *
 
@@ -591,13 +624,19 @@ Try the following:
 * \\g
 Executing . . .
 
+.fi
+.TS
+tab (@);
+|l|l|l|
+|l|r|r|.
+pname@pnum@tot
+_
+memory@2@640
+byte-soap@10@0
+_
+.TE
+.nf
 
-|pname               |pnum  |tot   |
-|----------------------------------|
-|memory              |     2|   640|
-|byte-soap           |    10|     0|
-|----------------------------------|
-
 continue
 *
 
@@ -611,19 +650,25 @@ equal to 10:
 * \\g
 Executing . . .
 
+.fi
+.TS
+tab (@);
+|l|l|l|
+|l|r|r|.
+pname@pnum@tot
+_
+disk drive@3@1370
+tape drive@4@1800
+tapes@5@250
+line printer@6@1734
+l-p paper@7@1425
+terminals@8@285
+terminal paper@9@700
+byte-soap@10@0
+_
+.TE
+.nf
 
-|pname               |pnum  |tot   |
-|----------------------------------|
-|disk drive          |     3|  1370|
-|tape drive          |     4|  1800|
-|tapes               |     5|   250|
-|line printer        |     6|  1734|
-|l-p paper           |     7|  1425|
-|terminals           |     8|   285|
-|terminal paper      |     9|   700|
-|byte-soap           |    10|     0|
-|----------------------------------|
-
 continue
 *
 
@@ -699,16 +744,22 @@ retrieve (p.pname,p.pnum,tot = p.qoh * p.weight)
 where p.pnum > 5 and p.pnum <= 10
 Executing . . .
 
+.fi
+.TS
+tab (@);
+|l|l|l|
+|l|r|r|.
+pname@pnum@tot
+_
+line printer@6@1734
+l-p paper@7@1425
+terminals@8@285
+terminal paper@9@700
+byte-soap@10@0
+_
+.TE
+.nf
 
-|pname               |pnum  |tot   |
-|----------------------------------|
-|line printer        |     6|  1734|
-|l-p paper           |     7|  1425|
-|terminals           |     8|   285|
-|terminal paper      |     9|   700|
-|byte-soap           |    10|     0|
-|----------------------------------|
-
 continue
 *
 
@@ -724,36 +775,42 @@ Type:
 * \\g
 Executing . . .
 
-
 supply relation
 
-|snum  |pnum  |jnum  |shipdate|quan  |
-|------------------------------------|
-|   475|     1|  1001|73-12-31|     1|
-|   475|     2|  1002|74-05-31|    32|
-|   475|     3|  1001|73-12-31|     2|
-|   475|     4|  1002|74-05-31|     1|
-|   122|     7|  1003|75-02-01|   144|
-|   122|     7|  1004|75-02-01|    48|
-|   122|     9|  1004|75-02-01|   144|
-|   440|     6|  1001|74-10-10|     2|
-|   241|     4|  1001|73-12-31|     1|
-|    62|     3|  1002|74-06-18|     3|
-|   475|     2|  1001|73-12-31|    32|
-|   475|     1|  1002|74-07-01|     1|
-|     5|     4|  1003|74-11-15|     3|
-|     5|     4|  1004|75-01-22|     6|
-|    20|     5|  1001|75-01-10|    20|
-|    20|     5|  1002|75-01-10|    75|
-|   241|     1|  1005|75-06-01|     1|
-|   241|     2|  1005|75-06-01|    32|
-|   241|     3|  1005|75-06-01|     1|
-|    67|     4|  1005|75-07-01|     1|
-|   999|    10|  1006|76-01-01|   144|
-|   241|     8|  1005|75-07-01|     1|
-|   241|     9|  1005|75-07-01|   144|
-|------------------------------------|
-
+.fi
+.TS
+tab (@);
+|l|l|l|l|l|
+|r|r|r|r|r|.
+snum@pnum@jnum@shipdate@quan
+_
+475@1@1001@73-12-31@1
+475@2@1002@74-05-31@32
+475@3@1001@73-12-31@2
+475@4@1002@74-05-31@1
+122@7@1003@75-02-01@144
+122@7@1004@75-02-01@48
+122@9@1004@75-02-01@144
+440@6@1001@74-10-10@2
+241@4@1001@73-12-31@1
+62@3@1002@74-06-18@3
+475@2@1001@73-12-31@32
+475@1@1002@74-07-01@1
+5@4@1003@74-11-15@3
+5@4@1004@75-01-22@6
+20@5@1001@75-01-10@20
+20@5@1002@75-01-10@75
+241@1@1005@75-06-01@1
+241@2@1005@75-06-01@32
+241@3@1005@75-06-01@1
+67@4@1005@75-07-01@1
+999@10@1006@76-01-01@144
+241@8@1005@75-07-01@1
+241@9@1005@75-07-01@144
+_
+.TE
+.nf
+
 continue
 *
 
@@ -772,7 +829,7 @@ To find out what parts are supplied by supplier number 122 type:
 Executing . . .
 
 2109: line 1, Variable 's' not declared in RANGE statement
-
+
 continue
 *
 
@@ -789,14 +846,20 @@ Retype the query as follows:
 * \\g
 Executing . . .
 
+.fi
+.TS
+tab (@);
+|l|
+|r|.
+pnum
+_
+7
+7
+9
+_
+.TE
+.nf
 
-|pnum  |
-|------|
-|     7|
-|     7|
-|     9|
-|------|
-
 continue
 *
 
@@ -823,13 +886,18 @@ running the query:
 * \\g
 Executing . . .
 
+.fi
+.TS
+tab (@);
+|l|.
+pname
+_
+l-p paper
+terminal paper
+_
+.TE
+.nf
 
-|pname               |
-|--------------------|
-|l-p paper           |
-|terminal paper      |
-|--------------------|
-
 continue
 *
 
@@ -844,14 +912,19 @@ We could do the same thing in one query by asking:
 * \\g
 Executing . . .
 
+.fi
+.TS
+tab (@);
+|l|.
+pname
+_
+l-p paper
+l-p paper
+terminal paper
+_
+.TE
+.nf
 
-|pname               |
-|--------------------|
-|l-p paper           |
-|l-p paper           |
-|terminal paper      |
-|--------------------|
-
 continue
 *
 
@@ -881,14 +954,20 @@ The query is:
 * \\g
 Executing . . .
 
+.fi
+.TS
+tab (@);
+|l|
+|r|.
+snum
+_
+475
+475
+241
+_
+.TE
+.fi
 
-|snum  |
-|------|
-|   475|
-|   475|
-|   241|
-|------|
-
 continue
 *
 
@@ -901,24 +980,28 @@ database by typing:
 * help \\g
 * Executing . . .
 
+.fi
+.TS
+tab (@);
+l l.
+relation name@relation owner
+@@
+relation@ingres
+attribute@ingres
+indexes@ingres
+integrity@ingres
+constraint@ingres
+item@ingres
+sale@ingres
+employee@ingres
+dept@ingres
+supplier@ingres
+store@ingres
+parts@ingres
+supply@ingres
+.TE
+.nf
 
- relation name     relation owner
-
- relation          ingres
- attribute         ingres
- indexes           ingres
- integrity         ingres
- constraint        ingres
- item              ingres
- sale              ingres
- employee          ingres
- dept              ingres
- supplier          ingres
- store             ingres
- parts             ingres
- supply            ingres
-
-
 continue
 * 
 
@@ -933,25 +1016,29 @@ Type:
 * \\g
 Executing . . .
 
+.fi
+.TS
+tab (@);
+l l l.
+Relation:@employee
+Owner:@ingres
+Tuple width:@30
+Saved until:@Fri Mar 25 11:01:30 1977
+Number of tuples:@24
+Storage structure:@paged heap
+relation type:@user relation
+@@
+attribute name@type@length keyno.
+@@
+number@i@2
+name@c@20
+salary@i@2
+manager@i@2
+birthdate@i@2
+startdate@i@2
+.TE
+.nf
 
-Relation:		employee
-Owner:			ingres
-Tuple width:		30
-Saved until:		Fri Mar 25 11:01:30 1977
-Number of tuples:	24
-Storage structure:	paged heap
-relation type:		user relation
-
- attribute name    type  length  keyno.
-
- number      	    i       2
- name        	    c      20
- salary      	    i       2
- manager     	    i       2
- birthdate   	    i       2
- startdate   	    i       2
-
-
 continue
 * 
 
@@ -984,36 +1071,42 @@ Try the following:
 * \\g
 Executing . . .
 
+.fi
+.TS
+tab (@);
+|l|l|l|l|l|l|
+|r|l|r|r|r|r|.
+number@name@salary@manage@birthd@startd
+_
+157@Jones, Tim@12000@199@1940@1960
+1110@Smith, Paul@6000@33@1952@1973
+35@Evans, Michael@5000@32@1952@1974
+129@Thomas, Tom@10000@199@1941@1962
+13@Edwards, Peter@9000@199@1928@1958
+215@Collins, Joanne@7000@10@1950@1971
+55@James, Mary@12000@199@1920@1969
+26@Thompson, Bob@13000@199@1930@1970
+98@Williams, Judy@9000@199@1935@1969
+32@Smythe, Carol@9050@199@1929@1967
+33@Hayes, Evelyn@10100@199@1931@1963
+199@Bullock, J.D.@27000@ 0@1920@1920
+4901@Bailey, Chas M.@8377@32@1956@1975
+843@Schmidt, Herman@11204@26@1936@1956
+2398@Wallace, Maggie J.@7880@26@1940@1959
+1639@Choy, Wanda@11160@55@1947@1970
+5119@Ferro, Tony@13621@55@1939@1963
+37@Raveen, Lemont@11985@26@1950@1974
+5219@Williams, Bruce@13374@33@1944@1959
+1523@Zugnoni, Arthur A.@19868@129@1928@1949
+430@Brunet, Paul C.@17674@129@1938@1959
+994@Iwano, Masahiro@15641@129@1944@1970
+1330@Onstad, Richard@8779@13@1952@1971
+10@Ross, Stanley@15908@199@1927@1945
+11@Ross, Stuart@12067@0@1931@1932
+_
+.TE
+.fi
 
-|number|name                |salary|manage|birthd|startd|
-|-------------------------------------------------------|
-|   157|Jones, Tim          | 12000|   199|  1940|  1960|
-|  1110|Smith, Paul         |  6000|    33|  1952|  1973|
-|    35|Evans, Michael      |  5000|    32|  1952|  1974|
-|   129|Thomas, Tom         | 10000|   199|  1941|  1962|
-|    13|Edwards, Peter      |  9000|   199|  1928|  1958|
-|   215|Collins, Joanne     |  7000|    10|  1950|  1971|
-|    55|James, Mary         | 12000|   199|  1920|  1969|
-|    26|Thompson, Bob       | 13000|   199|  1930|  1970|
-|    98|Williams, Judy      |  9000|   199|  1935|  1969|
-|    32|Smythe, Carol       |  9050|   199|  1929|  1967|
-|    33|Hayes, Evelyn       | 10100|   199|  1931|  1963|
-|   199|Bullock, J.D.       | 27000|     0|  1920|  1920|
-|  4901|Bailey, Chas M.     |  8377|    32|  1956|  1975|
-|   843|Schmidt, Herman     | 11204|    26|  1936|  1956|
-|  2398|Wallace, Maggie J.  |  7880|    26|  1940|  1959|
-|  1639|Choy, Wanda         | 11160|    55|  1947|  1970|
-|  5119|Ferro, Tony         | 13621|    55|  1939|  1963|
-|    37|Raveen, Lemont      | 11985|    26|  1950|  1974|
-|  5219|Williams, Bruce     | 13374|    33|  1944|  1959|
-|  1523|Zugnoni, Arthur A.  | 19868|   129|  1928|  1949|
-|   430|Brunet, Paul C.     | 17674|   129|  1938|  1959|
-|   994|Iwano, Masahiro     | 15641|   129|  1944|  1970|
-|  1330|Onstad, Richard     |  8779|    13|  1952|  1971|
-|    10|Ross, Stanley       | 15908|   199|  1927|  1945|
-|    11|Ross, Stuart        | 12067|     0|  1931|  1932|
-|-------------------------------------------------------|
-
 continue
 *
 
@@ -1049,11 +1142,17 @@ Run the query:
 * \\g
 Executing . . .
 
+.fi
+.TS
+tab (@);
+|l|l|.
+name    @salary
+_
+@@
+_
+.TE
+.nf
 
-|name                |salary|
-|---------------------------|
-|---------------------------|
-
 continue
 *
 
@@ -1079,13 +1178,19 @@ Try the query:
 * \\g
 Executing . . .
 
+.fi
+.TS
+tab (@);
+|l|l|
+|l|r|.
+name@salary
+_
+Ross, Stanley@15908
+Ross, Stuart@12067
+_
+.TE
+.nf
 
-|name                |salary|
-|---------------------------|
-|Ross, Stanley       | 15908|
-|Ross, Stuart        | 12067|
-|---------------------------|
-
 continue
 *
 
@@ -1103,13 +1208,19 @@ whose first name is "Paul":
 * \\g
 Executing . . .
 
+.fi
+.TS
+tab (@);
+|l|l|
+|l|r|.
+name@salary
+_
+Smith, Paul@6000
+Brunet, Paul C.@17674
+_
+.TE
+.nf
 
-|name                |salary|
-|---------------------------|
-|Smith, Paul         |  6000|
-|Brunet, Paul C.     | 17674|
-|---------------------------|
-
 continue
 *
 
@@ -1140,19 +1251,25 @@ For example, find all people whose names start with
 * \\g
 Executing . . .
 
+.fi
+.TS
+tab (@);
+|l|l|
+|l|r|.
+name@salary
+_
+Evans, Michael@5000
+Edwards, Peter@9000
+Collins, Joanne@7000
+Bullock, J.D.@27000
+Bailey, Chas M.@8377
+Choy, Wanda@11160
+Ferro, Tony@13621
+Brunet, Paul C.@17674
+_
+.TE
+.nf
 
-|name                |salary|
-|---------------------------|
-|Evans, Michael      |  5000|
-|Edwards, Peter      |  9000|
-|Collins, Joanne     |  7000|
-|Bullock, J.D.       | 27000|
-|Bailey, Chas M.     |  8377|
-|Choy, Wanda         | 11160|
-|Ferro, Tony         | 13621|
-|Brunet, Paul C.     | 17674|
-|---------------------------|
-
 continue
 *
 
@@ -1165,19 +1282,25 @@ Notice that this last query could be done another way:
 * \\g
 Executing . . .
 
+.fi
+.TS
+tab (@);
+|l|l|
+|l|r|.
+name@salary
+_
+Evans, Michael@5000
+Edwards, Peter@9000
+Collins, Joanne@7000
+Bullock, J.D.@27000
+Bailey, Chas M.@8377
+Choy, Wanda@11160
+Ferro, Tony@13621
+Brunet, Paul C.@17674
+_
+.TE
+.nf
 
-|name                |salary|
-|---------------------------|
-|Evans, Michael      |  5000|
-|Edwards, Peter      |  9000|
-|Collins, Joanne     |  7000|
-|Bullock, J.D.       | 27000|
-|Bailey, Chas M.     |  8377|
-|Choy, Wanda         | 11160|
-|Ferro, Tony         | 13621|
-|Brunet, Paul C.     | 17674|
-|---------------------------|
-
 continue
 *
 
@@ -1221,12 +1344,18 @@ To compute the average salary for all employees, we enter:
 * \\g
 Executing . . .
 
+.fi
+.TS
+tab (@);
+|l|
+|r|.
+avgsal
+_
+11867.520
+_
+.TE
+.nf
 
-|avgsal    |
-|----------|
-| 11867.520|
-|----------|
-
 continue
 *
 
@@ -1247,12 +1376,18 @@ We can also find the minimum and maximum salaries:
 * \\g
 Executing . . .
 
+.fi
+.TS
+tab (@);
+|l|l|
+|r|r|.
+minsal@maxsal
+_
+5000@27000
+_
+.TE
+.nf
 
-|minsal|maxsal|
-|-------------|
-|  5000| 27000|
-|-------------|
-
 continue
 *
 
@@ -1266,12 +1401,19 @@ make the minimum and maximum salaries, that query would be:
 * \\g
 Executing . . .
 
-|name                |salary|
-|---------------------------|
-|Evans, Michael      |  5000|
-|Bullock, J.D.       | 27000|
-|---------------------------|
-
+.fi
+.TS
+tab (@);
+|l|l|
+|l|r|.
+name@salary
+_
+Evans, Michael@5000
+Bullock, J.D.@27000
+_
+.TE
+.nf
+
 continue
 * 
 
@@ -1295,36 +1437,42 @@ with the average salary for all employees:
 * \\g
 Executing . . .
 
+.fi
+.TS
+tab (@);
+|l|l|
+|l|r|.
+name@peersal
+_
+Jones, Tim@11867.520
+Smith, Paul@11867.520
+Evans, Michael@11867.520
+Thomas, Tom@11867.520
+Edwards, Peter@11867.520
+Collins, Joanne@11867.520
+James, Mary@11867.520
+Thompson, Bob@11867.520
+Williams, Judy@11867.520
+Smythe, Carol@11867.520
+Hayes, Evelyn@11867.520
+Bullock, J.D.@11867.520
+Bailey, Chas M.@11867.520
+Schmidt, Herman@11867.520
+Wallace, Maggie J.@11867.520
+Choy, Wanda@11867.520
+Ferro, Tony@11867.520
+Raveen, Lemont@11867.520
+Williams, Bruce@11867.520
+Zugnoni, Arthur A.@11867.520
+Brunet, Paul C.@11867.520
+Iwano, Masahiro@11867.520
+Onstad, Richard@11867.520
+Ross, Stanley@11867.520
+Ross, Stuart@11867.520
+_
+.TE
+.nf
 
-|name                |peersal   |
-|-------------------------------|
-|Jones, Tim          | 11867.520|
-|Smith, Paul         | 11867.520|
-|Evans, Michael      | 11867.520|
-|Thomas, Tom         | 11867.520|
-|Edwards, Peter      | 11867.520|
-|Collins, Joanne     | 11867.520|
-|James, Mary         | 11867.520|
-|Thompson, Bob       | 11867.520|
-|Williams, Judy      | 11867.520|
-|Smythe, Carol       | 11867.520|
-|Hayes, Evelyn       | 11867.520|
-|Bullock, J.D.       | 11867.520|
-|Bailey, Chas M.     | 11867.520|
-|Schmidt, Herman     | 11867.520|
-|Wallace, Maggie J.  | 11867.520|
-|Choy, Wanda         | 11867.520|
-|Ferro, Tony         | 11867.520|
-|Raveen, Lemont      | 11867.520|
-|Williams, Bruce     | 11867.520|
-|Zugnoni, Arthur A.  | 11867.520|
-|Brunet, Paul C.     | 11867.520|
-|Iwano, Masahiro     | 11867.520|
-|Onstad, Richard     | 11867.520|
-|Ross, Stanley       | 11867.520|
-|Ross, Stuart        | 11867.520|
-|-------------------------------|
-
 continue
 *
 
@@ -1345,36 +1493,42 @@ of those employees over 50.
 * \\g
 Executing . . .
 
+.fi
+.TS
+tab (@);
+|l|l|
+|l|r|.
+name@peersal
+_
+Jones, Tim@19500.000
+Smith, Paul@19500.000
+Evans, Michael@19500.000
+Thomas, Tom@19500.000
+Edwards, Peter@19500.000
+Collins, Joanne@19500.000
+James, Mary@19500.000
+Thompson, Bob@19500.000
+Williams, Judy@19500.000
+Smythe, Carol@19500.000
+Hayes, Evelyn@19500.000
+Bullock, J.D.@19500.000
+Bailey, Chas M.@19500.000
+Schmidt, Herman@19500.000
+Wallace, Maggie J.@19500.000
+Choy, Wanda@19500.000
+Ferro, Tony@19500.000
+Raveen, Lemont@19500.000
+Williams, Bruce@19500.000
+Zugnoni, Arthur A.@19500.000
+Brunet, Paul C.@19500.000
+Iwano, Masahiro@19500.000
+Onstad, Richard@19500.000
+Ross, Stanley@19500.000
+Ross, Stuart@19500.000
+_
+.TE
+.nf
 
-|name                |peersal   |
-|-------------------------------|
-|Jones, Tim          | 19500.000|
-|Smith, Paul         | 19500.000|
-|Evans, Michael      | 19500.000|
-|Thomas, Tom         | 19500.000|
-|Edwards, Peter      | 19500.000|
-|Collins, Joanne     | 19500.000|
-|James, Mary         | 19500.000|
-|Thompson, Bob       | 19500.000|
-|Williams, Judy      | 19500.000|
-|Smythe, Carol       | 19500.000|
-|Hayes, Evelyn       | 19500.000|
-|Bullock, J.D.       | 19500.000|
-|Bailey, Chas M.     | 19500.000|
-|Schmidt, Herman     | 19500.000|
-|Wallace, Maggie J.  | 19500.000|
-|Choy, Wanda         | 19500.000|
-|Ferro, Tony         | 19500.000|
-|Raveen, Lemont      | 19500.000|
-|Williams, Bruce     | 19500.000|
-|Zugnoni, Arthur A.  | 19500.000|
-|Brunet, Paul C.     | 19500.000|
-|Iwano, Masahiro     | 19500.000|
-|Onstad, Richard     | 19500.000|
-|Ross, Stanley       | 19500.000|
-|Ross, Stuart        | 19500.000|
-|-------------------------------|
-
 continue
 *
 
@@ -1390,12 +1544,19 @@ retrieve the average salary for all employees.
 Executing . . .
 
 
-|name                |peersal   |
-|-------------------------------|
-|James, Mary         | 11867.520|
-|Bullock, J.D.       | 11867.520|
-|-------------------------------|
-
+.fi
+.TS
+tab (@);
+|l|l|
+|l|r|.
+name@peersal
+_
+James, Mary@11867.520
+Bullock, J.D.@11867.520
+_
+.TE
+.nf
+
 continue
 *
 
@@ -1423,13 +1584,19 @@ That query would be:
 * \\g
 Executing . . .
 
+.fi
+.TS
+tab (@);
+|l|l|
+|l|r|.
+name@peersal
+_
+James, Mary@19500.000
+Bullock, J.D.@19500.000
+_
+.TE
+.nf
 
-|name                |peersal   |
-|-------------------------------|
-|James, Mary         | 19500.000|
-|Bullock, J.D.       | 19500.000|
-|-------------------------------|
-
 continue
 * 
 
@@ -1444,12 +1611,18 @@ the following query will not give the right answer:
 * \\g
 * Executing . . .
 
+.fi
+.TS
+tab (@);
+|l|
+|r|.
+bosses
+_
+25
+_
+.TE
+.nf
 
-|bosses       |
-|-------------|
-|           25|
-|-------------|
-
 continue
 * 
 
@@ -1480,12 +1653,18 @@ The correct query to find the number of managers is:
 * \\g
 Executing . . .
 
+.fi
+.TS
+tab (@);
+|l|
+|r|.
+bosses
+_
+9
+_
+.TE
+.nf
 
-|bosses       |
-|-------------|
-|            9|
-|-------------|
-
 continue
 *
 
@@ -1504,36 +1683,42 @@ That query would be:
 * \\g
 Executing . . .
 
+.fi
+.TS
+tab (@);
+|l|l|
+|l|r|.
+name@manageravg
+_
+Jones, Tim@11117.555
+Thomas, Tom@11117.555
+Edwards, Peter@11117.555
+James, Mary@11117.555
+Thompson, Bob@11117.555
+Williams, Judy@11117.555
+Smythe, Carol@11117.555
+Hayes, Evelyn@11117.555
+Ross, Stanley@11117.555
+Smith, Paul@9687.000
+Williams, Bruce@9687.000
+Evans, Michael@6688.500
+Bailey, Chas M.@6688.500
+Collins, Joanne@7000.000
+Bullock, J.D.@19533.500
+Ross, Stuart@19533.500
+Schmidt, Herman@10356.333
+Wallace, Maggie J.@10356.333
+Raveen, Lemont@10356.333
+Choy, Wanda@12390.500
+Ferro, Tony@12390.500
+Zugnoni, Arthur A.@17727.666
+Brunet, Paul C.@17727.666
+Iwano, Masahiro@17727.666
+Onstad, Richard@8779.000
+_
+.TE
+.nf
 
-|name                |manageravg|
-|-------------------------------|
-|Jones, Tim          | 11117.555|
-|Thomas, Tom         | 11117.555|
-|Edwards, Peter      | 11117.555|
-|James, Mary         | 11117.555|
-|Thompson, Bob       | 11117.555|
-|Williams, Judy      | 11117.555|
-|Smythe, Carol       | 11117.555|
-|Hayes, Evelyn       | 11117.555|
-|Ross, Stanley       | 11117.555|
-|Smith, Paul         |  9687.000|
-|Williams, Bruce     |  9687.000|
-|Evans, Michael      |  6688.500|
-|Bailey, Chas M.     |  6688.500|
-|Collins, Joanne     |  7000.000|
-|Bullock, J.D.       | 19533.500|
-|Ross, Stuart        | 19533.500|
-|Schmidt, Herman     | 10356.333|
-|Wallace, Maggie J.  | 10356.333|
-|Raveen, Lemont      | 10356.333|
-|Choy, Wanda         | 12390.500|
-|Ferro, Tony         | 12390.500|
-|Zugnoni, Arthur A.  | 17727.666|
-|Brunet, Paul C.     | 17727.666|
-|Iwano, Masahiro     | 17727.666|
-|Onstad, Richard     |  8779.000|
-|-------------------------------|
-
 continue
 *
 
@@ -1552,13 +1737,19 @@ just for those employees over 50:
 * \\g
 Executing . . .
 
+.fi
+.TS
+tab (@);
+|l|l|
+|l|r|.
+name@manageravg
+_
+James, Mary@11117.555
+Bullock, J.D.@19533.500
+_
+.TE
+.nf
 
-|name                |manageravg|
-|-------------------------------|
-|James, Mary         | 11117.555|
-|Bullock, J.D.       | 19533.500|
-|-------------------------------|
-
 continue
 *
 
@@ -1584,22 +1775,28 @@ then the query would be:
 * \\g
 Executing . . .
 
+.fi
+.TS
+tab (@);
+|l|l|
+|l|r|.
+name@manageravg
+_
+Jones, Tim@11117.555
+Thomas, Tom@11117.555
+Edwards, Pete@11117.555
+James, Mary@11117.555
+Thompson, Bob@11117.555
+Williams, Judy@11117.555
+Smythe, Carol@11117.555
+Hayes, Evelyn@11117.555
+Ross, Stanley@11117.555
+Smith, Paul@9687.000
+Williams, Bruce@9687.000
+_
+.TE
+.nf
 
-|name                |manageravg|
-|-------------------------------|
-|Jones, Tim          | 11117.555|
-|Thomas, Tom         | 11117.555|
-|Edwards, Peter      | 11117.555|
-|James, Mary         | 11117.555|
-|Thompson, Bob       | 11117.555|
-|Williams, Judy      | 11117.555|
-|Smythe, Carol       | 11117.555|
-|Hayes, Evelyn       | 11117.555|
-|Ross, Stanley       | 11117.555|
-|Smith, Paul         |  9687.000|
-|Williams, Bruce     |  9687.000|
-|-------------------------------|
-
 continue
 *
 
@@ -1616,20 +1813,26 @@ employees who have worked at least seven years.
 * \\g
 Executing . . .
 
+.fi
+.TS
+tab (@);
+|l|l|
+|r|r|.
+manage@people
+_
+199@8
+33@2
+32@0
+10@0
+0@2
+26@2
+55@1
+129@2
+13@0
+_
+.TE
+.nf
 
-|manage|people       |
-|--------------------|
-|   199|            8|
-|    33|            2|
-|    32|            0|
-|    10|            0|
-|     0|            2|
-|    26|            2|
-|    55|            1|
-|   129|            2|
-|    13|            0|
-|--------------------|
-
 continue
 *
 
@@ -1647,20 +1850,26 @@ Simply change "count" to "avg" and rerun the query.
 * \\g
 Executing . . .
 
+.fi
+.TS
+tab (@);
+|l|l|
+|r|r|.
+manage@people
+_
+199@10882.250
+33@22687.000
+32@0.000
+10@0.000
+0@19533.500
+26@9542.000
+55@13621.000
+129@18771.000
+13@0.000
+_
+.TE
+.nf
 
-|manage|people    |
-|-----------------|
-|   199| 10882.250|
-|    33| 22687.000|
-|    32|     0.000|
-|    10|     0.000|
-|     0| 19533.500|
-|    26|  9542.000|
-|    55| 13621.000|
-|   129| 18771.000|
-|    13|     0.000|
-|-----------------|
-
 continue
 *
 
@@ -1686,17 +1895,23 @@ only for those which are greater than zero.
 * \\g
 Executing . . .
 
+.fi
+.TS
+tab (@);
+|l|l|
+|r|r|.
+manage@people
+_
+199@10882.250
+33@22687.000
+0@19533.500
+26@9542.000
+55@13621.000
+129@18771.000
+_
+.TE
+.nf
 
-|manage|people    |
-|-----------------|
-|   199| 10882.250|
-|    33| 22687.000|
-|     0| 19533.500|
-|    26|  9542.000|
-|    55| 13621.000|
-|   129| 18771.000|
-|-----------------|
-
 continue
 * 
 
@@ -1729,34 +1944,40 @@ those employees who make more than $8000:
 * \\g
 Executing . . .
 
-
 overpaid relation
 
-|number|name                |salary|manage|birthd|startd|
-|-------------------------------------------------------|
-|    10|Ross, Stanley       | 15908|   199|  1927|  1945|
-|    11|Ross, Stuart        | 12067|     0|  1931|  1932|
-|    13|Edwards, Peter      |  9000|   199|  1928|  1958|
-|    26|Thompson, Bob       | 13000|   199|  1930|  1970|
-|    32|Smythe, Carol       |  9050|   199|  1929|  1967|
-|    33|Hayes, Evelyn       | 10100|   199|  1931|  1963|
-|    37|Raveen, Lemont      | 11985|    26|  1950|  1974|
-|    55|James, Mary         | 12000|   199|  1920|  1969|
-|    98|Williams, Judy      |  9000|   199|  1935|  1969|
-|   129|Thomas, Tom         | 10000|   199|  1941|  1962|
-|   157|Jones, Tim          | 12000|   199|  1940|  1960|
-|   199|Bullock, J.D.       | 27000|     0|  1920|  1920|
-|   430|Brunet, Paul C.     | 17674|   129|  1938|  1959|
-|   843|Schmidt, Herman     | 11204|    26|  1936|  1956|
-|   994|Iwano, Masahiro     | 15641|   129|  1944|  1970|
-|  1330|Onstad, Richard     |  8779|    13|  1952|  1971|
-|  1523|Zugnoni, Arthur A.  | 19868|   129|  1928|  1949|
-|  1639|Choy, Wanda         | 11160|    55|  1947|  1970|
-|  4901|Bailey, Chas M.     |  8377|    32|  1956|  1975|
-|  5119|Ferro, Tony         | 13621|    55|  1939|  1963|
-|  5219|Williams, Bruce     | 13374|    33|  1944|  1959|
-|-------------------------------------------------------|
-
+.fi
+.TS
+tab (@);
+|l|l|l|l|l|l|
+|r|l|r|r|r|r|.
+number@name@salary@manage@birthd@startd
+_
+10@Ross, Stanley@15908@199@1927@1945
+11@Ross, Stuart@12067@0@1931@1932
+13@Edwards, Peter@9000@199@1928@1958
+26@Thompson, Bob@13000@199@1930@1970
+32@Smythe, Carol@9050@199@1929@1967
+33@Hayes, Evelyn@10100@199@1931@1963
+37@Raveen, Lemont@11985@26@1950@1974
+55@James, Mary@12000@199@1920@1969
+98@Williams, Judy@9000@199@1935@1969
+129@Thomas, Tom@10000@199@1941@1962
+157@Jones, Tim@12000@199@1940@1960
+199@Bullock, J.D.@27000@0@1920@1920
+430@Brunet, Paul C.@17674@129@1938@1959
+843@Schmidt, Herman@11204@26@1936@1956
+994@Iwano, Masahiro@15641@129@1944@1970
+1330@Onstad, Richard@8779@13@1952@1971
+1523@Zugnoni, Arthur A.@19868@129@1928@1949
+1639@Choy, Wanda@11160@55@1947@1970
+4901@Bailey, Chas M.@8377@32@1956@1975
+5119@Ferro, Tony@13621@55@1939@1963
+5219@Williams, Bruce@13374@33@1944@1959
+_
+.TE
+.nf
+
 continue
 *
 
@@ -1803,7 +2024,7 @@ off at $10000:
 * \\g
 Executing . . .
 
-
+
 continue
 *
 
@@ -1830,7 +2051,7 @@ Type the query:
 * \\g
 Executing . . .
 
-
+
 continue
 *
 
@@ -1862,32 +2083,39 @@ Executing . . .
 
 overpaid relation
 
-|number|name                |salary|manage|birthd|startd|
-|-------------------------------------------------------|
-|    10|Ross, Stanley       | 17498|   199|  1927|  1945|
-|    11|Ross, Stuart        | 13273|     0|  1931|  1932|
-|    13|Edwards, Peter      |  9899|   199|  1928|  1958|
-|    26|Thompson, Bob       | 14299|   199|  1930|  1970|
-|    32|Smythe, Carol       |  9954|   199|  1929|  1967|
-|    33|Hayes, Evelyn       | 11109|   199|  1931|  1963|
-|    37|Raveen, Lemont      | 13183|    26|  1950|  1974|
-|    55|James, Mary         | 13199|   199|  1920|  1969|
-|    98|Williams, Judy      |  9899|   199|  1935|  1969|
-|   129|Thomas, Tom         | 10999|   199|  1941|  1962|
-|   157|Jones, Tim          | 13199|   199|  1940|  1960|
-|   199|Bullock, J.D.       | 29699|     0|  1920|  1920|
-|   430|Brunet, Paul C.     | 19441|   129|  1938|  1959|
-|   843|Schmidt, Herman     | 12324|    26|  1936|  1956|
-|   994|Iwano, Masahiro     | 17205|   129|  1944|  1970|
-|  1330|Onstad, Richard     |  9656|    13|  1952|  1971|
-|  1523|Zugnoni, Arthur A.  | 21854|   129|  1928|  1949|
-|  1639|Choy, Wanda         | 12275|    55|  1947|  1970|
-|  4901|Bailey, Chas M.     |  9214|    32|  1956|  1975|
-|  5119|Ferro, Tony         | 14983|    55|  1939|  1963|
-|  5219|Williams, Bruce     | 14711|    33|  1944|  1959|
-|     0|Terrific, Tom       | 11000|     0|     0|     0|
-|-------------------------------------------------------|
-
+.fi
+.TS
+tab (@);
+|l|l|l|l|l|l|
+|r|l|r|r|r|r|.
+number@name@salary@manage@birthd@startd
+_
+10@Ross, Stanley@17498@199@1927@1945
+11@Ross, Stuart@13273@0@1931@1932
+13@Edwards, Peter@9899@199@1928@1958
+26@Thompson, Bob@14299@199@1930@1970
+32@Smythe, Carol@9954@199@1929@1967
+33@Hayes, Evelyn@11109@199@1931@1963
+37@Raveen, Lemont@13183@26@1950@1974
+55@James, Mary@13199@199@1920@1969
+98@Williams, Judy@9899@199@1935@1969
+129@Thomas, Tom@10999@199@1941@1962
+157@Jones, Tim@13199@199@1940@1960
+199@Bullock, J.D.@29699@0@1920@1920
+430@Brunet, Paul C.@19441@129@1938@1959
+843@Schmidt, Herman@12324@26@1936@1956
+994@Iwano, Masahiro@17205@129@1944@1970
+1330@Onstad, Richard@9656@13@1952@1971
+1523@Zugnoni, Arthur A.@21854@129@1928@1949
+1639@Choy, Wanda@12275@55@1947@1970
+4901@Bailey, Chas M.@9214@32@1956@1975
+5119@Ferro, Tony@14983@55@1939@1963
+5219@Williams, Bruce@14711@33@1944@1959
+0@Terrific, Tom@11000@0@0@0
+_
+.TE
+.nf
+
 continue
 *
 
@@ -1929,27 +2157,33 @@ The complete query is:
 * \\g
 * Executing . . .
 
+.fi
+.TS
+tab (@);
+|l|l|l|
+|l|r|r|.
+name@osal@tomsal
+_
+Ross, Stanley       | 19247| 11000|
+Ross, Stuart        | 14600| 11000|
+Thompson, Bob       | 15728| 11000|
+Hayes, Evelyn       | 12219| 11000|
+Raveen, Lemont      | 14501| 11000|
+James, Mary         | 14518| 11000|
+Thomas, Tom         | 12098| 11000|
+Jones, Tim          | 14518| 11000|
+Bullock, J.D.       | 32668| 11000|
+Brunet, Paul C.     | 21385| 11000|
+Schmidt, Herman     | 13556| 11000|
+Iwano, Masahiro     | 18925| 11000|
+Zugnoni, Arthur A.  | 24039| 11000|
+Choy, Wanda         | 13502| 11000|
+Ferro, Tony         | 16481| 11000|
+Williams, Bruce     | 16182| 11000|
+_
+.TE
+.nf
 
-|name                |osal  |tomsal|
-|----------------------------------|
-|Ross, Stanley       | 19247| 11000|
-|Ross, Stuart        | 14600| 11000|
-|Thompson, Bob       | 15728| 11000|
-|Hayes, Evelyn       | 12219| 11000|
-|Raveen, Lemont      | 14501| 11000|
-|James, Mary         | 14518| 11000|
-|Thomas, Tom         | 12098| 11000|
-|Jones, Tim          | 14518| 11000|
-|Bullock, J.D.       | 32668| 11000|
-|Brunet, Paul C.     | 21385| 11000|
-|Schmidt, Herman     | 13556| 11000|
-|Iwano, Masahiro     | 18925| 11000|
-|Zugnoni, Arthur A.  | 24039| 11000|
-|Choy, Wanda         | 13502| 11000|
-|Ferro, Tony         | 16481| 11000|
-|Williams, Bruce     | 16182| 11000|
-|----------------------------------|
-
 continue
 * 
 
@@ -1963,7 +2197,7 @@ than anyone else, the query would be:
 * \\g
 Executing . . .
 
-
+
 continue
 * 
 

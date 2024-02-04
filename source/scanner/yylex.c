@@ -95,6 +95,7 @@ int	len;
 	extern char	Cmap[];
 	register int	save;
 	char		buf[MAXSTRING + 1];
+	char		*syment();
 
 	save = Lcase;
 	Lcase = 0;

@@ -159,7 +159,7 @@ modupdate()
 		while ((i = getequal(&Inddes, &ikey, &itup, &tid)) == 0)
 		{
 			newpv[0] = itup.irelidi;
-			newpv[1] = -1;
+			newpv[1] = (char *) -1;
 			printf("destroying secondary index %s\n", trim_relname(itup.irelidi));
 			if (destroy(1, newpv))
 				syserr("MODUPDATE:Can't destroy %s", itup.irelidi);

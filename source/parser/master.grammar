@@ -722,9 +722,9 @@ destqm:		destmnt INTEGRITY NAME =
 		}
 ;
 destlist:	I2CONST =
-			setp(iocv($1->i2type));
+			setp(iocv(i2deref($1)));
 	|	destlist COMMA I2CONST =
-			setp(iocv($3->i2type));
+			setp(iocv(i2deref($3)));
 	|	ALL
 ;
 help:		helstmnt hlist
@@ -847,7 +847,7 @@ modfill:	modfillnum
 modfillnum:	NAME IS I2CONST =
 		{
 			setp($1);
-			setp(iocv($3->i2type));
+			setp(iocv(i2deref($3)));
 		}
 ;
 keys:		alias =
@@ -876,7 +876,7 @@ month:		alias
 ;
 day_year:	I2CONST =
 		{
-			i = iocv($1->i2type);
+			i = iocv(i2deref($1));
 #			ifdef	xPTR3
 			tTfp(57, 1, "day_year: %s\n", i);
 #			endif

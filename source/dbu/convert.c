@@ -27,22 +27,12 @@ int	dlen;	/* length of the dest */
 	register char	*num;
 	register int	sl;
 	register int	dl;
-	struct
-	{
-		int	integer;
-	};
-	struct
-	{
-		long	longint;
-	};
-	struct
-	{
-		float	flt;
-	};
-	struct
-	{
-		double	dbl;
-	};
+
+#	define	i1deref(x)	(*((char *)(x)))
+#	define	i2deref(x)	(*((int *)(x)))
+#	define	i4deref(x)	(*((long *)(x)))
+#	define	f4deref(x)	(*((float *)(x)))
+#	define	f8deref(x)	(*((double *)(x)))
 
 	dl = dlen;
 	sl = slen;
@@ -61,15 +51,15 @@ int	dlen;	/* length of the dest */
 			{
 
 			  case 1:
-				num->dbl = num[0];	/* i1 to f8 */
+				f8deref(num) = i1deref(num);	/* i1 to f8 */
 				break;
 
 			  case 2:
-				num->dbl = num->integer;	/* i2 to f8 */
+				f8deref(num) = i2deref(num);	/* i2 to f8 */
 				break;
 
 			  case 4:
-				num->dbl = num->longint;	/* i4 to f8 */
+				f8deref(num) = i4deref(num);	/* i4 to f8 */
 			}
 		sl = 8;
 		}
@@ -77,11 +67,11 @@ int	dlen;	/* length of the dest */
 		{
 			/* check if float >  2**31 */
 			if (sl == 8)
-				num->flt = num->dbl;	/* convert f8 to f4 */
+				f4deref(num) = f8deref(num);	/* f8 to f4 */
 
-			if (num->flt > 2147483647.0 | num->flt < -2147483648.0)
+			if (f4deref(num) > 2147483647.0 | f4deref(num) < -2147483648.0)
 				return (-1);
-			num->longint = num->flt;
+			i4deref(num) = f4deref(num);
 			sl = 4;
 		}
 	}
@@ -95,9 +85,9 @@ int	dlen;	/* length of the dest */
 		if (df == FLOAT)
 		{
 			if (dl == 8)
-				num->dbl = num->flt;	/* f4 to f8 */
+				f8deref(num) = f4deref(num);	/* f4 to f8 */
 			else
-				num->flt = num->dbl;	/* f8 to f4 with rounding */
+				f4deref(num) = f8deref(num);	/* f8 to f4 with rounding */
 		}
 		else
 		{
@@ -107,36 +97,36 @@ int	dlen;	/* length of the dest */
 			  case 1:
 				if (sl == 2)
 				{
-					if (num->integer > 127 | num->integer < -128)
+					if (i2deref(num) > 127 | i2deref(num) < -128)
 						return (-1);
-					*num = num->integer;	/* i2 to i1 */
+					i1deref(num) = i2deref(num);	/* i2 to i1 */
 				}
 				else
 				{
-					if (num->longint > 127 | num->longint < -128)
+					if (i4deref(num) > 127 | i4deref(num) < -128)
 						return (-1);
-					*num = num->longint;	/* i4 to i1 */
+					i1deref(num) = i4deref(num);	/* i4 to i1 */
 				}
 				break;
 
 			  case 2:
 				if (sl == 1)
 				{
-					num->integer = *num;	/* i1 to i2 */
+					i2deref(num) = i1deref(num);	/* i1 to i2 */
 				}
 				else
 				{
-					if (num->longint > 32767 | num->longint <-32768)
+					if (i4deref(num) > 32767 | i4deref(num) < -32768)
 						return (-1);
-					num->integer = num->longint;	/* i4 to i2 */
+					i2deref(num) = i4deref(num);	/* i4 to i2 */
 				}
 				break;
 
 			  case 4:
 				if (sl == 1)
-					num->longint = *num;	/* i1 to i4 */
+					i4deref(num) = i1deref(num);	/* i1 to i4 */
 				else
-					num->longint = num->integer;	/* i2 to i4 */
+					i4deref(num) = i2deref(num);	/* i2 to i4 */
 			}
 		}
 	}

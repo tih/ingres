@@ -32,7 +32,7 @@ struct atstash		*attnum1;
 
 	attnum = attnum1;
 	valu = valu1;
-	tptr = need(Qbuf, len + 6);
+	tptr = (struct querytree *) need(Qbuf, len + 6);
 	tptr->left = lptr;
 	tptr->right = rptr;
 	tptr->sym.type = typ;
@@ -40,11 +40,11 @@ struct atstash		*attnum1;
 	switch (typ)
 	{
 	  case VAR:
-		tptr->varno = valu & I1MASK;
-		tptr->attno = attnum->atbid;
-		tptr->frmt = attnum->atbfrmt;
-		tptr->frml = attnum->atbfrml;
-		tptr->valptr = 0;
+		((struct qt_var *)tptr)->varno = valu & I1MASK;
+		((struct qt_var *)tptr)->attno = attnum->atbid;
+		((struct qt_var *)tptr)->frmt = attnum->atbfrmt;
+		((struct qt_var *)tptr)->frml = attnum->atbfrml;
+		((struct qt_var *)tptr)->valptr = 0;
 		break;
 
 	  case ROOT:
@@ -57,26 +57,26 @@ struct atstash		*attnum1;
 
 	  case UOP:
 	  case BOP:
-		tptr->opno = valu;
+		((struct qt_op *)tptr)->opno = valu;
 		format(tptr);
 		break;
 
 	  case COP:
-		if ((tptr->opno = getcop(valu)) == BADCOP)
+		if ((((struct qt_op *)tptr)->opno = getcop(valu)) == BADCOP)
 			/* bad const operator */
 			yyerror(BADCONSTOP, valu, 0);
 		break;
 
 	  case AOP:
 		format(tptr->right);
-		tptr->agfrmt = Trfrmt;
-		tptr->agfrml = Trfrml;
+		((struct qt_ag *)tptr)->agfrmt = Trfrmt;
+		((struct qt_ag *)tptr)->agfrml = Trfrml;
 
 	  case RESDOM:
-		tptr->resno = valu;
+		((struct qt_res *)tptr)->resno = valu;
 		format(tptr);
-		tptr->frmt = Trfrmt;
-		tptr->frml = Trfrml;
+		((struct qt_var *)tptr)->frmt = Trfrmt;
+		((struct qt_var *)tptr)->frml = Trfrml;
 		break;
 
 	  default:
@@ -142,22 +142,32 @@ struct querytree	*p1;
 	register struct querytree	*p;
 	char				str[257];
 	register char			*ptr;
-	register long			*lptr;
+	char				*bmove();
 
 	p = p1;
 	printf("addr=%l, l=%l, r=%l, typ=%d, len=%d:\n", p, p->left, p->right, p->sym.type, p->sym.len);
 	switch (p->sym.type)
 	{
 	  case VAR:
-		printf("\t\tvarno=%d, attno=%d, frmt=%d, frml=%d\n", p->varno, p->attno, p->frmt, p->frml);
+		printf("\t\tvarno=%d, attno=%d, frmt=%d, frml=%d\n",
+			((struct qt_var *)p)->varno,
+			((struct qt_var *)p)->attno,
+			((struct qt_var *)p)->frmt,
+			((struct qt_var *)p)->frml);
 		break;
 
 	  case AOP:
-		printf("\t\taop=%d, frmt=%d, frml=%d\n", p->resno, p->frmt, p->frml);
+		printf("\t\taop=%d, frmt=%d, frml=%d\n",
+			((struct qt_res *)p)->resno,
+			((struct qt_var *)p)->frmt,
+			((struct qt_var *)p)->frml);
 		break;
 
 	  case RESDOM:
-		printf("\t\trsdmno=%d, frmt=%d, frml=%d\n", p->resno, p->frmt, p->frml);
+		printf("\t\trsdmno=%d, frmt=%d, frml=%d\n",
+			((struct qt_res *)p)->resno,
+			((struct qt_var *)p)->frmt,
+			((struct qt_var *)p)->frml);
 		break;
 
 	  case CHAR:
@@ -170,12 +180,12 @@ struct querytree	*p1;
 		switch(p->sym.len)
 		{
 		  case 2:
-			printf("\t\tvalue=%d\n", p->sym.value->i2type);
+			printf("\t\tvalue=%d\n", i2deref(p->sym.value));
 			break;
 
+
 		  case 4:
-			lptr = p->sym.value;	/* must do this way because of compiler bug */
-			printf("\t\tvalue=%s\n", locv(lptr->i4type));
+			printf("\t\tvalue=%s\n", locv(i4deref(p->sym.value)));
 			break;
 		}
 		break;
@@ -184,11 +194,11 @@ struct querytree	*p1;
 		switch(p->sym.len)
 		{
 		  case 4:
-			printf("\t\tvalue=%f\n", p->sym.value->f4type);
+			printf("\t\tvalue=%f\n", f4deref(p->sym.value));
 			break;
 
 		  case 8:
-			printf("\t\tvalue=%f\n", p->sym.value->f8type);
+			printf("\t\tvalue=%f\n", f8deref(p->sym.value));
 			break;
 		}
 		break;
@@ -196,7 +206,7 @@ struct querytree	*p1;
 	  case UOP:
 	  case BOP:
 	  case COP:
-		printf("\t\top=%d\n", p->opno);
+		printf("\t\top=%d\n", ((struct qt_op *)p)->opno);
 		break;
 	}
 }
@@ -219,7 +229,7 @@ struct querytree	*ptr;
 		kk++;
 	tot = 1;
 	for (t=ptr; t;t = t->left)
-		t->resno = kk - tot++;
+		((struct qt_res *)t)->resno = kk - tot++;
 }
 
 /*
@@ -239,6 +249,7 @@ struct querytree	*lptr, *rptr;
 	register struct querytree	*rtval;
 	register struct atstash		*aptr;
 	char				buf[10];	/* buffer type and length in ascii for dbu */
+	struct atstash			*attlookup();
 
 	switch (Opflag)
 	{

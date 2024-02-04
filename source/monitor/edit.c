@@ -1,7 +1,8 @@
+# include	<stdio.h>
+
 # include	"../ingres.h"
 # include	"../aux.h"
 # include	"../unix.h"
-# include	"../fileio.h"
 # include	"monitor.h"
 
 /*
@@ -19,6 +20,8 @@ edit()
 	register int	i;
 	register char	*p;
 	register char	*editfile;
+	char		*getfilename();
+	char		*macro();
 
 	editfile = getfilename();
 	if (*editfile == 0)

@@ -58,7 +58,7 @@ struct protect	*protup;
 		syserr("fillprotup: atoi#1 %s", buf);
 	pt->proopset = ix;
 	if ((pt->proopset & PRO_RETR) != 0)
-		pt->proopset =| PRO_TEST | PRO_AGGR;
+		pt->proopset |= PRO_TEST | PRO_AGGR;
 
 	/* read relation name */
 	if (rdpipe(P_NORM, &Pipe, R_up, buf, 0) > MAXNAME + 1)
@@ -107,7 +107,11 @@ struct protect	*protup;
 			ferror(3590, -1, Resultvar, buf, 0);
 #		endif
 #		ifdef xV7_UNIX
-		if (bequal(buf, "tty", 3))
+		if (bequal(buf, "/dev/tty", 8))
+			pmove(&buf[8], pt->proterm, 2, ' ');
+		else if (bequal(buf, "/dev/", 5))
+			pmove(&buf[5], pt->proterm, 2, ' ');
+		else if (bequal(buf, "tty", 3))
 			pmove(&buf[3], pt->proterm, 2, ' ');
 		else
 			pmove(buf, pt->proterm, 2, ' ');

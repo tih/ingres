@@ -94,6 +94,8 @@ int	(*rdfn)();	/* tree read function */
 	register QTREE		*rtval;
 	register char		*p;
 	int			berror();
+	char			*readtree();
+	QTREE			*trbuild();
 
 	/* initialize for new query block */
 	initbuf(Qbuf, QBUFSIZ, QBUFFULL, berror);
@@ -101,7 +103,7 @@ int	(*rdfn)();	/* tree read function */
 	Resultvar = -1;
 	Qmode = -1;
 
-	s = &locbuf;
+	s = (struct symbol *) &locbuf;
 
 	/* read symbols from input */
 	for (;;)
@@ -126,7 +128,9 @@ int	(*rdfn)();	/* tree read function */
 			break;
 
 		  case SOURCEID:
-			declare(s->srcvar, s->srcname, s->srcown);
+			declare(((struct srcid *)s)->srcvar,
+				((struct srcid *)s)->srcname,
+				((struct srcid *)s)->srcown);
 			break;
 
 		  case TREE:	/* beginning of tree, no more other stuff */
@@ -155,9 +159,10 @@ int	(*rdfn)();	/* tree read function */
 {
 	register int		len, t;
 	register struct symbol	*p;
+	char			*need();
 
 	/* check if enough space for type and len of sym */
-	p = (dest != NULL) ? dest : need(Qbuf, 2);
+	p = (struct symbol *) ((dest != NULL) ? dest : need(Qbuf, 2));
 	if ((*rdfn)(p, 2) < 2) 
 		goto err3;
 	len = p->len & I1MASK;
@@ -188,19 +193,20 @@ err3:
 **
 */
 
-readtree(tresym, rdfn)
+char *readtree(tresym, rdfn)
 struct symbol	*tresym;
 int		(*rdfn)();
 {
 	register QTREE	*nod;
 	register char	*rtval;
+	char *need();
 
 	rtval = need(Qbuf, 6);
-	bmove(tresym, &(rtval->sym), 2);	/* insert type and len of TREE node */
+	bmove(tresym, &(((struct querytree *)rtval)->sym), 2);	/* insert type and len of TREE node */
 	for(;;)
 	{
 		/* space for left & right pointers */
-		nod = need(Qbuf, 4);
+		nod = (QTREE *) need(Qbuf, 4);
 		readsym(NULL, rdfn);
 		if (nod->sym.type == ROOT)
 			return (rtval);

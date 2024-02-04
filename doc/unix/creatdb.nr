@@ -67,7 +67,7 @@ are still shared.
 If the concurrency control scheme is not installed
 in \*(UU,
 or if the special file
-/dev/lock
+/dev/ingreslock
 does not exist or is not accessible
 for read-write by \*(II,
 concurrency control acts as though it is off

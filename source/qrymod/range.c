@@ -257,8 +257,8 @@ QTREE	*tree;
 		/* check this node */
 		if (t->sym.type == VAR)
 		{
-			if ((i = Remap[t->varno]) >= 0)
-				t->varno = i;
+			if ((i = Remap[((struct qt_var *)t)->varno]) >= 0)
+				((struct qt_var *)t)->varno = i;
 		}
 
 		/* map left subtree (iteratively) */

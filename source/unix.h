@@ -65,7 +65,7 @@
 **  Must match 'NOFILE' entry in /usr/sys/param.h
 */
 
-# define	MAXFILES	15
+# define	MAXFILES	30
 
 
 /*
@@ -93,7 +93,7 @@ struct sgttyb
 };
 # endif
 # ifdef xV7_UNIX
-# include	"sgtty.h"
+# include	<sgtty.h>
 # endif
 
 
@@ -124,8 +124,8 @@ struct stat {
 #define		IFBLK	060000
 # endif
 # ifdef xV7_UNIX
-# include	"sys/types.h"
-# include	"sys/stat.h"
+# include	<sys/types.h>
+# include	<sys/stat.h>
 # endif
 
 
@@ -135,7 +135,7 @@ struct stat {
 */
 
 # ifdef xV7_UNIX
-# include	"setjmp.h"
+# include	<setjmp.h>
 # define	setexit()	setjmp(Sx_buf)
 extern jmp_buf	Sx_buf;		/* defined in iutil/reset.c */
 # endif

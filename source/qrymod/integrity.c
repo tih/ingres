@@ -58,7 +58,7 @@
 
 extern struct descriptor	Intdes;
 
-integrity(root)
+QTREE *integrity(root)
 QTREE	*root;
 {
 	register QTREE		*r;
@@ -68,6 +68,7 @@ QTREE	*root;
 	auto QTREE		*iqual;
 	struct integrity	inttup, intkey;
 	struct tup_id		hitid, lotid;
+	QTREE			*gettree(), *norml();
 
 #	ifdef xQTR1
 	tTfp(40, -1, "\n->INTEGRITY\n");
@@ -103,7 +104,7 @@ QTREE	*root;
 		if (p->sym.type != RESDOM)
 			syserr("integrity: RESDOM %d", p->sym.type);
 #		endif
-		lsetbit(p->resno, dset);
+		lsetbit(((struct qt_res *)p)->resno, dset);
 	}
 
 #	ifdef xQTR3

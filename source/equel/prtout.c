@@ -1,5 +1,6 @@
 #
-# include	"../fileio.h"
+# include	<stdio.h>
+
 # include	"constants.h"
 # include	"globals.h"
 
@@ -32,7 +33,6 @@
 **
 **	Files:
 **		globals.h
-**		../fileio.h
 **		constants.h
 **
 **	History:
@@ -41,7 +41,7 @@
 
 
 
-extern int	Fillcnt		FILLCNT;
+extern int	Fillcnt		= FILLCNT;
 
 
 /*
@@ -302,7 +302,7 @@ int	type;
 		w_raw("\\");
 	}
 	s = t = string;
-	In_string =+ 1;
+	In_string += 1;
 	w_raw("\"");
 	for ( ;*t ; )
 	{
@@ -340,7 +340,7 @@ int	type;
 			t++;
 	}
 	w_raw(s);
-	In_string =- 1;
+	In_string -= 1;
 	if (type)
 		w_raw("\\\"");
 	else
@@ -400,7 +400,7 @@ char	*string;
 			}
 		}
 	}
-	if ((Charcnt =+ charcnt) > Fillcnt && Fillmode == 1)
+	if ((Charcnt += charcnt) > Fillcnt && Fillmode == 1)
 	{
 		if (In_string)
 		{

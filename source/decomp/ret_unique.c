@@ -18,7 +18,7 @@ struct querytree	*root;
 	r = root;
 
 	/* verify that target list is within range */
-	domcnt = r->left->sym.type != TREE ? r->left->resno : 0;
+	domcnt = r->left->sym.type != TREE ? ((struct qt_res *)r->left)->resno : 0;
 	if (findwid(r) > MAXTUP || domcnt > MAXDOM)
 		derror(4620);
 	i = MAXRANGE - 1;
@@ -26,7 +26,7 @@ struct querytree	*root;
 	Resultvar = i;
 
 	/* don't count retrieve into portion as a user query */
-	r->rootuser = 0;
+	((struct qt_root *)r)->rootuser = 0;
 }
 
 
@@ -46,6 +46,7 @@ int			var1;
 {
 	register struct querytree	*root, *r;
 	register int			var;
+	extern struct querytree		*makavar();
 
 	root = root1;
 	var = var1;
@@ -58,10 +59,10 @@ int			var1;
 
 	/* make all resdoms refer to the result relation */
 	for (r = root->left; r->sym.type != TREE; r = r->left)
-		r->right = makavar(r, var, r->resno);
+		r->right = makavar(r, var, ((struct qt_res *)r)->resno);
 
 	/* count as a user query */
-	root->rootuser = TRUE;
+	((struct qt_root *)root)->rootuser = TRUE;
 
 	/* run the retrieve */
 	Sourcevar = var;

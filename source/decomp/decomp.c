@@ -49,7 +49,7 @@ int			result_num;
 	int				locrange[MAXRANGE];
 
 	root = q;
-	vc = root->tvarc;
+	vc = ((struct qt_root *)root)->tvarc;
 #	ifdef xDTR1
 	if (tTf(9, 0))
 		printf("DECOMP: %d-var query, result_num=%d\n", vc, result_num);
@@ -100,7 +100,7 @@ int		result_num;
 	int			locrang[MAXRANGE], sqrange[MAXRANGE];
 	extern int		derror();
 
-	vc = root->tvarc;
+	vc = ((struct qt_root *)root)->tvarc;
 	initbuf(sqbuf, SQSIZ, SQBUFFULL, &derror);
 	pull_sq(root, sqlist, locrang, sqrange, sqbuf);
 	if ((i = exec_sq(sqlist, sqrange, &disj)) != -1) 
@@ -108,7 +108,7 @@ int		result_num;
 		undo_sq(sqlist, locrang, sqrange, i, i, FALSE);
 		return (FALSE);
 	}
-	vc =- disj;
+	vc -= disj;
 	tempvar(root, sqlist, sqbuf);
 	if (pull_const(root, sqbuf) == 0)
 		return (FALSE);
@@ -153,13 +153,13 @@ char			*sqbuf;
 	int				disj, tc, qtrue;
 	long				tid, hitid;
 	char				*tuple;
-	struct querytree		*sqlist[MAXRANGE];
+	struct querytree		*sqlist[MAXRANGE], *need(), *copy_ands();
 	int				sqmark, sqmark1;
 	int				locrang[MAXRANGE], sqrange[MAXRANGE];
 	extern struct descriptor	*readopen();
 
 	root = q;
-	vc = root->tvarc;
+	vc = ((struct qt_root *)root)->tvarc;
 
 #	ifdef xDTR1
 	if (tTf(9, -1))
@@ -167,13 +167,13 @@ char			*sqbuf;
 #	endif
 
 	sqmark = markbuf(sqbuf);
-	constl = !root->lvarc;
+	constl = !((struct qt_root *)root)->lvarc;
 	qtrue = FALSE;
 
 	if ((var = selectv(root)) < 0)
 		return (qtrue);
 	descript = readopen(var);	/* gets full descriptor for setvar & get */
-	tuple = need(sqbuf, descript->relwid);
+	tuple = (char *) need(sqbuf, descript->relwid);
 	setvar(root, var, &tid, tuple);
 	pull_sq(root, sqlist, locrang, sqrange, sqbuf);
 	tempvar(root, sqlist, sqbuf);
@@ -205,23 +205,23 @@ char			*sqbuf;
 				continue;
 
 			maxsqcnt = sqcnt;
-			vc =- disj;
+			vc -= disj;
 			if (vc <= 1)
 			{
 				Sourcevar = srcvar;
-				qtrue =| decompz(root, qmode, result_num);
+				qtrue |= decompz(root, qmode, result_num);
 				srcvar = Sourcevar;
 			}
 			else
 			{
 				freebuf(sqbuf, sqmark1);
 				newroot = copy_ands(root, sqbuf);
-				qtrue =| decision(newroot, qmode, result_num, sqbuf);
+				qtrue |= decision(newroot, qmode, result_num, sqbuf);
 			}
-			vc =+ disj;
+			vc += disj;
 		}
 		else
-			qtrue =| decompz(root, qmode, result_num);
+			qtrue |= decompz(root, qmode, result_num);
 
 		/* check for early termination on constant Target list */
 		if (constl && qtrue) 
@@ -267,7 +267,7 @@ int			result_num;
 	register int			qualfound;
 
 	root = q;
-	if (root->tvarc)
+	if (((struct qt_root *)root)->tvarc)
 	{
 		if (Sourcevar < 0)
 		{

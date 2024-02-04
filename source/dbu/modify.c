@@ -1,9 +1,10 @@
+# include	<stdio.h>
+
 # include	"../ingres.h"
 # include	"../aux.h"
 # include	"../access.h"
 # include	"../batch.h"
 # include	"../lock.h"
-# include	"../fileio.h"
 # include	"../unix.h"
 
 /*
@@ -56,7 +57,7 @@ struct modtab
 };
 
 
-struct modtab	Modtab[]
+struct modtab	Modtab[] =
 {
 	/* type		spec	keys	sort	seq	ffac	min	max */
 
@@ -146,7 +147,7 @@ char	**pv;
 	** the new relation.
 	*/
 	bmove(&dold, &dnew, sizeof dnew);
-	dnew.reltid.line_id = -2;	/* choose impossible reltid */
+	((struct tup_id *)&dnew.reltid)->line_id = -2;	/* choose impossible reltid */
 
 	/* In case of an interrupt from a previous modify,
 	** there might be pages around. Get rid of them.
@@ -357,7 +358,7 @@ struct modtab		*mp;
 		if (!sort_only)
 		{
 			d->relxtra[i] = keyno;
-			keywid =+ (d->relfrml[i] & I1MASK);
+			keywid += (d->relfrml[i] & I1MASK);
 		}
 		if (d->relgiven[i])
 			return (error(5507, relname, cp, 0));	/* duplicate attribute */
@@ -639,7 +640,6 @@ char			sortit;
 	register int			i;
 	char				tup_buf[MAXTUP], last_tup[MAXTUP];
 	char				junk[4], newreltype, anytups, chkdups;
-	char				sortbuf[IOBUFSIZ], spoolbuf[IOBUFSIZ];
 	int				need, j;
 	long				lnum;
 	struct tup_id			tid, stid, stidlim;
@@ -650,7 +650,7 @@ char			sortit;
 	newreltype = abs(desc->relspec);
 	if (sortit)
 	{
-		if ((fp = fopen(Mod_info.outfile, "read", sortbuf)) == NULL)
+		if ((fp = fopen(Mod_info.outfile, "r")) == NULL)
 			syserr("FILL_REL: fopen %.14s", Mod_info.outfile);
 	}
 	else
@@ -681,13 +681,13 @@ char			sortit;
 	{
 		if (sortit)
 		{
-			i = fread(fp, tup_buf, desc->relwid);
+			i = fread(tup_buf, 1, desc->relwid, fp);
 			if (i == 0)
 				break;
 			if (i != desc->relwid)
 				syserr("FILL_REL: fread A %d", i);
 			if (newreltype == M_HASH)
-				if (fread(fp, junk, 4) != 4)
+				if (fread(junk, 1, 4, fp) != 4)
 					syserr("FILL_REL: fread B");
 		}
 		else
@@ -743,11 +743,11 @@ char			sortit;
 			/* spool out this tuple. will go on overflow page later */
 			if (spfp == NULL)
 			{
-				if ((spfp = fopen(Mod_info.spfile, "write", spoolbuf)) == NULL)
+				if ((spfp = fopen(Mod_info.spfile, "w")) == NULL)
 					syserr("FILL_REL: fopen %.14s", Mod_info.spfile);
 				Mod_info.spflag = TRUE;
 			}
-			if (fwrite(spfp, tup_buf, desc->relwid) != desc->relwid)
+			if (fwrite(tup_buf, 1, desc->relwid, spfp) != desc->relwid)
 				syserr("FILL_REL: putb spool");
 			continue;
 		}
@@ -804,7 +804,7 @@ struct descriptor	*dx;
 		if (d->relxtra[tmp] > 0)
 		{
 			keyx[d->relxtra[tmp] - 1] = tmp;
-			keywid =+ d->relfrml[tmp] & I1MASK;
+			keywid += d->relfrml[tmp] & I1MASK;
 		}
 
 	/* Determine the last page of the relation. This will
@@ -871,7 +871,7 @@ struct descriptor	*dx;
 				{
 					len = d->relfrml[keyx[tmp]] & I1MASK;
 					bmove(&tuple[d->reloff[keyx[tmp]]], key, len);
-					key =+ len;
+					key += len;
 				}
 				key = temptup;
 			}
@@ -890,10 +890,10 @@ struct descriptor	*dx;
 				dirbuf.nxtlino = 0;
 			}
 			/* copy key to directory page */
-			bmove(key, &dirbuf.acc_buf[offset], keywid);
+			bmove(key, &(((struct raw_accbuf *)&dirbuf)->acc_buf[offset]), keywid);
 
 			/* update next line number */
-			offset =+ keywid;
+			offset += keywid;
 			dirbuf.nxtlino++;
 			dirbuf.linetab[-dirbuf.nxtlino] = offset;
 		}
@@ -922,15 +922,15 @@ struct descriptor	*descx;
 	register struct descriptor	*desc;
 	register int			i;
 	struct tup_id			tid;
-	char				tup_buf[MAXTUP], spoolbuf[IOBUFSIZ];
+	char				tup_buf[MAXTUP];
 	FILE				*spfp;
 
 	desc = descx;
 	if (Mod_info.spflag)
 	{
-		if ((spfp = fopen(Mod_info.spfile, "read", spoolbuf)) == NULL)
+		if ((spfp = fopen(Mod_info.spfile, "r")) == NULL)
 			syserr("UNSPOOL: fopen spool");
-		while ((i = fread(spfp, tup_buf, desc->relwid)) == desc->relwid)
+		while ((i = fread(tup_buf, 1, desc->relwid, spfp)) == desc->relwid)
 			if ((i = insert(desc, &tid, tup_buf, FALSE)) < 0)
 				syserr("UNSPOOL: insert %.14s %d", desc->relid, i);
 		if (i != 0)
@@ -938,7 +938,7 @@ struct descriptor	*descx;
 		fclose(spfp);
 		unlink(Mod_info.spfile);
 	}
-	desc->reltups =+ desc->reladds;
+	desc->reltups += desc->reladds;
 	desc->reladds = 0;
 	return (0);
 }

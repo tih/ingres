@@ -92,7 +92,7 @@ prred(){ /* print the information about the actions and the reductions */
     if( tystate[i]>0 ){  /* the state is real */
       temp1[i] = index;
       arrval( index );
-      index =+ tystate[i];
+      index += tystate[i];
       }
     else {
       arrval( temp1[-tystate[i]] );
@@ -116,7 +116,7 @@ go2(i,c){ /* do a goto on the closure state, not worrying about lookaheads */
   else return( amem[ apstate[i] + c - NTBASE + nterms ] );
   }
 
-int pkdebug 0;
+int pkdebug = 0;
 apack(p, n ) int *p;{ /* pack state i from temp1 into amem */
   _REGISTER k, l, off;
   int j;
@@ -128,7 +128,7 @@ apack(p, n ) int *p;{ /* pack state i from temp1 into amem */
   if( off > j ){ /* no actions */
     return(0);
     }
-  j =- off;
+  j -= off;
   for( k=0; k<actsiz; ++k ){
     for( l=0; l<=j; ++l ){
       if( p[off+l] != 0 ){
@@ -145,7 +145,7 @@ apack(p, n ) int *p;{ /* pack state i from temp1 into amem */
         }
       }
     if( pkdebug ){
-      for( k=0; k<memact; k=+10){
+      for( k=0; k<memact; k+=10){
         fprintf(Fout, "\t");
         for( l=0; l<=9; ++l ) fprintf(Fout, "%d ", amem[k+l] );
         fprintf(Fout, "\n");
@@ -194,23 +194,23 @@ go2out(){ /* output the gotos for the nontermninals */
 
     /* best is now the default entry */
 
-    zzgobest =+ (times-1)*2;
+    zzgobest += (times-1)*2;
     settab();
     for( j=0; j<=nstate; ++j ){
       if( tystate[j] != 0 && tystate[j]!=best ){
         arrval( j );
         arrval( tystate[j] );
-        offset =+ 2;
-        zzgoent =+ 2;
+        offset += 2;
+        zzgoent += 2;
         }
       }
 
     /* now, the default */
 
-    zzgoent =+ 2;
+    zzgoent += 2;
     arrval( -1 );
     arrval( best );
-    offset =+ 2;
+    offset += 2;
 
     }
 
@@ -222,7 +222,7 @@ go2out(){ /* output the gotos for the nontermninals */
 
   }
 
-int g2debug 0;
+int g2debug = 0;
 go2gen(c){ /* output the gotos for nonterminal c */
 
   int i, work, cc;
@@ -267,7 +267,7 @@ go2gen(c){ /* output the gotos for nonterminal c */
     q = pstate[i+1];
     for( p=pstate[i]; p<q; ++p ){
       if( (cc= *p->pitem) >= NTBASE ){
-        if( temp1[cc =- NTBASE] ){ /* goto on c is possible */
+        if( temp1[cc -= NTBASE] ){ /* goto on c is possible */
           tystate[i] = amem[indgo[i]+c];
           break;
           }
@@ -293,7 +293,7 @@ precftn(r,t){ /* decide a shift/reduce conflict by precedence.
 	return(1);
 	}
 
-int cdebug 0; /* debug for common states */
+int cdebug = 0; /* debug for common states */
 wract(i){ /* output state i */
   /* temp1 has the actions, lastred the default */
   int p, p0, p1, size;
@@ -355,7 +355,7 @@ wract(i){ /* output state i */
       /* we have a match with state j ! */
 
       tystate[i] = -j;
-      zzacsave =+ tystate[j];
+      zzacsave += tystate[j];
       zznsave++;
       wrstate(i);
       return;
@@ -376,12 +376,12 @@ wract(i){ /* output state i */
         else if( p1 == ACCEPTCODE ) arrval( ACCEPTACT );
         else if( p1 == ERRCODE ) arrval( ERRACT );
         else arrval( SHIFTACT + p1 );
-        size =+ 2;
+        size += 2;
         }
     if( lastred ) arrval( REDUCACT + lastred );
     else arrval( ERRACT );
     tystate[i] = size+1; /* store entry size in tystate */
-    zzacent =+ (size+1);
+    zzacent += (size+1);
     return;
   }
 

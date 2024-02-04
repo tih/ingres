@@ -100,7 +100,7 @@ char	chr;
 		break;
 	}
 	Lcase = lsave;
-	Lastok.tok = yylval;
+	Lastok.tok = (char *) yylval;
 	Lastok.tokop = 0;
 	return (Lastok.toktyp);
 }

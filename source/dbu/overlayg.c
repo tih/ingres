@@ -11,7 +11,7 @@ extern int	index();
 extern int	display();
 extern int	dest_const();
 
-int	(*Func[])()
+int	(*Func[])() =
 {
 	&create,
 	&destroy,

@@ -248,7 +248,7 @@ compare(v) char *v; {	/* compare ctokn with v */
 int *yalloc(n){ /* allocate n+1 words from vector mem */
 	int *omem;
 	omem = mem;
-	mem =+ n+1;
+	mem += n+1;
 	if(mem-mem0 >= memsiz) error("memory overflow");
 	return(omem);
 	}

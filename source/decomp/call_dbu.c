@@ -105,7 +105,7 @@ int		rpipnum;
 struct descriptor	Inddes;
 
 
-struct desxx	Desxx[]
+struct desxx	Desxx[] =
 {
 	"indexes",	&Inddes,	0,
 	0

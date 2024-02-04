@@ -1,6 +1,7 @@
+# include	<stdio.h>
+
 # include	"../ingres.h"
 # include	"../aux.h"
-# include	"../fileio.h"
 # include	"monitor.h"
 
 /*
@@ -44,7 +45,7 @@ xwait()
 	Xwaitpid = 0;
 
 	/* reopen query buffer */
-	if ((Qryiop = fopen(Qbname, "a", Qryxxx)) == NULL)
+	if ((Qryiop = fopen(Qbname, "a")) == NULL)
 		syserr("xwait: open %s", Qbname);
 	Notnull = 1;
 

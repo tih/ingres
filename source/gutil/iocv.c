@@ -6,7 +6,7 @@
 **	returned.
 */
 
-iocv(i)
+char *iocv(i)
 int	i;
 {
 	static char	buf[7];

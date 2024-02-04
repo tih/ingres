@@ -27,9 +27,9 @@ struct querytree	*n;
 	switch (t)
 	{
 	  case VAR:
-		printf("%d,%d,%d,%d,%l/", q->varno, q->attno, q->frmt, q->frml&0377, q->valptr);
-		if (q->varno < 0) 
-			writenod(q->valptr);
+		printf("%d,%d,%d,%d,%l/", ((struct qt_var *)q)->varno, ((struct qt_var *)q)->attno, ((struct qt_var *)q)->frmt, ((struct qt_var *)q)->frml&0377, ((struct qt_var *)q)->valptr);
+		if (((struct qt_var *)q)->varno < 0) 
+			writenod(((struct qt_var *)q)->valptr);
 		else
 			printf("\n");
 		return;
@@ -37,16 +37,16 @@ struct querytree	*n;
 	  case AND:
 	  case ROOT:
 	  case AGHEAD:
-		printf("%d,%d,%o,%o", q->tvarc, q->lvarc, q->lvarm, q->rvarm);
+		printf("%d,%d,%o,%o", ((struct qt_root *)q)->tvarc, ((struct qt_root *)q)->lvarc, ((struct qt_root *)q)->lvarm, ((struct qt_root *)q)->rvarm);
 		if (t != AND)
-			printf(",(%d)", q->rootuser);
+			printf(",(%d)", ((struct qt_root *)q)->rootuser);
 		break;
 
 	  case AOP:
 	  case RESDOM:
-		printf("%d,%d,%d", q->resno, q->frmt, q->frml & 0377);
+		printf("%d,%d,%d", ((struct qt_res *)q)->resno, ((struct qt_var *)q)->frmt, ((struct qt_var *)q)->frml & 0377);
 		if (t == AOP)
-			printf("(%d,%d)", q->agfrmt, q->agfrml & 0377);
+			printf("(%d,%d)", ((struct qt_ag *)q)->agfrmt, ((struct qt_ag *)q)->agfrml & 0377);
 		break;
 
 	  case UOP:
@@ -56,21 +56,29 @@ struct querytree	*n;
 		switch (l)
 		{
 		  case 1:
-		  case 2:
-			printf("%d", s->value[0]);
+			printf("%d", i1deref(s->value));
 			break;
-
+		  case 2:
+			printf("%d", i2deref(s->value));
+			break;
 		  case 4:
-			printf("%s", locv(s->value->i4type));
+			printf("%s", locv(i4deref(s->value)));
 		}
 		break;
 
 	  case FLOAT:
-		printf("%.10f", s->value->f4type);
+		switch (l)
+		{
+		  case 4:
+			printf("%.10f", f4deref(s->value));
+			break;
+		  case 8:
+			printf("%.10f", f8deref(s->value));
+		}
 		break;
 
 	  case CHAR:
-		cp = s->value;
+		cp = (char *) s->value;
 		while (l--)
 			putchar(*cp++);
 		break;

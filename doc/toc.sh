@@ -1,4 +1,4 @@
-#
+#! /bin/csh
 foreach i ($*)
 ex - $i << 'EOF'
 /DESCRIPTION/i

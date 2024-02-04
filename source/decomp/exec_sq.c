@@ -117,7 +117,7 @@ int		reopen;
 		maxlimit = MAXRANGE;
 
 	for (i = 0; i < MAXRANGE; i++)
-		if (sq = sqlist[i])
+		if (sq = (struct querytree *) sqlist[i])
 		{
 			if (sq->left->sym.type != TREE)
 			{

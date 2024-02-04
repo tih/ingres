@@ -53,26 +53,26 @@ struct macro
 };
 
 /* primitive declarations */
-struct macro	Macprims[]
+struct macro	Macprims[] =
 {
-	&Macprims[1],	"{define;\020\024t;\020\024s}",				1,
-	&Macprims[2],	"{rawdefine;\020\024t;\020\024s}",			2,
-	&Macprims[3],	"{remove;\020\024t}",					3,
-	&Macprims[4],	"{dump}",						4,
-	&Macprims[5],	"{type\020\024m}",					5,
-	&Macprims[6],	"{read\020\024m}",					6,
-	&Macprims[7],	"{readdefine;\020\024n;\020\024m}",			7,
-	&Macprims[8],	"{ifsame;\020\024a;\020\024b;\020\023t;\020\023f}",	8,
-	&Macprims[9],	"{ifeq;\020\024a;\020\024b;\020\023t;\020\023f}",	9,
-	&Macprims[10],	"{ifgt;\020\024a;\020\024b;\020\023t;\020\023f}",	10,
-	&Macprims[11],	"{eval\020\024e}",					11,
-	&Macprims[12],	"{substr;\020\024f;\020\024t;\024s}",			12,
-	&Macprims[13],	"{dnl}",						13,
-	&Macprims[14],	"{remove}",						3,
-	0,		"{dump;\020\024n}",					4,
+	&Macprims[1],	"{define;\020\024t;\020\024s}",				(char *) 1,
+	&Macprims[2],	"{rawdefine;\020\024t;\020\024s}",			(char *) 2,
+	&Macprims[3],	"{remove;\020\024t}",					(char *) 3,
+	&Macprims[4],	"{dump}",						(char *) 4,
+	&Macprims[5],	"{type\020\024m}",					(char *) 5,
+	&Macprims[6],	"{read\020\024m}",					(char *) 6,
+	&Macprims[7],	"{readdefine;\020\024n;\020\024m}",			(char *) 7,
+	&Macprims[8],	"{ifsame;\020\024a;\020\024b;\020\023t;\020\023f}",	(char *) 8,
+	&Macprims[9],	"{ifeq;\020\024a;\020\024b;\020\023t;\020\023f}",	(char *) 9,
+	&Macprims[10],	"{ifgt;\020\024a;\020\024b;\020\023t;\020\023f}",	(char *) 10,
+	&Macprims[11],	"{eval\020\024e}",					(char *) 11,
+	&Macprims[12],	"{substr;\020\024f;\020\024t;\024s}",			(char *) 12,
+	&Macprims[13],	"{dnl}",						(char *) 13,
+	&Macprims[14],	"{remove}",						(char *) 3,
+	0,		"{dump;\020\024n}",					(char *) 4,
 };
 
-struct macro	*Machead	&Macprims[0];	/* head of macro list */
+struct macro	*Machead	= &Macprims[0];	/* head of macro list */
 
 
 /* parameters */
@@ -130,7 +130,7 @@ struct env	*Macenv;
 */
 
 macinit(rawget, rawpar, endtrap)
-char	(*rawget)();
+int	(*rawget)();
 char	**rawpar;
 int	endtrap;
 {
@@ -420,7 +420,7 @@ int	quote;
 	/* ('escapech' now becomes the maybe quoted character) */
 	escapech = c;
 	if (quote && c != 0)
-		escapech =| QUOTED;
+		escapech |= QUOTED;
 
 	/* set change flag */
 	macschng(escapech);
@@ -666,6 +666,8 @@ char	delim;
 	struct buf		*b;
 	register struct param	*p;
 	int			bracecount;
+	char			*bufalloc();
+	char			*bufcrunch();
 
 	e = Macenv;
 	b = 0;
@@ -708,7 +710,7 @@ char	delim;
 	e->pdelim = 0;
 
 	/* allocate and store the parameter */
-	p = bufalloc(sizeof *p);
+	p = (struct param *) bufalloc(sizeof *p);
 	p->mode = mode;
 	p->name = name;
 	p->nextp = e->params;
@@ -910,6 +912,7 @@ char	**pp;
 	register struct env	*e;
 	register char		c;
 	extern int		macsget();
+	char			*bufcrunch();
 
 	b = 0;
 	p = *pp;
@@ -942,12 +945,13 @@ char	**pp;
 */
 
 macnewev(rawget, rawpar)
-char	(*rawget)();
+int	(*rawget)();
 char	**rawpar;
 {
 	register struct env	*e;
+	char			*bufalloc();
 
-	e = bufalloc(sizeof *e);
+	e = (struct env *) bufalloc(sizeof *e);
 	e->rawget = rawget;
 	e->rawpar = rawpar;
 	e->nexte = Macenv;
@@ -1106,7 +1110,7 @@ int	mask;
 	{
 		c = bufget(&e->mbuf);
 		if (mask)
-			c =& CHARMASK;
+			c &= CHARMASK;
 		bufput(c, &e->pbuf);
 		e->tokenmode = NONE;
 	}
@@ -1122,7 +1126,7 @@ int	mask;
 **	if the parameter is not found ("cannot happen").
 */
 
-macplkup(name)
+char *macplkup(name)
 char	name;
 {
 	register struct param	*p;
@@ -1150,6 +1154,7 @@ char	*trap;
 {
 	register struct env	*e;
 	register char		*p;
+	char			*macro();
 
 	e = Macenv;
 
@@ -1179,10 +1184,12 @@ char	*trap;
 **	The parameter is the primitive to execute.
 */
 
-macprim(n)
+char *macprim(n)
 int	n;
 {
 	register struct env	*e;
+	char			*bufcrunch();
+	char			*macsstr();
 
 	e = Macenv;
 
@@ -1304,6 +1311,9 @@ int	raw;
 	register struct macro	*m;
 	extern int		macsget();
 	int			escapech;
+	char			*bufalloc();
+	char			*bufcrunch();
+	char			*mactcvt();
 
 	/* remove any old macro definition */
 	macremove(template);
@@ -1321,7 +1331,7 @@ int	raw;
 	escapech = 1;
 
 	/* allocate macro header and template */
-	m = bufalloc(sizeof *m);
+	m = (struct macro *) bufalloc(sizeof *m);
 
 	/* scan and convert template, collect available parameters */
 	p = template;
@@ -1399,7 +1409,7 @@ int	raw;
 **	get this.
 */
 
-mactcvt(raw, paramdefined)
+char *mactcvt(raw, paramdefined)
 int	raw;
 char	paramdefined[128];
 {
@@ -1408,6 +1418,7 @@ char	paramdefined[128];
 	register char		d;
 	register int		escapech;
 	char			*p;
+	char			*bufcrunch();
 
 	b = 0;
 	escapech = 1;
@@ -1494,7 +1505,7 @@ char	paramdefined[128];
 		  case TAB | QUOTED:
 		  case SPACE | QUOTED:
 			if (escapech < 0)
-				c =& CHARMASK;
+				c &= CHARMASK;
 			escapech = 1;
 			break;
 
@@ -1521,7 +1532,7 @@ char	paramdefined[128];
 				if (escapech < 0)
 				{
 					/* parameter: don't allow quoted delimiters */
-					c =& CHARMASK;
+					c &= CHARMASK;
 				}
 				escapech = 0;
 			}
@@ -1555,6 +1566,7 @@ char	*name;
 	extern int		macsget();
 	char			*p;
 	register char		*cname;
+	struct macro		*macmlkup();
 
 	if (name != 0)
 	{
@@ -1600,7 +1612,7 @@ char	*name;
 **	The name must be in internal form.
 */
 
-macmlkup(name)
+struct macro *macmlkup(name)
 char	*name;
 {
 	register struct macro	*m;
@@ -1614,7 +1626,7 @@ char	*name;
 		if (macmmatch(n, m->template, 0))
 			return (m);
 	}
-	return (0);
+	return ((struct macro *) 0);
 }
 
 
@@ -1829,7 +1841,7 @@ char	*s;
 **	in the general case modifies 'string' in place.
 */
 
-macsstr(from, to, string)
+char *macsstr(from, to, string)
 int	from;
 int	to;
 char	*string;
@@ -1871,6 +1883,7 @@ char	*name;
 	register char		*n;
 	extern int		macsget();
 	char			*ptr;
+	char			*macmocv();
 
 	n = name;
 	if (n != 0)
@@ -1915,7 +1928,7 @@ char	*name;
 **	in most cases.
 */
 
-macmocv(m)
+char *macmocv(m)
 char	*m;
 {
 	register char	*p;
@@ -1923,6 +1936,7 @@ char	*m;
 	register int	c;
 	register int	pc;
 	static char	*lastbuf;
+	char		*bufcrunch();
 
 	p = m;
 
@@ -2019,7 +2033,7 @@ char	*m;
 **	The null pointer is returned if the macro is not defined.
 */
 
-macro(name)
+char *macro(name)
 char	*name;
 {
 	register struct macro	*m;
@@ -2035,7 +2049,7 @@ char	*name;
 	if (n == 0)
 	{
 		/* some sort of syntax error */
-		return (0);
+		return ((char *) 0);
 	}
 
 	for (m = Machead; m != 0; m = m->nextm)
@@ -2048,5 +2062,5 @@ char	*name;
 	}
 
 	buffree(n);
-	return (0);
+	return ((char *) 0);
 }

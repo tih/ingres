@@ -226,6 +226,7 @@ nullsync()
 	register QTREE		*t;
 	extern struct retcode	*issue();
 	register struct retcode	*rc;
+	QTREE			*tree();
 
 	t = tree(tree(NULL, NULL, TREE, 0), tree(NULL, NULL, QLEND, 0), ROOT, 0);
 	rc = issue(EXEC_DECOMP, '0', t);

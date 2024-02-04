@@ -1,6 +1,7 @@
+# include	<stdio.h>
+
 # include	"../ingres.h"
 # include	"../aux.h"
-# include	"../fileio.h"
 # include	"../access.h"
 # include	"../pipes.h"
 # include	"../symbol.h"
@@ -242,8 +243,8 @@ int	argc;
 char	*argv[];
 {
 	register int		i;
-	FILE			*admin;
-	char			adminbuf[IOBUFSIZ];
+	int			admin;			/* file desc */
+	char			adminbuf[BUFSIZ];
 	extern struct admin	Admin;
 	extern int		errno;
 	auto int		code;
@@ -259,6 +260,8 @@ char	*argv[];
 	extern char		*Flagvect[];
 	int			exists;
 	extern char		Version[];
+	int			*flaglkup();
+	char			*ztack();
 
 #	ifdef xSTR1
 	tTrace(&argc, argv, 'T');
@@ -626,7 +629,7 @@ readdbtemp()
 
 		/* get relation name */
 		q[1] = p;
-		p =+ getname(p) + 1;
+		p += getname(p) + 1;
 
 		/* test for end of dbtmplt file */
 		if (q[1][0] == 0)
@@ -634,10 +637,10 @@ readdbtemp()
 		
 		/* get relation status */
 		i = getstat(defrstat, &r->bitson, &r->bitsoff);
-		i =| S_CATALOG;		/* guarantee system catalog */
+		i |= S_CATALOG;		/* guarantee system catalog */
 		*q++ = p;
 		*p++ = ((i >> 15) & 1) + '0';
-		for (j = 12; j >= 0; j =- 3)
+		for (j = 12; j >= 0; j -= 3)
 			*p++ = ((i >> j) & 07) + '0';
 		*p++ = 0;
 		q++;
@@ -649,7 +652,7 @@ readdbtemp()
 		{
 			/* get attribute name */
 			*q++ = p;
-			p =+ getname(p) + 1;
+			p += getname(p) + 1;
 			if (q[-1][0] == 0)
 				break;
 			if (Delim != '\t')
@@ -657,7 +660,7 @@ readdbtemp()
 			
 			/* get attribute type */
 			*q++ = p;
-			p =+ getname(p) + 1;
+			p += getname(p) + 1;
 			if (Delim != '\n')
 				syserr("readdbtemp: bad type %c", Delim);
 		}
@@ -826,13 +829,13 @@ int	*bitsoff;
 
 		if (c == '+')
 		{
-			stat =| i;
-			*bitson =| i;
+			stat |= i;
+			*bitson |= i;
 		}
 		else
 		{
-			stat =& ~i;
-			*bitsoff =| i;
+			stat &= ~i;
+			*bitsoff |= i;
 		}
 	}
 }
@@ -1035,7 +1038,7 @@ makedb()
 #	endif
 
 	/* create the physical files */
-	for (r = &Rellist; r->parmv[1] != 0; r++)
+	for (r = Rellist; r->parmv[1] != 0; r++)
 	{
 		makefile(r);
 	}
@@ -1146,7 +1149,7 @@ char			*pv[];
 			syserr("makeadmin: len err %s", p[0]);
 		des->relfrml[des->relatts] = len;
 		des->reloff[des->relatts] = des->relwid;
-		des->relwid =+ len;
+		des->relwid += len;
 	}
 }
 /*
@@ -1402,7 +1405,7 @@ struct flag
 	int	flagval;	/* user-defined value of the flag */
 };
 
-struct flag	Flags[]
+struct flag	Flags[] =
 {
 	'q',	0,	0,
 	'l',	0,	0,
@@ -1481,7 +1484,7 @@ char	fx;
 	f = fx;
 
 	/* get value of flag */
-	p = flaglkup(f, 0);
+	p = (char *) flaglkup(f, 0);
 
 	/* test for error return, syserr if so */
 	if (p == NULL)
@@ -1624,7 +1627,7 @@ changedb()
 	opencatalog("attribute", 0);
 
 	/* scan the relation list:- Rellist */
-	for (r = &Rellist; r->parmv[1] != 0; r++)
+	for (r = Rellist; r->parmv[1] != 0; r++)
 	{
 		/* see if this relation exists */
 		clearkeys(&Reldes);

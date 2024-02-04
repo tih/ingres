@@ -6,7 +6,7 @@
 **	zero.  A pointer to the parameter is returned.
 */
 
-getufield(buf, num)
+char *getufield(buf, num)
 char	*buf;
 int	num;
 {

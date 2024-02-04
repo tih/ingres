@@ -14,7 +14,7 @@
 **	generating a syntax error from the yacc parser.  In other
 **	words, they should never happen.
 */
-int	Messages[]
+int	Messages[] =
 {
 	0,		/* mdRETTERM */
 	2502,		/* mdRETR */
@@ -61,19 +61,19 @@ char	*a, *b, *c;
 		switch (Lastok.toktyp)
 		{
 		  case I2CONST:
-			itoa(Lastok.tok->i2type, buf);
+			itoa(i2deref(Lastok.tok), buf);
 			break;
 
 		  case I4CONST:
-			smove(locv(Lastok.tok->i4type), buf);
+			smove(locv(i4deref(Lastok.tok)), buf);
 			break;
 
 		  case F4CONST:
-			ftoa(Lastok.tok->f4type, buf, 10, 3, 'n');
+			ftoa(f4deref(Lastok.tok), buf, 10, 3, 'n');
 			break;
 
 		  case F8CONST:
-			ftoa(Lastok.tok->f8type, buf, 10, 3, 'n');
+			ftoa(f8deref(Lastok.tok), buf, 10, 3, 'n');
 			break;
 
 		  case SCONST:

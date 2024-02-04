@@ -41,12 +41,13 @@ char	format;
 	char		mode;
 	int		lowercase;
 	int		prec;
+	char		*fcvt(), *ecvt();
 
 	prec = prec1;
 	mode = format;
 	lowercase = 'a' - 'A';
 	if (mode >= 'a')
-		mode =- 'a' - 'A';
+		mode -= 'a' - 'A';
 	else
 		lowercase = 0;
 
@@ -72,9 +73,9 @@ char	format;
 		}
 
 		/* compute space length left after dec pt and fraction */
-		avail =- prec + 1;
+		avail -= prec + 1;
 		if (mode == 'G')
-			avail =- 4;
+			avail -= 4;
 
 		if (avail >= expon)
 		{

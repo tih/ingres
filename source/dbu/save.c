@@ -81,35 +81,35 @@ char	**parmv;
 	/* do year conversion */
 	for (i = 1970; i < year; i++)
 	{
-		date =+ dysize(i);
+		date += dysize(i);
 	}
 
 	/* do month conversion */
 	for (i = 0; i < month; i++)
-		date =+ Dmsize[i];
+		date += Dmsize[i];
 	/* once again, allow for leapyears */
 	if (month >= 2 && year % 4 == 0 && year % 100 != 0)
-		date =+ 1;
+		date += 1;
 
 	/* do day conversion */
-	date =+ day - 1;
+	date += day - 1;
 
 	/* we now convert date to be the # of hours since 1970 */
-	date =* 24;
+	date *= 24;
 
 	/* do daylight savings computations */
 	/*  <<<<< none now >>>>> */
 
 	/* convert to seconds */
-	date =* 60 * 60;
+	date *= 60 * 60;
 
 	/* adjust to local time */
 #	ifdef xV7_UNIX
 	ftime(&timeb);
-	date =+ ((long) timeb.timezone) * 60;
+	date += ((long) timeb.timezone) * 60;
 #	endif
 #	ifndef xV7_UNIX
-	date =+ timezone;
+	date += timezone;
 #	endif
 
 #	ifdef xZTR1
@@ -154,7 +154,7 @@ struct monthtab
 	int	month;
 };
 
-struct monthtab	Monthtab[]
+struct monthtab	Monthtab[] =
 {
 	"jan",		1,
 	"feb",		2,

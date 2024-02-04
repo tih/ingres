@@ -18,6 +18,7 @@ char	*id;
 char	*outname;
 {
 	register char	*p;
+	char *pmove();
 
 	p = outname;
 	p = pmove(iname, p, MAXNAME, ' ');

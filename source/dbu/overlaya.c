@@ -5,7 +5,7 @@ extern	print();
 extern	help();
 extern	resetrel();
 
-int	(*Func[])()
+int	(*Func[])() =
 {
 	&create,
 	&destroy,

@@ -19,6 +19,7 @@ struct tup_id		*tid;
 	int				i;
 	long				mpage, newpage;
 	struct tup_id			tidx;
+	struct accbuf			*choose_buf();
 
 	d = dx;
 
@@ -63,7 +64,7 @@ struct tup_id		*tid;
 	b->thispage = newpage;
 	b->linetab[0] = b->firstup - b;
 	b->nxtlino = 0;
-	b->bufstatus =| BUF_DIRTY;
+	b->bufstatus |= BUF_DIRTY;
 	if (pageflush(b))
 		return (-2);
 
@@ -79,7 +80,7 @@ struct tup_id		*tid;
 	if (get_page(d, tid))
 		return (-3);
 	Acc_head->ovflopg = newpage;
-	Acc_head->bufstatus =| BUF_DIRTY;
+	Acc_head->bufstatus |= BUF_DIRTY;
 	i = pageflush(Acc_head);
 	if (lk)
 	{

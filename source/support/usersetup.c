@@ -1,7 +1,8 @@
+# include	<stdio.h>
+
 # include	"../ingres.h"
 # include	"../aux.h"
 # include	"../unix.h"
-# include	"../fileio.h"
 
 /*
 **  Initialize Users File From Passwd File
@@ -31,15 +32,14 @@ char	**argv;
 	char			*pathname;
 	register char		*code;
 	char			*field[UF_NFIELDS];
-	char			iobuf[IOBUFSIZ];
-	register int		iop;
+	register FILE		*iop;
 	extern char		*Proc_name;
 
 	Proc_name = "USERSETUP";
 	pathname = NULL;
 
 	code = "aa";
-	if ((iop = fopen("/etc/passwd", "r", iobuf)) == NULL)
+	if ((iop = fopen("/etc/passwd", "r")) == NULL)
 		syserr(0, "cannot open /etc/passwd for reading");
 
 	/* scan for INGRES in /etc/passwd */
@@ -64,7 +64,7 @@ char	**argv;
 	/* rewind passwd file */
 	if (fclose(iop))
 		syserr("fclose");
-	if ((iop = fopen("/etc/passwd", "r", iobuf)) == NULL)
+	if ((iop = fopen("/etc/passwd", "r")) == NULL)
 		syserr("open /etc/passwd 2");
 
 	/* open output file as needed */

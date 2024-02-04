@@ -8,7 +8,7 @@
 
 
 exactkey(ap, key)
-struct accessparm	*ap;
+struct accessparam	*ap;
 struct  key		*key;
 
 /*
@@ -23,7 +23,7 @@ struct  key		*key;
 **	Returns > 0 if it can.
 */
 {
-	register struct accessparm	*a;
+	register struct accessparam	*a;
 	register struct key		*k;
 	register struct simp		*s;
 	int				d, i, j;
@@ -78,7 +78,7 @@ struct  key		*key;
 
 
 rangekey(ap, l, h)
-struct accessparm	*ap;
+struct accessparam	*ap;
 struct key		*l;
 struct key		*h;
 
@@ -99,7 +99,7 @@ struct key		*h;
 {
 	register struct key	*low, *high;
 	register struct simp	*s;
-	struct accessparm	*a;
+	struct accessparam	*a;
 	int			sec_indx, d, i;
 	int			rel, success, ns, lowkey, allexact;
 
@@ -209,7 +209,7 @@ char		*keytuple;
 		sk = Stack;
 		getsymbol(sk, &s);	/* copy symbol to stack. caution:getsym changes the value of s. */
 		rcvt(sk, Scanr->relfrmt[dnum], Scanr->relfrml[dnum]);	/* convert key to correct type */
-		p = sk->value;
+		p = (char *) sk->value;
 
 		if (sk->type == CHAR)
 		{
@@ -261,7 +261,7 @@ char		*dest;
 	register int	l;
 	int		blank;
 
-	s = sym->value->stringp;	/* s points to the char string */
+	s = cpderef(sym->value);	/* s points to the char string */
 	d = dest;
 	blank = 0;
 

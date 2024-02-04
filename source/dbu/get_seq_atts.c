@@ -12,7 +12,7 @@
 **
 **		seq_init(Attribute_descriptor, Descriptor_for_relation)
 **
-**		while (seq_attribute(Att_desc, Des_for_rel, Tuple)
+**		while (seq_attributes(Att_desc, Des_for_rel, Tuple)
 **		{
 **		}
 **
@@ -100,7 +100,7 @@ struct attribute	*att_tuple;
 				** Turn off seq mode. Save the tid of
 				** the current tuple. It will be the
 				** starting point for the next call
-				** to seq_attribute
+				** to seq_attributes
 				*/
 				bmove(&Seq_tdl, &Seq_tdf, sizeof (Seq_tdf));
 				Seq_seqmode = FALSE;

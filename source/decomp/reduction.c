@@ -53,11 +53,11 @@ int		varmap;
 	struct complist			*cprev, *cl;
 
 	vmap = varmap;
-	for (var = 1; vmap; var =<< 1)
+	for (var = 1; vmap; var <<= 1)
 	{
 		if ((vmap & var) == 0)
 			continue;
-		vmap =& ~var;	/* remove var */
+		vmap &= ~var;	/* remove var */
 
 		/* done if query is already a single piece */
 		if (clist->nextcomp == 0)
@@ -87,7 +87,7 @@ int		varmap;
 						cprev->nextcomp = cnext->nextcomp;
 		
 						/* fix up bit map */
-						chead->bitmap =| cnext->bitmap;
+						chead->bitmap |= cnext->bitmap;
 		
 						/* find end of head component */
 						for (cl = chead; cl->linkcomp; cl = cl->linkcomp);
@@ -131,16 +131,17 @@ char			*buf;
 	register struct complist	*head, *next;
 	register struct querytree	*root;
 	struct complist			*ret;
+	extern struct querytree		*need();
 
-	ret = need(buf, 0);
+	ret = (struct complist *) need(buf, 0);
 	head = 0;
 
 	for (root = root1; root->sym.type != QLEND; root = root->right)
 	{
-		next = need(buf, sizeof (struct complist));
+		next = (struct complist *) need(buf, sizeof (struct complist));
 		next->clause = root;
 		next->nextcomp = next->linkcomp = 0;
-		next->bitmap = root->lvarm;
+		next->bitmap = ((struct qt_root *)root)->lvarm;
 
 		if (head)
 			head->nextcomp = next;
@@ -150,7 +151,7 @@ char			*buf;
 }
 
 
-construct(root, listhead, buf)
+struct querytree *construct(root, listhead, buf)
 struct querytree	*root;
 struct complist		*listhead;
 char			*buf;
@@ -168,6 +169,7 @@ char			*buf;
 {
 	register struct querytree	*ret, *q;
 	register struct complist	*clist;
+	extern struct querytree		*makroot();
 
 	clist = listhead;
 

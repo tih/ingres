@@ -509,7 +509,7 @@ loop:
 		** the	domain	is not known.  Ascii applied to	a
 		** character domain does nothing.
 		*/
-##		retrieve (rname	= e.name, info = ascii(e.domain))
+##		retrieve (rname	= e.name, info = ascii(#e.domain))
 ##			where e.name = ename
 ##		{
 

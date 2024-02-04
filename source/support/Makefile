@@ -1,67 +1,61 @@
 BIN=	../../bin
 LIB=	../../lib
-LIBS=	$(LIB)/dbulib $(LIB)/access $(LIB)/iutil $(LIB)/iutil $(LIB)/gutil
+LIBS=	$(LIB)/dbulib $(LIB)/access $(LIB)/iutil $(LIB)/gutil
 CFLAGS= -O
 LDFLAGS=-i
 OBJS=	error.o
-MODE=	4711
 ALL=	creatdb destroydb purge helpr ingres printr restore sysmod \
-	usersetup drtst timefix
+	usersetup
+ALLQ=	copydb
 
 all: $(ALL)
 
+allq: $(ALLQ)
+
 creatdb: creatdb.o $(OBJS)
-	$(CC) $(LDFLAGS) creatdb.o $(OBJS) $(LIBS) -o creatdb
+	$(CC) $(LDFLAGS) -o creatdb creatdb.o $(OBJS) $(LIBS)
 
 destroydb: destroydb.o
-	$(CC) $(LDFLAGS) destroydb.o $(LIBS) -o destroydb
+	$(CC) $(LDFLAGS) -o destroydb destroydb.o $(LIBS)
 
 purge: purge.o subs.o $(OBJS)
-	$(CC) $(LDFLAGS) purge.o subs.o $(OBJS) $(LIBS) -o purge
+	$(CC) $(LDFLAGS) -o purge purge.o subs.o $(OBJS) $(LIBS)
 		
 helpr: helpr.o $(OBJS)
-	$(CC) $(LDFLAGS) helpr.o $(OBJS) $(LIBS) -o helpr
+	$(CC) $(LDFLAGS) -o helpr helpr.o $(OBJS) $(LIBS)
 
 ingres: ingres.o
-	$(CC) $(LDFLAGS) ingres.o $(LIBS) -o ingres
+	$(CC) $(LDFLAGS) -o ingres ingres.o $(LIBS)
 
 printr: printr.o
-	$(CC) $(LDFLAGS) printr.o $(LIBS) -o printr
+	$(CC) $(LDFLAGS) -o printr printr.o $(LIBS)
 
 restore: restore.o $(OBJS) subs.o
-	$(CC) $(LDFLAGS) restore.o $(OBJS) subs.o $(LIBS) -o restore
+	$(CC) $(LDFLAGS) -o restore restore.o $(OBJS) subs.o $(LIBS)
 
 sysmod: sysmod.o $(OBJS)
-	$(CC) $(LDFLAGS) sysmod.o $(OBJS) $(LIBS) -o sysmod
+	$(CC) $(LDFLAGS) -o sysmod sysmod.o $(OBJS) $(LIBS)
 
 usersetup: usersetup.o
-	$(CC) $(LDFLAGS) usersetup.o $(LIBS) -o usersetup
+	$(CC) $(LDFLAGS) -o usersetup usersetup.o $(LIBS)
 
-drtst: drtst.o
-	$(CC) $(LDFLAGS) drtst.o $(LIBS) -o drtst
-
-timefix: timefix.o
-	$(CC) $(LDFLAGS) timefix.o $(LIBS) -o timefix
+copydb: copydb.q
+	equel copydb.q
+	$(CC) $(LDFLAGS) -o copydb copydb.c $(LIB)/gutil $(LIB)/libq.a
 
 install: creatdb destroydb helpr ingres printr restore sysmod purge usersetup
-	cp usersetup $(BIN)/usersetup
-	chmod 700 $(BIN)/usersetup
-	cp purge $(BIN)/purge
-	chmod $(MODE) $(BIN)/purge
-	cp creatdb $(BIN)/creatdb
-	chmod $(MODE) $(BIN)/creatdb
-	cp destroydb $(BIN)/destroydb
-	chmod $(MODE) $(BIN)/destroydb
-	cp helpr $(BIN)/helpr
-	chmod $(MODE) $(BIN)/helpr
-	cp ingres $(BIN)/ingres
-	chmod $(MODE) $(BIN)/ingres
-	cp printr $(BIN)/printr
-	chmod $(MODE) $(BIN)/printr
-	cp restore $(BIN)/restore
-	chmod $(MODE) $(BIN)/restore
-	cp sysmod $(BIN)/sysmod
-	chmod $(MODE) $(BIN)/sysmod
+	install -c -m 0700 usersetup $(BIN)/usersetup
+	install -c -m 4751 purge $(BIN)/purge
+	install -c -m 4751 creatdb $(BIN)/creatdb
+	install -c -m 4751 destroydb $(BIN)/destroydb
+	install -c -m 4751 helpr $(BIN)/helpr
+	install -c -m 4751 ingres $(BIN)/ingres
+	install -c -m 4751 printr $(BIN)/printr
+	install -c -m 4751 restore $(BIN)/restore
+	install -c -m 4751 sysmod $(BIN)/sysmod
+
+installq: copydb
+	install -c -m 0751 copydb $(BIN)/copydb
 
 clean:
-	rm *.o
+	rm -f $(ALL) $(ALLQ) copydb.c *.o *.core a.out

@@ -18,7 +18,7 @@
 char	*Proc_name;
 int	Accerror;
 extern	exit();
-int	(*Exitfn)()	&exit;
+int	(*Exitfn)() =	&exit;
 
 syserr(pv)
 char	*pv;

@@ -1,6 +1,7 @@
+# include	<stdio.h>
+
 # include	"../ingres.h"
 # include	"../aux.h"
-# include	"../fileio.h"
 # include	"monitor.h"
 
 /*
@@ -10,6 +11,7 @@
 newdirec()
 {
 	register char	*direc;
+	char		*getfilename();
 
 	direc = getfilename();
 	if (chdir(direc))

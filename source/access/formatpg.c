@@ -16,7 +16,7 @@ long			n;
 		return (-2);
 	buf.rel_tupid = d->reltid;
 	buf.filedesc = d->relfp;
-	for (p = &buf; p <= buf.linetab; p++)
+	for (p = (char *)&buf; p <= buf.linetab; p++)
 		*p = NULL;
 	buf.nxtlino = 0;
 	buf.linetab[0] = buf.firstup - &buf;
@@ -29,6 +29,6 @@ long			n;
 	buf.mainpg = 0;
 	if (write(buf.filedesc, &buf, PGSIZE) != PGSIZE)
 		return (-4);
-	Accuwrite =+ n;
+	Accuwrite += n;
 	return (0);
 }

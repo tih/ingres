@@ -126,7 +126,7 @@ QTREE	*vtree;
 
 	for (v = vtree; v->sym.type == RESDOM; v = v->left)
 	{
-		if (v->resno != n)
+		if (((struct qt_res *)v)->resno != n)
 			continue;
 
 		/* found the correct replacement */
@@ -189,7 +189,7 @@ int	an;
 		return (t);
 
 	/* check to see if this node qualifies */
-	if (t->sym.type == VAR && t->varno == vn && t->attno == an)
+	if (t->sym.type == VAR && ((struct qt_var *)t)->varno == vn && ((struct qt_var *)t)->attno == an)
 		return (t);
 
 	/* check other nodes */
@@ -242,13 +242,13 @@ QTREE	*root;
 
 	/* scan left and right branches */
 	s = varset(t->left);
-	s =| varset(t->right);
+	s |= varset(t->right);
 
 	/* check out this node */
 	if (t->sym.type == VAR)
 	{
 		/* or in bit corresponding to this varno */
-		s =| 1 << t->varno;
+		s |= 1 << ((struct qt_var *)t)->varno;
 	}
 
 	return (s);
@@ -340,7 +340,7 @@ int	vmode;
 	register QTREE	*t;
 	register QTREE	*v;
 	register int	i;
-	extern QTREE	*vfind();
+	extern QTREE	*vfind(), *makezero(), *treedup();
 	extern int	Newresvar;	/* defined in view.c */
 
 	t = *proot;
@@ -358,7 +358,7 @@ int	vmode;
 	subsvars(&t->left, vn, v, vmode);
 
 	/* check for special 'tid' RESDOM (used by DEL and REPL) */
-	if (t->sym.type == RESDOM && t->resno == 0)
+	if (t->sym.type == RESDOM && ((struct qt_res *)t)->resno == 0)
 	{
 		/* test for not Resultvar, in which case we ignore leaf */
 		if (vn != Resultvar)
@@ -366,16 +366,16 @@ int	vmode;
 
 		/* t->right better be VAR node, attno 0 */
 		t = t->right;
-		if (t->sym.type != VAR || t->attno != 0 || t->varno != vn)
+		if (t->sym.type != VAR || ((struct qt_var *)t)->attno != 0 || ((struct qt_var *)t)->varno != vn)
 			syserr("subsvars: RESDOM 0 not VAR 0 %d, %d, %d",
-				vn, t->attno, t->sym.type);
+				vn, ((struct qt_var *)t)->attno, t->sym.type);
 		
 		/* change varno to new Newresvar (set by vrscan) */
 #		ifdef xQTR3
 		if (tTf(32, 1))
 			printf("RESDOM 0: Newresvar %d\n", Newresvar);
 #		endif
-		t->varno = Newresvar;
+		((struct qt_var *)t)->varno = Newresvar;
 		return;
 	}
 
@@ -383,21 +383,21 @@ int	vmode;
 	subsvars(&t->right, vn, v, vmode);
 
 	/* check for interesting node */
-	if (t->sym.type != VAR || t->varno != vn)
+	if (t->sym.type != VAR || ((struct qt_var *)t)->varno != vn)
 		return;
 
 	/* test for special 'tid' attribute case */
-	if (t->attno == 0 && vmode == mdVIEW)
+	if (((struct qt_var *)t)->attno == 0 && vmode == mdVIEW)
 	{
 		ferror(3340, Qmode, vn, 0);	/* views do not have tids */
 	}
 
 	/* find var in vtree */
-	v = vfind(t->attno, v);
+	v = vfind(((struct qt_var *)t)->attno, v);
 	if (v == NULL)
 	{
 		if (vmode == mdVIEW)
-			syserr("subsvars: attno %d", t->attno);
+			syserr("subsvars: attno %d", ((struct qt_var *)t)->attno);
 		else if (vmode == mdAPP)
 			v = makezero();
 	}

@@ -216,7 +216,7 @@ QTREE	*root;
 */
 
 extern struct pipfrmt	Pipe;
-char	*Qmdname[]
+char	*Qmdname[] =
 {
 	"[ERROR]",	/* 0 = mdRETTERM */
 	"RETRIEVE",	/* 1 = mdRETR */
@@ -258,7 +258,7 @@ char	*p1, *p2, *p3, *p4, *p5, *p6;
 	register int	i;
 	extern char	*trim_relname();
 	extern int	Nullsync;
-	struct retcode	*rc;
+	struct retcode	*rc, *nullsync();
 
 	/* flush the upward read pipe */
 	rdpipe(P_SYNC, &Pipe, R_up);
@@ -340,9 +340,9 @@ int	xset[8];
 
 	b = bitno;
 	n = b >> LOG2WORDSIZE;
-	b =& WORDSIZE - 1;
+	b &= WORDSIZE - 1;
 
-	x[n] =| 1 << b;
+	x[n] |= 1 << b;
 }
 /*
 **  MERGEVAR -- merge variable numbers to link terms
@@ -475,25 +475,26 @@ int	typ;
 	register int		l;
 	register struct symbol	*s;
 	int			symbuf[(sizeof *s + 4) / sizeof l];
+	char			*need();
 
-	s = &symbuf;
+	s = (struct symbol *) &symbuf;
 	s->type = typ;
 
 	switch (typ)
 	{
 	  case INT:
 		s->len = l = 2;
-		s->value[0] = 0;
+		i2deref(s->value) = 0;
 		break;
 
 	  case FLOAT:
 		s->len = l = 4;
-		s->value->f4type = 0.0;
+		f4deref(s->value) = 0.0;
 		break;
 
 	  case CHAR:
 		s->len = l = 2;
-		s->value[0] = '  ';	/* (two spaces) */
+		i2deref(s->value) = 0x2020;	/* (two spaces) */
 		break;
 
 	  default:
@@ -501,8 +502,8 @@ int	typ;
 	}
 
 	/* duplicate the node into Qbuf */
-	l =+ sizeof *s;
-	s = need(Qbuf, l);
+	l += sizeof *s;
+	s = (struct symbol *) need(Qbuf, l);
 	bmove(&symbuf, s, l);
-	return (s);
+	return ((QTREE *) s);
 }

@@ -34,7 +34,7 @@ char			*buf;
 		q = r;
 		r = r->right;	/* r is now the AND node */
 
-		if (r->lvarc == 0)
+		if (((struct qt_root *)r)->lvarc == 0)
 		{
 			/* we have a constant clause */
 			if (s == 0)
@@ -48,7 +48,7 @@ char			*buf;
 			s->right = r;
 
 			/* fix up var counts (just for good form!) */
-			r->rvarm = r->tvarc = 0;
+			((struct qt_root *)r)->rvarm = ((struct qt_root *)r)->tvarc = 0;
 
 			r = q;
 		}

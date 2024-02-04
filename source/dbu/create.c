@@ -246,7 +246,7 @@ char	**pv;
 	**	(Since views cannot be protected, this doesn't apply to them)
 	*/
 	if ((Admin.adhdr.adflags & A_QRYMOD) && ((relstat & (S_VIEW || S_CATALOG)) == 0))
-		relstat =| (S_PROTALL | S_PROTRET);
+		relstat |= (S_PROTALL | S_PROTRET);
 	relname = *(++pp);
 	ingresname(relname, Usercode, rel.relid);
 	bmove(rel.relid, att.attrelid, MAXNAME + 2);
@@ -284,14 +284,14 @@ char	**pv;
 
 	/* check attributes */
 	pp++;
-	for (i = pc - 2; i > 0; i =- 2)
+	for (i = pc - 2; i > 0; i -= 2)
 	{
 		bad = chk_att(&rel, pp[0], pp[1], domain);
 		if (bad != 0)
 		{
 			return (error(bad, relname, pp[0], pp[1], 0));
 		}
-		pp =+ 2;
+		pp += 2;
 	}
 
 	/*
@@ -348,10 +348,10 @@ char	**pv;
 	/* insert attributes into attribute relation */
 	pp = pv + 2;
 	dom = domain;
-	for (i = pc - 2; i > 0; i =- 2)
+	for (i = pc - 2; i > 0; i -= 2)
 	{
 		ins_att(&Attdes, &att, dom++);
-		pp =+ 2;
+		pp += 2;
 	}
 
 	/*
@@ -451,7 +451,7 @@ struct domain		domain[];
 	if (formck(format, &domain[i]))
 		return (5106);		/* bad attribute format */
 	r->relatts++;
-	r->relwid =+ domain[i].frml & 0377;
+	r->relwid += domain[i].frml & 0377;
 	if (r->relatts >= MAXDOM)
 		return (5107);		/* too many attributes */
 	if (r->relwid > MAXTUP && (r->relstat & S_VIEW) == 0)
@@ -520,7 +520,7 @@ struct domain		*dom;
 	att->attid++;
 	if (insert(des, &tid, att, FALSE))
 		syserr("ins_att: insert(att, %s)", d->name);
-	att->attoff =+ att->attfrml & 0377;
+	att->attoff += att->attfrml & 0377;
 }
 
 
@@ -636,7 +636,7 @@ struct relation		*rel1;
 
 	/* setup expiration date (today + one week) */
 	time(&rel->relsave);
-	rel->relsave =+ longconst(9, 14976);
+	rel->relsave += longconst(9, 14976);
 
 	rel->reltups = 0;
 	rel->relatts = 0;

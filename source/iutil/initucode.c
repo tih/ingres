@@ -1,8 +1,9 @@
+# include	<stdio.h>
+
 # include	"../ingres.h"
 # include	"../aux.h"
 # include	"../unix.h"
 # include	"../access.h"
-# include	"../fileio.h"
 # include	"../lock.h"
 
 /*
@@ -210,7 +211,6 @@ int	waitmode;
 	char		*q;
 	char		c;
 	FILE		*iop;
-	char		iobufx[IOBUFSIZ];
 	static char	sbuf[MAXLINE * 2];
 	register char	*sbufp;
 	char		buf[MAXLINE+1];
@@ -253,7 +253,7 @@ int	waitmode;
 	**  This algorithm suggested by Jim Popa.
 	*/
 
-	if ((iop = fopen("/etc/passwd", "r", iobufx)) == NULL)
+	if ((iop = fopen("/etc/passwd", "r")) == NULL)
 		syserr("initucode: passwd");
 
 	do
@@ -283,13 +283,13 @@ int	waitmode;
 
 	/* copy pathname entry into 'Pathname' variable */
 	Pathname = sbufp;
-	sbufp =+ smove(field[i - 1], sbufp) + 1;
+	sbufp += smove(field[i - 1], sbufp) + 1;
 
 	/* create the INGRES user id */
 	if (atoi(p = field[2], &Ing_uid) != 0)
 		syserr("initucode: bad Ing_uid %s", p);
 #	ifdef xV6_UNIX
-	Ing_uid =& 0377;
+	Ing_uid &= 0377;
 #	endif
 #	ifdef xB_UNIX
 	if (atoi(p = field[3], &gid) != 0)
@@ -379,7 +379,7 @@ int	waitmode;
 	**  Scan the "users" file.
 	*/
 
-	if ((iop = fopen(ztack(Pathname, "/files/users"), "r", iobufx)) == NULL)
+	if ((iop = fopen(ztack(Pathname, "/files/users"), "r")) == NULL)
 		syserr("initucode: open error");
 	
 	/* get uid (out of loop) for test */
@@ -457,14 +457,14 @@ int	waitmode;
 		*/
 
 		Usercode = sbufp;
-		sbufp =+ smove(field[UF_UCODE], sbufp) + 1;
+		sbufp += smove(field[UF_UCODE], sbufp) + 1;
 		Status = oatoi(field[UF_STAT]);
 		if (paramlist != NULL)
 		{
 			for (i = 0; i < 4; i++)
 			{
 				paramlist[i] = sbufp;
-				sbufp =+ smove(field[UF_FLAGS + i], sbufp) + 1;
+				sbufp += smove(field[UF_FLAGS + i], sbufp) + 1;
 			}
 		}
 
@@ -536,13 +536,13 @@ int	waitmode;
 		  default:
 			syserr("initucode: initdbpath %d", i);
 		}
-		sbufp =+ length(Dbpath) + 1;
+		sbufp += length(Dbpath) + 1;
 
 		if (rtval == 0 || rtval == 5)
 		{
 			i = open(ztack(Dbpath, "/admin"), 0);
 			if (i < 0)
-				rtval =+ 1;
+				rtval += 1;
 			else
 			{
 				read(i, &Admin.adhdr, sizeof Admin.adhdr);
@@ -630,7 +630,7 @@ int	mode;
 	if ((Admin.adhdr.adflags & A_DBCONCUR) == 0)
 		return;
 	if (Alockdes < 0)
-		Alockdes = open("/dev/lock", 1);
+		Alockdes = open("/dev/ingreslock", 1);
 	if (setdbl(Wait_action, mode) < 0)
 	{
 		printf("Database temporarily unavailable\n");
@@ -677,7 +677,6 @@ int	follow;
 	register char	*d;
 	register FILE	*f;
 	register int	phase;
-	char		fbuf[IOBUFSIZ];
 	int		retval;
 	int		uid;
 
@@ -719,7 +718,7 @@ int	follow;
 		/* set up the lock structure for future use */
 		bmove(&ibuf, Lock.dbnode, 4);
 
-		retval =- 2;
+		retval -= 2;
 		if ((ibuf.st_mode & 060000) == 040000)
 			return (retval);
 		
@@ -737,12 +736,12 @@ int	follow;
 		uid = (uid & 0377) | ((ibuf.st_gid & 0377) << 8);
 #		endif
 #		ifdef xV6_UNIX
-		uid =& 0377;
+		uid &= 0377;
 #		endif
 		if (uid != Ing_uid || (ibuf.st_mode & 0777) != 0600)
 			return (3);
 		
-		f = fopen(d, "r", fbuf);
+		f = fopen(d, "r");
 		if (f == NULL)
 			syserr("initdbpath: fopen");
 	

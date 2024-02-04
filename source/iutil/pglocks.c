@@ -27,8 +27,8 @@ struct	accbuf	*buf;
 	Lock.lrmod = M_EXCL;	/* exclusive lock */
 	bmove(&b->rel_tupid, Lock.lrel, 4);	/* copy relation id */
 	bmove(&b->thispage, Lock.lpage, 4);	/* copy page id */
-	i = write(Alockdes,  &Lock,  KEYSIZE + 3);
-	b->bufstatus =| BUF_LOCKED;
+	i = write(Alockdes,  &Lock,  sizeof(struct lockreq));
+	b->bufstatus |= BUF_LOCKED;
 	return(i);
 }
 /*
@@ -54,8 +54,8 @@ struct	accbuf	*buf;
 	bmove(&b->rel_tupid, Lock.lrel, 4);	/* copy relation id */
 	Lock.lrtype = T_PAGE;	/* page lock */
 	bmove(&b->thispage, Lock.lpage, 4);	/* copy page id */
-	b->bufstatus =& ~BUF_LOCKED;
-	i = write(Alockdes,  &Lock,  KEYSIZE + 3);
+	b->bufstatus &= ~BUF_LOCKED;
+	i = write(Alockdes,  &Lock,  sizeof(struct lockreq));
 	return(i);
 }
 /*
@@ -75,6 +75,6 @@ unlall()
 	if (Alockdes < 0)
 		return(1);
 	Lock.lract = A_RLSA;
-	i = write(Alockdes, &Lock, KEYSIZE + 3);
+	i = write(Alockdes, &Lock, sizeof(struct lockreq));
 	return (i);
 }

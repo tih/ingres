@@ -240,7 +240,7 @@ QTREE	*root;
 	register int		vn;
 	register QTREE		*vtree;
 	int			viewfound;
-	extern QTREE		*gettree();
+	extern QTREE		*gettree(), *norml();
 	auto QTREE		*r;
 
 #	ifdef xQTR1
@@ -457,31 +457,31 @@ QTREE	*vtree;
 			syserr("vrscan: bad TL node %d", t->sym.type);
 
 		/* check for 'tid' attribute (stuck in by DEL and REPL) */
-		if (t->resno == 0)
+		if (((struct qt_res *)t)->resno == 0)
 		{
 			continue;
 		}
 
 		/* find definition for this domain in the view */
-		p = vfind(t->resno, v->left);
+		p = vfind(((struct qt_res *)t)->resno, v->left);
 
 		/* check for simple attribute */
 		if (p->sym.type != VAR)
 			ferror(3310, Qmode, Resultvar, 0);	/* non-simple attribute */
 
 		/* scan qualification of view for this attribute */
-		if (qscan(v->right, p->varno, p->attno) != NULL)
+		if (qscan(v->right, ((struct qt_var *)p)->varno, ((struct qt_var *)p)->attno) != NULL)
 			ferror(3320, Qmode, Resultvar, 0);	/* attribute in qualification of view */
 
 		/* check for trying to do update on two relations again */
 		/* this test should only be true for REPLACE commands */
 		if (i < 0)
-			i = p->varno;
-		else if (i != p->varno)
+			i = ((struct qt_var *)p)->varno;
+		else if (i != ((struct qt_var *)p)->varno)
 			ferror(3330, Qmode, Resultvar, 0);	/* query on two relations */
 
 		/* finally, do the substitution of resno's */
-		t->resno = p->attno;
+		((struct qt_res *)t)->resno = ((struct qt_var *)p)->attno;
 	}
 
 	/* change the result variable for the query to the underlying */

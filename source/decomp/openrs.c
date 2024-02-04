@@ -105,7 +105,7 @@ struct querytree	*root;
 	struct descriptor		*openr1();
 
 	r = root;
-	map = r->lvarm | r->rvarm;
+	map = ((struct qt_root *)r)->lvarm | ((struct qt_root *)r)->rvarm;
 
 #	ifdef xDTR1
 	if (tTf(2, 0))
@@ -261,7 +261,7 @@ int	var;
 
 {
 	register struct desc_tab	*dt;
-
+	struct desc_tab			*desc_get();
 	/* get descv for the relation */
 	dt = desc_get(Rangev[var].relnum, TRUE);
 

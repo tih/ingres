@@ -28,7 +28,7 @@ char			*pre;
 	for (n=name; *n++= *pre++;);
 	*n = '\0';
 	n--;
-	for (p=lnp; *p; p++)
+	for (p=(char **)lnp; *p; p++)
 	{
 		*n = suf++;
 		setp(name);
@@ -102,8 +102,8 @@ struct querytree *p;
 
 	b = buf;
 
-	*b++ = p->frmt;
-	itoa(p->frml & I1MASK, b);
+	*b++ = ((struct qt_var *)p)->frmt;
+	itoa(((struct qt_var *)p)->frml & I1MASK, b);
 	return(buf);
 }
 

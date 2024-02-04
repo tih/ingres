@@ -35,7 +35,7 @@ struct tab
 };
 
 
-struct tab	Uop_tab[]
+struct tab	Uop_tab[] =
 {
 	opPLUS,		"+ ",
 	opMINUS,	"- ",
@@ -55,7 +55,7 @@ struct tab	Uop_tab[]
 	opFLOAT4,	"float4",
 	opFLOAT8,	"float8",
 };
-struct tab	Bop_tab[]
+struct tab	Bop_tab[] =
 {
 	opADD,		"+",
 	opSUB,		"-",
@@ -71,7 +71,7 @@ struct tab	Bop_tab[]
 	opMOD,		"%",
 };
 
-struct tab	Cop_tab[]
+struct tab	Cop_tab[] =
 {
 	opDBA,		"dba",
 	opUSERCODE,	"usercode",
@@ -79,7 +79,7 @@ struct tab	Cop_tab[]
 	opTIME,		"time",
 };
 
-struct tab	Aop_tab[]
+struct tab	Aop_tab[] =
 {
 	opCOUNT,	"count",
 	opCOUNTU,	"countu",
@@ -204,7 +204,7 @@ int			target_flag;
 	if (target_flag)
 	{
 		printf("\t");
-		pr_attname(resultres(), resdom->resno);
+		pr_attname(resultres(), ((struct qt_res *)resdom)->resno);
 		printf(" = ");
 	}
 }
@@ -280,7 +280,7 @@ struct querytree	*ex;
 		break;
 
 	  case BOP:
-		if (e->opno == opCONCAT)
+		if (((struct qt_op *)e)->opno == opCONCAT)
 		{
 			printf("concat(");
 			pr_expr(e->left);
@@ -292,23 +292,23 @@ struct querytree	*ex;
 		{
 			putchar('(');
 			pr_expr(e->left);
-			pr_op(BOP, e->opno);
+			pr_op(BOP, ((struct qt_op *)e)->opno);
 			pr_expr(e->right);
 			putchar(')');
 		}
 		break;
 
 	  case UOP:
-		if ((op = e->opno) == opMINUS || op == opPLUS || op == opNOT)
+		if ((op = ((struct qt_op *)e)->opno) == opMINUS || op == opPLUS || op == opNOT)
 		{
-			pr_op(UOP, e->opno);
+			pr_op(UOP, ((struct qt_op *)e)->opno);
 			pr_expr(e->left);
 			putchar(')');
 		}
 		else
 		{
 			/* functional operators */
-			pr_op(UOP, e->opno);
+			pr_op(UOP, ((struct qt_op *)e)->opno);
 			pr_expr(e->left);
 			putchar(')');
 		}
@@ -318,7 +318,7 @@ struct querytree	*ex;
 		if (e->left->sym.type == AOP)
 		{
 			/* simple aggregate */
-			pr_op(AOP, e->left->opno);
+			pr_op(AOP, ((struct qt_op *)e->left)->opno);
 			pr_expr(e->left->right);
 			if (e->right->sym.type != QLEND)
 			{
@@ -330,7 +330,7 @@ struct querytree	*ex;
 		else
 		{
 			/* aggregate function */
-			pr_op(AOP, e->left->right->opno);
+			pr_op(AOP, ((struct qt_op *)e->left->right)->opno);
 			pr_expr(e->left->right->right);
 			printf(" by ");
 			/* avoid counting target list elements
@@ -357,7 +357,7 @@ struct querytree	*ex;
 		break;
 
 	  case COP:
-		pr_op(COP, e->opno);
+		pr_op(COP, ((struct qt_op *)e)->opno);
 		break;
 
 	  default:
@@ -378,24 +378,24 @@ struct querytree	*ct;
 	{
 	  case INT:
 		if (c->sym.len == 1)
-			printf("%d", c->sym.value->i1type);
+			printf("%d", i1deref(c->sym.value));
 		else if (c->sym.len == 2)
-			printf("%d", c->sym.value[0]);
+			printf("%d", i2deref(c->sym.value));
 		else	/* i4 */
-			printf("%d", c->sym.value->i4type);
+			printf("%d", i4deref(c->sym.value));
 		break;
 
 	  case FLOAT:
 		if (c->sym.len == 4)
-			d = c->sym.value->f4type;
+			d = f4deref(c->sym.value);
 		else
-			d = c->sym.value->f8type;
-		printf("%-10.3f", c->sym.value->f8type);
+			d = f8deref(c->sym.value);
+		printf("%-10.3f", f8deref(c->sym.value));
 		break;
 
 	  case CHAR:
 		printf("\"");
-		cp = c->sym.value;
+		cp = (char *) c->sym.value;
 		for (i = c->sym.len; i--; cp++)
 		{
 			if (any(*cp, "\"\\[]*?") == TRUE)
@@ -493,9 +493,9 @@ struct querytree	*var;
 		printf("pr_var(var=%d)\n", var);
 #	endif
 	v = var;
-	pr_rv(v->varno);
+	pr_rv(((struct qt_var *)v)->varno);
 	putchar('.');
-	pr_attname(Rangev[v->varno].relid, v->attno);
+	pr_attname(Rangev[((struct qt_var *)v)->varno].relid, ((struct qt_var *)v)->attno);
 }
 
 /*

@@ -19,6 +19,7 @@ char *rdsym()
 	register int	i;
 	register int	j;
 	extern char	*Ovqpbuf;
+	char		*need();
 
 	next = need(Ovqpbuf, 2);	/* get two bytes for type and length */
 
@@ -42,13 +43,13 @@ char *rdsym()
 
 #	ifdef xOTR1
 	if (tTf(29, 1))
-		if (next->type != VAR)
+		if (((struct symbol *)next)->type != VAR)
 			prsym(next);
 #	endif
 	
 	if (Qvpointer >= MAXNODES)
 		ov_err(NODOVFLOW);
-	Qvect [Qvpointer++] = next;
+	Qvect [Qvpointer++] = (struct symbol *) next;
 	return (next);
 }
 
@@ -58,7 +59,7 @@ char *rdsym()
 **
 */
 
-sym_ad()
+struct symbol **sym_ad()
 {
 	return (&Qvect [Qvpointer - 1]);
 }
@@ -82,12 +83,13 @@ struct descriptor	*desc;
 	register char			*next;
 	register int			attnum;
 	extern char			*Ovqpbuf;
+	char				*need();
 
-	next = sym;
+	next = (char *) sym;
 	d = desc;
 
 
-	attnum = *next->value & 0377;
+	attnum = ((struct stacksym *)next)->value[0] & 0377;
 	next = need(Ovqpbuf, 4);	/* get four more bytes */
 
 	if (attnum)
@@ -95,16 +97,16 @@ struct descriptor	*desc;
 		/* attnum is a real attribute number */
 		if (attnum > d->relatts)
 			syserr("rdsym:bad att %d in %.12s", attnum, d->relid);
-		next->type = d->relfrmt[attnum];
-		next->len = d->relfrml[attnum];
-		*next->value = &tup[0] + d->reloff[attnum];	/* address within tuple buffer location */
+		((struct stacksym *)next)->type = d->relfrmt[attnum];
+		((struct stacksym *)next)->len = d->relfrml[attnum];
+		((struct stacksym *)next)->value[0] = (int) &tup[0] + d->reloff[attnum];	/* address within tuple buffer location */
 	}
 	else
 	{
 		/* attnum refers to the tuple id */
-		next->type = TIDTYPE;
-		next->len = TIDLEN;	/* tids are longs */
-		*next->value = &Intid;	/* address of tid */
+		((struct stacksym *)next)->type = TIDTYPE;
+		((struct stacksym *)next)->len = TIDLEN;	/* tids are longs */
+		((struct stacksym *)next)->value[0] = (int) &Intid;	/* address of tid */
 	}
 #	ifdef xOTR1
 	if (tTf(29, 3))

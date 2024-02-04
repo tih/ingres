@@ -1,6 +1,7 @@
+# include	<stdio.h>
+
 # include	"../ingres.h"
 # include	"../aux.h"
-# include	"../fileio.h"
 # include	"monitor.h"
 
 /*
@@ -18,9 +19,8 @@ eval(pr)
 int	pr;
 {
 	register FILE	*tfile;
-	char		tbuf[IOBUFSIZ];
 	register char	c;
-	extern int	getc();
+	extern int	fgetc();
 	char		tfilename[40];
 
 	Autoclear = 0;
@@ -30,14 +30,14 @@ int	pr;
 	if (!pr)
 	{
 		concat("/tmp/INGTQ", Fileset, tfilename);
-		if ((tfile = fopen(tfilename, "w", tbuf)) == NULL)
+		if ((tfile = fopen(tfilename, "w")) == NULL)
 			syserr("eval: open(%s)", tfilename);
 	}
 	if (freopen(Qbname, "r", Qryiop) == NULL)
 		syserr("eval: freopen 1");
 
 	/* COPY FILE */
-	macinit(&getc, Qryiop, 1);
+	macinit(&fgetc, Qryiop, 1);
 	while ((c = macgetch()) > 0)
 	{
 		if (pr)

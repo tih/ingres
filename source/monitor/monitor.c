@@ -1,6 +1,7 @@
+# include	<stdio.h>
+
 # include	"../ingres.h"
 # include	"../aux.h"
-# include	"../fileio.h"
 # include	"monitor.h"
 
 /*
@@ -43,7 +44,7 @@ struct cntrlwd
 	int	code;
 };
 
-struct cntrlwd	Controlwords[]
+struct cntrlwd	Controlwords[] =
 {
 	"a",		C_APPEND,
 	"append",	C_APPEND,
@@ -192,6 +193,7 @@ int	copy;
 {
 	register struct cntrlwd	*cw;
 	register char		*word;
+	char			*getname();
 
 	word = getname();
 	for (cw = Controlwords; cw->name; cw++)
@@ -214,7 +216,7 @@ int	copy;
 
 
 
-getname()
+char *getname()
 {
 	register char	*p;
 	static char	buf[41];

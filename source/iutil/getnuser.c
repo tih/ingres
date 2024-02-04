@@ -1,6 +1,7 @@
+# include	<stdio.h>
+
 # include	"../ingres.h"
 # include	"../aux.h"
-# include	"../fileio.h"
 
 /*
 **  GETNUSER -- get line from user file based on name
@@ -42,11 +43,10 @@ char	*name;
 char	buf[];
 {
 	FILE		*userf;
-	char		userbuf[IOBUFSIZ];
 	register char	c;
 	register char	*bp;
 	
-	userf = fopen(ztack(Pathname, "/files/users"), "r", userbuf);
+	userf = fopen(ztack(Pathname, "/files/users"), "r");
 	if (userf == NULL)
 		syserr("getuser: open err");
 	

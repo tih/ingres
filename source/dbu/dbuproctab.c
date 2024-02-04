@@ -11,7 +11,7 @@ struct proctemplate
 	char	proc_func;
 };
 
-struct proctemplate Proc_template[]
+struct proctemplate Proc_template[] =
 {
 	"copy",		mdCOPY,		0,	0,
 	"create",	mdCREATE,	0,	0,

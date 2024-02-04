@@ -66,12 +66,7 @@
 # define	NODOVFLOW	4112	/* node vector overflow */
 # define	BADSECINDX	4199	/* found a 6.0 sec index */
 
-
-struct
-{
-	char	*stringp;
-};
-
+# define	cpderef(x)	(*((char **)(x)))
 
 char		Outtup[MAXTUP];
 char		Intup[MAXTUP];

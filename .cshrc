@@ -1,4 +1,4 @@
+set path = (~/bin /bin /usr/ucb /usr/bin /usr/local /usr/new)
 set prompt = "! > "
 set history = 20
-alias a alias
-a ll "ls -l"
+umask 022

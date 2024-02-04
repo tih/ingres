@@ -118,6 +118,7 @@ char	*name;
 	int		stat;
 	char		name_nr[18];
 	register char	*naa;
+	char		*ztack();
 
 	if (length(name) > 14)
 		return (0);
@@ -180,6 +181,7 @@ int	mode;
 	char				buf[MAXLINE + 1];
 	char				lastuser[2];
 	struct relation			rel;
+	char				*bmove();
 
 	opencatalog("relation", 0);
 	d = &Reldes;
@@ -356,7 +358,7 @@ struct relation	*rel;
 	opencatalog("attribute", 0);
 	printf("\n attribute name    type  length  keyno.\n\n");
 	seq_init(&Attdes, r);
-	while (seq_attribute(&Attdes, r, &att))
+	while (seq_attributes(&Attdes, r, &att))
 	{
 		printf(" %.12s	    %c%8d",
 			att.attname, typeunconv(att.attfrmt), att.attfrml & 0377);

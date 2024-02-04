@@ -1,8 +1,9 @@
+# include	<stdio.h>
+
 # include	"../ingres.h"
 # include	"../aux.h"
 # include	"../access.h"
 # include	"../lock.h"
-# include	"../fileio.h"
 
 
 extern int	Status;
@@ -77,8 +78,6 @@ char 	*argv[];
 	/* initialize access methods (and Admin struct) for user_ovrd test */
 	acc_init();
 
-	set_so_buf();
-
 	av = &Parmvect[1];	/* get first param after datbase name */
 	p = *av;
 	if (p == NULL)
@@ -86,7 +85,7 @@ char 	*argv[];
 		/* special case of no relations specified */
 		nv = newpv;
 		*nv++ = "2";
-		*nv = -1;
+		*nv = (char *) -1;
 		help(1, newpv);
 	}
 	else
@@ -102,17 +101,17 @@ char 	*argv[];
 				av++;
 				while ((p = *av++) != NULL)
 				{
-					if ((i = qmtest(p)) != NULL)
+					if ((i = (int) qmtest(p)) != NULL)
 					{
 						/* change of qmtest result */
-						qm = i;
+						qm = (char *) i;
 						continue;
 					}
 					*nv++ = qm;
 					*nv++ = p;
-					nc =+ 2;
+					nc += 2;
 				}
-				*nv = -1;
+				*nv = (char *) -1;
 				display(nc, newpv);
 			}
 			else
@@ -129,10 +128,10 @@ char 	*argv[];
 					{
 						*nv++ = "0";
 						*nv++ = p;
-						nc =+ 2;
+						nc += 2;
 					}
 				}
-				*nv = -1;
+				*nv = (char *) -1;
 				help(nc, newpv);
 				/* this backs av up one step, so 
 				 * that it points at the keywords (permit,

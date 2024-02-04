@@ -231,6 +231,7 @@ char		*relation;
 char		*owner;
 {
 	register QTREE		*t;
+	QTREE			*gettree();
 
 #	ifdef xZTR1
 	if (tTf(11, 9))
@@ -346,6 +347,7 @@ struct integrity	*g;
 	register struct integrity	*i;
 	register QTREE			*t;
 	extern int			Resultvar;
+	QTREE				*gettree();
 
 	i = g;
 	clrrange();

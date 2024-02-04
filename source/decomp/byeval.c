@@ -65,6 +65,7 @@ int			agvar;		/* variable number assigned to this aggregate */
 	struct querytree 		*byhead, **alnp;
 	int				bydoms, bymap, primeag, srcmap;
 	extern int			derror();
+	extern struct querytree		*makroot(), *makresdom(), *copytree(), *makavar();
 
 #	ifdef xDTR1
 	if (tTf(7, -1))
@@ -124,7 +125,7 @@ int			agvar;		/* variable number assigned to this aggregate */
 	temp_relnum = NORESULT;
 	filled = FALSE;
 	primeag = prime(byhead->right);
-	if (ag->right->sym.type != QLEND || ag->tvarc > 1 || primeag)
+	if (ag->right->sym.type != QLEND || ((struct qt_root *)ag)->tvarc > 1 || primeag)
 	{
 		/* init a buffer for new tree components */
 		initbuf(agbuf, AGBUFSIZ, AGBUFFULL, &derror);
@@ -143,7 +144,7 @@ int			agvar;		/* variable number assigned to this aggregate */
 		for (i = 0; r = lnodv[i]; i++)
 		{
 			resdom = makresdom(agbuf, r);
-			resdom->resno = i + 2;
+			((struct qt_res *)resdom)->resno = i + 2;
 			resdom->right = copytree(r->right, agbuf);
 			resdom->left = q->left;
 			q->left = resdom;
@@ -164,7 +165,7 @@ int			agvar;		/* variable number assigned to this aggregate */
 		}
 
 		/* if agg is prime or multivar, compute into temp rel */
-		if (ag->tvarc > 1 || primeag)
+		if (((struct qt_root *)ag)->tvarc > 1 || primeag)
 		{
 			q->right = ag->right;	/* give q the qualification */
 			ag->right = Qle;	/* remove qualification from ag */
@@ -183,7 +184,7 @@ int			agvar;		/* variable number assigned to this aggregate */
 
 			/* assign result domain numbers */
 			for (resdom = q->left; resdom->sym.type != TREE; resdom = resdom->left)
-				resdom->resno = --i;
+				((struct qt_res *)resdom)->resno = --i;
 
 			/*
 			** change by-list in agg to reference new source rel.
@@ -270,7 +271,7 @@ int			agvar;
 {
 	register struct querytree	*and_eq, *afcn;
 	register int			i;
-	struct querytree		*copytree();
+	struct querytree		*copytree(), *need(), *makavar();
 
 #	ifdef xDTR1
 	if (tTf(14, 5))
@@ -283,7 +284,7 @@ int			agvar;
 		and_eq = need(Qbuf, 12);
 		and_eq->sym.type = AND;
 		and_eq->sym.len = 6;
-		and_eq->tvarc = and_eq->lvarc = and_eq->lvarm = and_eq->rvarm = 0;
+		((struct qt_root *)and_eq)->tvarc = ((struct qt_root *)and_eq)->lvarc = ((struct qt_root *)and_eq)->lvarm = ((struct qt_root *)and_eq)->rvarm = 0;
 		and_eq->right = root->right;
 		root->right = and_eq;
 
@@ -292,7 +293,7 @@ int			agvar;
 		and_eq = and_eq->left;
 		and_eq->sym.type = BOP;
 		and_eq->sym.len = 2;
-		and_eq->opno = opEQ;
+		((struct qt_op *)and_eq)->opno = opEQ;
 
 		/* bydomain opEQ var */
 		and_eq->right = copytree(afcn->right, Qbuf);	/* a-fcn (in Source) specifying BY domain */

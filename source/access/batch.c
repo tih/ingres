@@ -122,11 +122,11 @@ int			mode;
 				if (sp->dom_size != 0)
 					continue;	/* domain has already been done once */
 				Batchhd.si_dcount++;
-				Batchhd.tupo_size =+ rel->relfrml[dom] & 0377;
+				Batchhd.tupo_size += rel->relfrml[dom] & 0377;
 				sp->rel_off = rel->reloff[dom];
 				sp->dom_size = rel->relfrml[dom] & 0377;
 				sp->tupo_off = saveoff;
-				saveoff =+ sp->dom_size;
+				saveoff += sp->dom_size;
 			}
 		}
 		if (i < 0)
@@ -141,7 +141,7 @@ int			mode;
 			while (sp->dom_size == 0)
 				sp++;
 			sp->tupo_off = saveoff;
-			saveoff =+ sp->dom_size;
+			saveoff += sp->dom_size;
 			sp++;
 		}
 	}

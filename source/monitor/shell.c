@@ -1,7 +1,8 @@
+# include	<stdio.h>
+
 # include	"../ingres.h"
 # include	"../aux.h"
 # include	"../unix.h"
-# include	"../fileio.h"
 # include	"monitor.h"
 
 /*
@@ -22,6 +23,8 @@ shell()
 	register int	i;
 	register char	*p;
 	register char	*shellfile;
+	char		*getfilename();
+	char		*macro();
 
 	shellfile = getfilename();
 	if (*shellfile == 0)

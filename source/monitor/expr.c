@@ -94,7 +94,7 @@
 # define	MOD		13
 
 
-int 	ExprPrec[]			/* Precedence table */
+int 	ExprPrec[] =			/* Precedence table */
 {
 	0,	/* filler */
 	1,	/* 1 -- OR */

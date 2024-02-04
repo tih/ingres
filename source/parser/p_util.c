@@ -206,7 +206,7 @@ header()
 	int		j;
 
 	beginhdr();
-	for (i = 0; i < Pc; i =+ 2)
+	for (i = 0; i < Pc; i += 2)
 	{
 		atoi(&Pv[i + 1][1], &j);
 		printhdr(Pv[i + 1][0] & I1MASK, j, Pv[i]);
@@ -348,23 +348,23 @@ int	a;
 	switch (a)
 	{
 	  case mdRETR:
-		Permcomd =| PRO_RETR;
+		Permcomd |= PRO_RETR;
 		break;
 
 	  case mdAPP:
-		Permcomd =| PRO_APP;
+		Permcomd |= PRO_APP;
 		break;
 	
 	  case mdREPL:
-		Permcomd =| PRO_REPL;
+		Permcomd |= PRO_REPL;
 		break;
 
 	  case mdDEL:
-		Permcomd =| PRO_DEL;
+		Permcomd |= PRO_DEL;
 		break;
 
 	  case -1:
-		Permcomd =| 0177777;		/* all bits set */
+		Permcomd |= 0177777;		/* all bits set */
 		break;
 	
 	  default:

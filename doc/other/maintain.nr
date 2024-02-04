@@ -1,6 +1,6 @@
 .po 5
-
-.de sh			*** section heading
+.\"	*** section heading
+.de sh
 .if \\n(.$ .@d \\$1
 .ds @@ #\\n(#0
 .nr \\*(@@ +1
@@ -13,7 +13,8 @@
 .if !\\n(#0 .in 0
 .if \\n(#0 .@p
 ..
-.de @d			change section depth
+.\"	change section depth
+.de @d
 .nr #0 \\$1
 .if \\n(#0 .if !\\n(#1 .nr #1 0
 .if !\\n(#0 .nr #1 0
@@ -28,30 +29,36 @@
 .if \\n(#0-5 .if !\\n(#6 .nr #6 0
 .if !\\n(#0-5 .nr #6 0
 ..
-.de @p			print section heading
+.\"	print section heading
+.de @p
 .in \\n(#i*\\n(#0u
 .sp
 .ti -\\n(#i
 \\*(@n\&.\ \ \c
 ..
-.de up			*** move up heading number (2.1.1 -> 2.2)
+.\"	*** move up heading number (2.1.1 -> 2.2)
+.de up
 .sh -1
 ..
-.de ux			*** heading up, no increment (2.1.1 -> 2.1)
+.\"	*** heading up, no increment (2.1.1 -> 2.1)
+.de ux
 .nr _9 \\n(#0-1
 .if \\n(.$ .nr _9 +1
 .if \\n(.$ .nr _9 \\$1
 .@d \\n(_9
 .in \\n(#i*\\n(#0u
 ..
-.de dn			*** move down heading number (2.1.1 -> 2.1.1.1)
+.\"	*** move down heading number (2.1.1 -> 2.1.1.1)
+.de dn
 .sh +1
 ..
-.de gs			*** get section number
+.\"	*** get section number
+.de gs
 .ds ,\\$1 \\*(@n
 ..
 .nr #i 4
-.de PS			*** space after a section title
+.\"	*** space after a section title
+.de PS
 .sp 1
 ..
 .de @h

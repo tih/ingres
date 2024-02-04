@@ -83,8 +83,8 @@ int			bytes;
 	i = bytes - buf->nleft;
 	if (i < 0)
 		syserr("freebuf %d, %d", i, bytes);
-	buf->xfree =- i;
-	buf->nleft =+ i;
+	buf->xfree -= i;
+	buf->nleft += i;
 }
 
 /*
@@ -108,7 +108,7 @@ int			errnum;
 int			(*err_func)();
 {
 	register struct nodbuffer	*buf;
-	register int			erf;
+	register int			(*erf)();
 
 	buf = bf;
 	erf = err_func;

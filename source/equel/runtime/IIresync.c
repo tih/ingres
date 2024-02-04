@@ -16,7 +16,7 @@
 */
 
 extern	exit();
-int	(*IIinterrupt)()	&exit;
+int	(*IIinterrupt)()	= &exit;
 IIresync()
 {
 	struct pipfrmt		buf;

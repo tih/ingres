@@ -1,8 +1,9 @@
+# include	<stdio.h>
+
 # include	"../ingres.h"
 # include	"../aux.h"
 # include	"../symbol.h"
 # include	"../access.h"
-# include	"../fileio.h"
 
 # define	N	7
 # define	MEM	(32768 - 2)
@@ -33,7 +34,7 @@ int			Bucket;
 char			File[15];
 char			*Fileset;
 char			*Filep;
-int			Nfiles		1;
+int			Nfiles = 1;
 int			Nlines;
 long			Ccount;
 char			**Lspace;
@@ -52,6 +53,7 @@ char **argv;
 	register char	*mem;
 	char		*start;
 	int		maxkey, rev;
+	char		*sbrk();
 
 	Proc_name = "KSORT";
 	Exitfn = &term;
@@ -86,7 +88,7 @@ char **argv;
 	if (Bucket = (Descsort[0] == 0))
 	{
 		/* we will be generating hash bucket */
-		Tupsize =+ BUCKETSIZE;
+		Tupsize += BUCKETSIZE;
 		Desc.relfrml[0] = BUCKETSIZE;
 		Desc.relfrmt[0] = INT;
 		Desc.reloff[0] = Desc.relwid;
@@ -105,15 +107,15 @@ char **argv;
 
 	/* get up to 2**15 - 1 bytes of memory for buffers */
 	/* note that mem must end up positive so that Nlines computation is right */
-	start = Lspace = sbrk(0);
+	start = sbrk(0); Lspace = (char **) start;
 	mem = start + MEM;	/* take at most 2**15 - 1 bytes */
 	while (brk(mem) == -1)
-		mem =- 512;
-	mem =- start;
+		mem -= 512;
+	mem -= start;
 
 	/* compute pointers and sizes into buffer memory */
-	Nlines = mem / (Tupsize + 2);
-	Tspace = Lspace + Nlines;
+	Nlines = (unsigned int) mem / (Tupsize + 2);
+	Tspace = (char *) (Lspace + Nlines);
 	if (Trace & 01)
 		printf("Tspace=%l,Lspace=%l,Nlines=%l,mem=%l,start=%l\n",
 		Tspace, Lspace, Nlines, mem, start);
@@ -141,7 +143,7 @@ char **argv;
 
 	/* merge stage -- merge up to N temps into a new temp */
 	Ccount = 0;
-	for (i = 1; i + N < Nfiles; i =+ N) 
+	for (i = 1; i + N < Nfiles; i += N) 
 	{
 		newfile();
 		merge(i, i + N);
@@ -210,7 +212,7 @@ sort()
 				bmove(&pageid, cp + Desc.relwid, BUCKETSIZE);
 			}
 			*lp++ = cp;
-			cp =+ Tupsize;
+			cp += Tupsize;
 			ntups++;
 		}
 		qsort(Lspace, lp - Lspace, 2, &cmpa);
@@ -224,7 +226,7 @@ sort()
 			xp = cp;
 			if ((lp == Lspace) || (cmpa(&xp, &lp[-1]) != 0))
 			{
-				if ((i = fwrite(Oiop, cp, Tupsize)) != Tupsize)
+				if ((i = fwrite(cp, 1, Tupsize, Oiop)) != Tupsize)
 					syserr("cant write outfile %d (%d)", i, Nfiles);
 				Tupsout++;
 			}
@@ -238,8 +240,7 @@ sort()
 struct merg
 {
 	char		tup[MAXTUP+BUCKETSIZE];
-	int		fileno;
-	char		fbuf[IOBUFSIZ];
+	int		file_num;
 	FILE		*fiop;
 };
 
@@ -255,14 +256,14 @@ int	b;
 
 	if (Trace & 02)
 		printf("merge %d to %d\n", a, b);
-	merg = Lspace;
+	merg = (struct merg *) Lspace;
 	j = 0;
 	for (i = a; i < b; i++) 
 	{
 		f = setfil(i);
 		mbuf[j] = merg;
-		merg->fileno = i;
-		if ((merg->fiop = fopen(f, "read", merg->fbuf)) == NULL)
+		merg->file_num = i;
+		if ((merg->fiop = fopen(f, "r")) == NULL)
 			cant(f);
 		if (!rline(merg))
 			j++;
@@ -278,7 +279,7 @@ int	b;
 			printf("mintup %d\n", i);
 		if (mintup(mbuf, i, &cmpa))
 		{
-			if (fwrite(Oiop, mbuf[i]->tup, Tupsize) != Tupsize)
+			if (fwrite(mbuf[i]->tup, 1, Tupsize, Oiop) != Tupsize)
 				syserr("cant write merge output");
 			Tupsout++;
 		}
@@ -290,10 +291,10 @@ int	b;
 			{
 				/* truncate temporary files to zero length */
 				yesno = "";
-				close(creat(setfil(merg->fileno), 0600));
+				close(creat(setfil(merg->file_num), 0600));
 			}
 			if (Trace & 02 || Trace & 010)
-				printf("dropping and %struncating %s\n", yesno, setfil(merg->fileno));
+				printf("dropping and %struncating %s\n", yesno, setfil(merg->file_num));
 			i--;
 		}
 	}
@@ -356,14 +357,14 @@ struct merg	*mp;
 	register int		i;
 
 	merg = mp;
-	if ((i = fread(merg->fiop, merg->tup, Tupsize)) != Tupsize)
+	if ((i = fread(merg->tup, 1, Tupsize, merg->fiop)) != Tupsize)
 	{
 		if (i == 0)
 		{
 			fclose(merg->fiop);
 			return (1);
 		}
-		syserr("rd err %d on %s", i, setfil(merg->fileno));
+		syserr("rd err %d on %s", i, setfil(merg->file_num));
 	}
 	return (0);
 }
@@ -409,9 +410,7 @@ char	*name;
 */
 
 {
-	static char	outbuf[IOBUFSIZ];
-
-	if ((Oiop = fopen(name, "write", outbuf)) == NULL)
+	if ((Oiop = fopen(name, "w")) == NULL)
 		cant(name);
 }
 
@@ -474,7 +473,7 @@ char	**b;
 		}
 		if (frmt == CHAR)
 		{
-			frml =& 0377;
+			frml &= 0377;
 			if (rt = scompare(tupb, frml, tupa, frml))
 				return (rt);
 			continue;
@@ -486,8 +485,8 @@ char	**b;
 		/* copy to even word boundary */
 		bmove(tupa, af, frml);
 		bmove(tupb, bf, frml);
-		tupa = af;
-		tupb = bf;
+		tupa = (char *) &af[0];
+		tupb = (char *) &bf[0];
 
 		switch (frmt)
 		{
@@ -497,13 +496,13 @@ char	**b;
 			{
 
 			  case 1:
-				return (tupa->i1type > tupb->i1type ? -1 : 1);
+				return (i1deref(tupa) > i1deref(tupb) ? -1 : 1);
 
 			  case 2:
-				return (tupa->i2type > tupb->i2type ? -1 : 1);
+				return (i2deref(tupa) > i2deref(tupb) ? -1 : 1);
 
 			  case 4:
-				return (tupa->i4type > tupb->i4type ? -1 : 1);
+				return (i4deref(tupa) > i4deref(tupb) ? -1 : 1);
 			}
 
 		  case FLOAT:
@@ -511,10 +510,10 @@ char	**b;
 			{
 
 			  case 4:
-				return (tupa->f4type > tupb->f4type ? -1 : 1);
+				return (f4deref(tupa) > f4deref(tupb) ? -1 : 1);
 
 			  case 8:
-				return (tupa->f8type > tupb->f8type ? -1 : 1);
+				return (f8deref(tupa) > f8deref(tupb) ? -1 : 1);
 			}
 		}
 	}

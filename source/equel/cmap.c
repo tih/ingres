@@ -17,7 +17,7 @@
 
 # include	"constants.h"
 
-char	Cmap []
+char	Cmap [] =
 {
 	EOF_TOK, CNTRL, CNTRL, CNTRL, CNTRL, CNTRL, CNTRL, CNTRL,
 	CNTRL, PUNCT, PUNCT, CNTRL, CNTRL, PUNCT, CNTRL, CNTRL,

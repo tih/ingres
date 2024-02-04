@@ -8,7 +8,7 @@
 
 int Synconly, Error_flag;
 
-char	D_dbu70 1;	/* used for loading only. causes call_dbu70 to be loaded
+char	D_dbu70 = 1;	/* used for loading only. causes call_dbu70 to be loaded
 			** instead of call_dbu.
 			*/
 
@@ -64,7 +64,7 @@ int	errflag;
 
 	if (func != NULL)
 	{
-		Pv[Pc] = -1;
+		Pv[Pc] = (char *) -1;
 		Error_flag = (*func)(Pc, Pv);
 		closecatalog(FALSE);
 	}
@@ -147,7 +147,7 @@ struct descriptor	Attdes;
 struct descriptor	Inddes;
 
 
-struct desxx	Desxx[]
+struct desxx	Desxx[] =
 {
 	"relation",	&Reldes,	&Admin.adreld,
 	"attribute",	&Attdes,	&Admin.adattd,

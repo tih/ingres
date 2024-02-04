@@ -13,10 +13,10 @@
 
 char	*IIconcatv(buf, args)
 char		*buf;
-int		args;
+char		*args;
 {
 	register char	*p;
-	register int	*i;
+	register char	**i;
 	register char	*s;
 
 	i = &args;

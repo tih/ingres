@@ -106,7 +106,7 @@ int	code;
 	register	i, t;
 	struct stacksym	ressym;
 	struct symbol	**alist;
-	struct
+	struct al_sym
 	{
 		char	type;
 		char	len;
@@ -137,18 +137,18 @@ int	code;
 				if (t == ROOT)
 					syserr("retdecomp:missing aop %d", i);
 
-			ressym.type = (*alist)->atype;
-			t = ressym.len = (*alist)->alen;
-			t =& I1MASK;
+			ressym.type = ((struct al_sym *) *alist)->atype;
+			t = ressym.len = ((struct al_sym *) *alist)->alen;
+			t &= I1MASK;
 			if (ressym.type == CHAR)
 			{
-				ressym.value->stringp = Tend;
+				cpderef(ressym.value) = Tend;
 				/* make sure it is blank padded */
 				pad(Tend, t);
 			}
 			else
 				bmove(Tend, ressym.value, t);
-			Tend =+ t;
+			Tend += t;
 
 #			ifdef xOTR1
 			if (tTf(33, 2))
@@ -240,7 +240,7 @@ extern struct descriptor	Inddes;
 
 
 
-struct desxx	Desxx[]
+struct desxx	Desxx[] =
 {
 	"indexes",	&Inddes,	0,
 	0

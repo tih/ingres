@@ -77,9 +77,9 @@
 **	you read an EOP, zero is returned.
 */
 
-extern int	(*Exitfn)();	/* defined in syserr */
-extern int	read();		/* standard read routine */
-int		(*Pi_rd_fn)()	&read;		/* fn to read from pipe */
+extern int	(*Exitfn)();		/* defined in syserr */
+extern int	read();			/* standard read routine */
+int		(*Pi_rd_fn)() = &read;	/* fn to read from pipe */
 
 rdpipe(mode, buf1, des, msg, n)
 int		mode;

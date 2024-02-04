@@ -1,7 +1,7 @@
 extern	copy();
 extern	save();
 
-int	(*Func[])()
+int	(*Func[])() =
 {
 	&copy,
 	&save,

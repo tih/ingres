@@ -112,7 +112,7 @@ int		nlen;
 	{
 		val = tos->value;
 		cp = temp;
-		bmove(tos->value->stringp, cp, tos->len & I1MASK);
+		bmove(cpderef(tos->value), cp, tos->len & I1MASK);
 		cp[tos->len & I1MASK] = '\0';
 		if (ntype == FLOAT)
 			ret = atof(cp, val);
@@ -140,7 +140,7 @@ struct symbol *pp;
 
 	p = pp;
 
-	p->value->i4type = p->value->i2type;
+	i4deref(p->value) = i2deref(p->value);
 	p->len = 4;
 }
 
@@ -152,7 +152,7 @@ struct symbol *pp;
 
 	p = pp;
 
-	p->value->i2type = p->value->i4type;
+	i2deref(p->value) = i4deref(p->value);
 	p->len = 2;
 }
 
@@ -165,9 +165,9 @@ struct symbol *pp;
 	p  = pp;
 
 	if  (p->len == 4)
-		p->value->f8type = p->value->i4type;
+		f8deref(p->value) = i4deref(p->value);
 	else
-		p->value->f8type = p->value->i2type;
+		f8deref(p->value) = i2deref(p->value);
 	p->type = FLOAT;
 	p->len= 8;
 }
@@ -180,7 +180,7 @@ struct symbol *pp;
 
 	p = pp;
 
-	p->value->i2type = p->value->f8type;
+	i2deref(p->value) = f8deref(p->value);
 	p->type = INT;
 	p->len = 2;
 }
@@ -192,7 +192,7 @@ struct symbol *pp;
 	register struct symbol	*p;
 
 	p = pp;
-	p->value->i4type = p->value->f8type;
+	i4deref(p->value) = f8deref(p->value);
 	p->type = INT;
 	p->len = 4;
 }
@@ -201,5 +201,9 @@ struct symbol *pp;
 f8tof4(pp)
 struct symbol	*pp;
 {
-	pp->len = 4;
+	register struct symbol	*p;
+
+	p = pp;
+	f4deref(p->value) = f8deref(p->value);
+	p->len = 4;
 }

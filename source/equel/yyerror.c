@@ -1,5 +1,6 @@
 #
-# include	"../fileio.h"
+# include	<stdio.h>
+
 # include	"constants.h"
 # include	"globals.h"
 
@@ -48,7 +49,7 @@ char	*s;
 		printf("%s = ", yysterm [yychar - 0400]);
 
 	if (yylval)
-		printf("'%s' : ", yylval->d_elm);
+		printf("'%s' : ", ((struct disp_node *)yylval)->d_elm);
 
 	printf("line %d, %s\n",
 	yyline, s);
@@ -127,6 +128,6 @@ struct disp_node	*d;
 
 file_spec()
 {
-	if (Inc_file)
+	if (Inc_files)
 		printf("** %s : ", Input_file_name);
 }

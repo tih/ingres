@@ -17,13 +17,13 @@ extern int	*yypv;		/* defined in the table file */
 
 
 /* -------- the next line is an INGRES customization -------- */
-int	yypflag		1;	/* zero for no actions performed */
-int	yydebug		0;	/* 1 for debugging */
+int	yypflag		= 1;	/* zero for no actions performed */
+int	yydebug		= 0;	/* 1 for debugging */
 int	yyv[MAXDEPTH];		/* where the values are stored */
-int	yystate		0;	/* current parser state */
-int	yychar		-1;	/* current input token number */
-int	yynerrs		0;	/* number of errors */
-int	yyerrflag	0;	/* error recovery flag */
+int	yystate		= 0;	/* current parser state */
+int	yychar		= -1;	/* current input token number */
+int	yynerrs		= 0;	/* number of errors */
+int	yyerrflag	= 0;	/* error recovery flag */
 
 
 yyparse()
@@ -91,14 +91,14 @@ actn:		/* get the next action, and perform it */
 	  case 3:		/* reduce */
 		if (yydebug)
 			printf("reduce %d\n", n);
-		ps =- yyr2[n];
-		yypv =- yyr2[n];
+		ps -= yyr2[n];
+		yypv -= yyr2[n];
 		yyval = yypv[1];
 		/* --------  the next 2 lines are an INGRES customization -------- */
 		if (yypflag && yyactr(n))
 			 goto abort;
 		/* consult goto table to find next state */
-		for (p = &yygo[yypgo[yyr1[n]]]; *p != *ps && *p >= 0; p =+ 2) ;
+		for (p = &yygo[yypgo[yyr1[n]]]; *p != *ps && *p >= 0; p += 2) ;
 		yystate = p[1];
 		goto stack;  /* stack new state and value */
 
@@ -123,7 +123,7 @@ actn:		/* get the next action, and perform it */
 			while (ps >= s)
 			{
 				/* search ps actions */
-				for (p = &yyact[yypact[*ps + 1]]; (*p >> 12) == 1; p =+ 2)
+				for (p = &yyact[yypact[*ps + 1]]; (*p >> 12) == 1; p += 2)
 				if (*p == 4352)
 					goto found;
 

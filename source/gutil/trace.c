@@ -97,7 +97,7 @@ int	pt1;
 	fun = fun1;
 	pt = pt1;
 	if (pt >= 0)
-		tT[fun] =| (1<<pt%16);
+		tT[fun] |= (1<<pt%16);
 	else
 		tT[fun] = 0177777;
 }

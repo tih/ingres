@@ -185,7 +185,7 @@
 **		2/14/79 -- version 6.2 release.
 */
 
-int	Proopmap[MAXPROQM + 1]
+int	Proopmap[MAXPROQM + 1] =
 {
 	PRO_RETR,		/* 0 -- mdRETTERM */
 	PRO_RETR,		/* 1 -- mdRETR */
@@ -204,7 +204,7 @@ extern char			Terminal[3];
 extern QTREE			*gettree();
 
 
-protect(root)
+QTREE *protect(root)
 QTREE	*root;
 {
 	QTREE		*r;
@@ -243,7 +243,7 @@ QTREE	*root;
 		    (Qmode == mdRETR || Qmode == mdRET_UNI))
 			continue;
 
-		varset =| 1 << vn;
+		varset |= 1 << vn;
 	}
 
 	/*
@@ -357,7 +357,7 @@ int	byset[8];
 	};
 	struct qvect	quals[4];
 	int		j;
-
+	QTREE		*trimqlend(), *tree(), *norml();
 
 	t = root;
 	vn = varno;
@@ -396,8 +396,8 @@ int	byset[8];
 			for (i = 0; i < 8; i++)
 			{
 				if (byset != NULL)
-					byset[i] =| rset[i];
-				qset[i] =| rset[i];
+					byset[i] |= rset[i];
+				qset[i] |= rset[i];
 				rset[i] = 0;
 			}
 
@@ -460,13 +460,13 @@ int	byset[8];
 	/* create a bit map of all referenced operations */
 	noperm = 0;
 	if (!bequal(uset, zeros, sizeof zeros))
-		noperm =| Proopmap[qmode];
+		noperm |= Proopmap[qmode];
 	if (!bequal(&rset, &zeros, sizeof zeros))
-		noperm =| PRO_RETR;
+		noperm |= PRO_RETR;
 	if (!bequal(&aset, &zeros, sizeof zeros))
-		noperm =| PRO_AGGR;
+		noperm |= PRO_AGGR;
 	if (!bequal(&qset, &zeros, sizeof zeros))
-		noperm =| PRO_TEST;
+		noperm |= PRO_TEST;
 
 	/* if no oper, then the query was probably just aggr's */
 	if (noperm == 0)
@@ -504,9 +504,9 @@ int	byset[8];
 		i = 0;
 		if (qmode != mdRETTERM)
 			i = quals[0].q_mode = prochk(Proopmap[qmode], &uset, &protup);
-		i =| quals[1].q_mode = prochk(PRO_RETR, &rset, &protup);
-		i =| quals[2].q_mode = prochk(PRO_AGGR, &aset, &protup);
-		i =| quals[3].q_mode = prochk(PRO_TEST, &qset, &protup);
+		i |= quals[1].q_mode = prochk(PRO_RETR, &rset, &protup);
+		i |= quals[2].q_mode = prochk(PRO_AGGR, &aset, &protup);
+		i |= quals[3].q_mode = prochk(PRO_TEST, &qset, &protup);
 
 #		ifdef xQTR2
 		if (tTf(51, 5))
@@ -553,7 +553,7 @@ int	byset[8];
 			noqual = TRUE;
 
 		/* mark this operation as having been handled */
-		noperm =& ~i;
+		noperm &= ~i;
 	}
 
 	/* test 'get' return code */
@@ -712,8 +712,8 @@ int	qset[8];
 		switch (t->sym.type)
 		{
 		  case VAR:
-			if (t->varno == vn)
-				lsetbit(t->attno, rset);
+			if (((struct qt_var *)t)->varno == vn)
+				lsetbit(((struct qt_var *)t)->attno, rset);
 			break;
 
 		  case AGHEAD:
@@ -722,7 +722,7 @@ int	qset[8];
 
 			/* merge by-list set into qualification set */
 			for (i = 0; i < 8; i++)
-				qset[i] =| byset[i];
+				qset[i] |= byset[i];
 
 			break;
 
@@ -731,14 +731,14 @@ int	qset[8];
 			syserr("makedset: node %d", t->sym.type);
 
 		  case RESDOM:
-			if (t->resno == 0)
+			if (((struct qt_res *)t)->resno == 0)
 			{
 				/* tid -- ignore right subtree (and this node) */
 				t = t->left;
 				continue;
 			}
 			if (uset != NULL)
-				lsetbit(t->resno, uset);
+				lsetbit(((struct qt_res *)t)->resno, uset);
 			/* explicit fall-through to "default" case */
 
 		  default:
@@ -1011,7 +1011,7 @@ char	*labl;
 	register long	*y;
 
 	printf("\t%s: ", labl);
-	y = x = xset;
+	y = (long *) (x = xset);
 	if (x == NULL)
 	{
 		printf("<NULL>\n");

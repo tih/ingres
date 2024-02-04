@@ -36,17 +36,17 @@ struct querytree *trbuild(bufptr)
 char	*bufptr;
 {
 	register struct querytree 	**stackptr;
-	register char 			*p;		/* really ptr to struct querytree */
+	register char			*p; /* really struct querytree * */
 	register struct symbol 		*s;
 	struct querytree		*treestack[STACKSIZ];
 
 
 	stackptr = treestack;
 
-	for (p = bufptr; ;p =+ 6 + ((s->len + 1) & 0376))
+	for (p = bufptr; ;p += 6 + ((s->len + 1) & 0376))
 	{
-		s = &p->sym;
-		p->left = p->right = 0;
+		s = &(((struct querytree *)p)->sym);
+		((struct querytree *)p)->left = ((struct querytree *)p)->right = 0;
 
 		/* reunite p with left and right children on stack, if any*/
 		if (!leaf(p))		/* this node has children */
@@ -58,12 +58,12 @@ char	*bufptr;
 					syserr("trbuild:too few nodes");
 				}
 				else
-					p->right = *(--stackptr);
+					((struct querytree *)p)->right = *(--stackptr);
 			if (s->type != AOP)
 				if (stackptr <= treestack) 
 					goto err;
 				else
-					p->left = *(--stackptr);
+					((struct querytree *)p)->left = *(--stackptr);
 		}
 
 		/*
@@ -75,13 +75,13 @@ char	*bufptr;
 		{
 			if (stackptr != treestack)
 				syserr("trbuild:xtra nodes");
-			return (p);
+			return ((struct querytree *)p);
 		}
 
 		/* stack p */
 		if (stackptr-treestack >= STACKSIZ) 
 			return (NULL);	/* error:stack full */
-		*(stackptr++) = p;
+		*(stackptr++) = (struct querytree *)p;
 
 	}
 }

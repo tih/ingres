@@ -106,9 +106,9 @@ The functions operate as follows:
 .ti -10
 fopen(file, mode, buffer)
 opens the UNIX file named
-.it file
+\fIfile\fP
 for I/O of mode
-.it mode
+\fImode\fP
 which may be
 "read" for read,
 "write" for write,
@@ -126,14 +126,14 @@ to indicate no buffer.
 .ti -10
 freopen(file, mode, iop)
 closes file
-.it iop
+\fIiop\fP
 and then re-opens it just like fopen.
 It keeps the same buffer it had before.
 This is normally used on the standard input
 (called "stdin") or the standard output (called "stdout").
 It returns NULL if the open failed;
 otherwise, it returns
-.it iop.
+\fIiop\fP.
 .ti -10
 fclose(iop)
 closes the named file.
@@ -142,20 +142,20 @@ it is flushed.
 .ti -10
 setbuf(iop, buffer, bufsize)
 sets the buffer for file
-.it iop
+\fIiop\fP
 to be
-.it buffer.
+\fIbuffer\fP.
 This is most commonly used on
 standard input or output.
 Additionally,
 the buffer size is set to be
-.it bufsize.
+\fIbufsize\fP.
 .ti -10
 fflush(iop)
 flushes file
-.it iop.
+\fIiop\fP.
 If
-.it iop
+\fIiop\fP
 is an output file,
 any data in the buffer
 is output to the file;
@@ -183,7 +183,7 @@ Note that zero is a legal character.
 .ti -10
 putchar(c)
 outputs
-.it c
+\fIc\fP
 to the standard output.
 Control characters are printed as backslash escapes;
 use putc for outputing cursor control
@@ -196,9 +196,9 @@ except that it uses
 these buffering routines.
 Also,
 if
-.it buf
+\fIbuf\fP
 is
-.bd NULL
+.B NULL
 the password file is closed.
 This is important for overlays.
 .in -10

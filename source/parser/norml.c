@@ -186,7 +186,7 @@ struct querytree	*p1;
 		*/
 		return (p);
 	}
-	if ((p->sym.type == UOP) && (p->opno == opNOT))
+	if ((p->sym.type == UOP) && (((struct qt_op *)p)->opno == opNOT))
 	{
 		/* skip not node */
 		p = p->right;
@@ -230,46 +230,46 @@ struct querytree	*p1;
 		break;
 
 	  case BOP:
-		switch (p->opno)
+		switch (((struct qt_op *)p)->opno)
 		{
 		  case opEQ:
-			p->opno = opNE;
+			((struct qt_op *)p)->opno = opNE;
 			break;
 
 		  case opNE:
-			p->opno = opEQ;
+			((struct qt_op *)p)->opno = opEQ;
 			break;
 
 		  case opLT:
-			p->opno = opGE;
+			((struct qt_op *)p)->opno = opGE;
 			break;
 
 		  case opGE:
-			p->opno = opLT;
+			((struct qt_op *)p)->opno = opLT;
 			break;
 
 		  case opLE:
-			p->opno = opGT;
+			((struct qt_op *)p)->opno = opGT;
 			break;
 
 		  case opGT:
-			p->opno = opLE;
+			((struct qt_op *)p)->opno = opLE;
 			break;
 
 		  default:
-			syserr("strange BOP in notpush '%d'", p->opno);
+			syserr("strange BOP in notpush '%d'", ((struct qt_op *)p)->opno);
 		}
 		break;
 
 	  case UOP:
-		if (p->opno == opNOT)
+		if (((struct qt_op *)p)->opno == opNOT)
 		{
 			/* skip not node */
 			p = p->right;
 			p = nnorm(p);
 		}
 		else
-			syserr("strange UOP in notpush '%d'", p->opno);
+			syserr("strange UOP in notpush '%d'", ((struct qt_op *)p)->opno);
 		break;
 
 	  default:
@@ -302,7 +302,7 @@ struct querytree	**pp;
 	}
 }
 
-treedup(p1)
+struct querytree *treedup(p1)
 struct querytree	*p1;
 {
 	register struct querytree	*np;
@@ -311,7 +311,7 @@ struct querytree	*p1;
 
 	if ((p = p1) == NULL)
 		return (p);
-	np = need(Qbuf, (p->sym.len & I1MASK) + 6);
+	np = (struct querytree *) need(Qbuf, (p->sym.len & I1MASK) + 6);
 	bmove(p, np, (p->sym.len & I1MASK) + 6);
 	np->left = treedup(p->left);
 	np->right = treedup(p->right);

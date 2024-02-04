@@ -214,7 +214,7 @@ struct pipfrmt	*buf1;
 				while (i = IIrdpipe(P_NORM,buf,des,ap,0))
 				{
 					argv[argc++] = ap;
-					ap =+ i;
+					ap += i;
 					if (argc > 10 || (args - ap) >= 500)
 						IIsyserr("Too many error parameters!");
 				}

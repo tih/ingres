@@ -1,18 +1,19 @@
-# include	"../fileio.h"
+# include	<stdio.h>
+
 # define	MAXNAME	13	/* one more for the null */
 # define	MAXKEYS	6	/* changing this is insuficient */
-# define	MAXINDEX	10	/* change as needed */
+# define	MAXINDEX 10	/* change as needed */
 # define	MAXREL	1000	/* can be increased as needed */
 # define	MAXDOM 	50
 # define	INT	30
 # define	FLOAT	31
 # define	CHAR	32
-##char	*Usercode;
+
+##char	Usercode[3];		/* two char  usercode plus null */
 char	**Wanted;
 int	Status;
 
 FILE	*Ifile, *Ofile;
-char	*Ibuf[IOBUFSIZ], *Obuf[IOBUFSIZ];
 
 struct relation
 {
@@ -64,11 +65,10 @@ char	**argv;
 	int				attxtra[MAXDOM], indattx[MAXKEYS];
 	int				xcount;
 	int				j;
-	extern				*Exitfn, exitfn, _Filemode;
+	extern				*Exitfn, exitfn;
 	char				line[100];
 ##	char				*uover;
 
-	_Filemode = 0644;
 	if (argc < 3)
 		syserr(0,"wrong number of parameters");
 
@@ -79,13 +79,14 @@ char	**argv;
 	path = *argv++;
 	Wanted = argv++;
 
-	if(path[0] != '/')
-		printf("Warning %s is not a full path name\n",path);
+	if(path[0] != '/') {
+		printf("Error: %s is not a full path name\n", path);
+		exit(1);
+	}
 
-
-	if ((Ifile = fopen(ztack(path,"/copy.in"), "write" ,Ibuf)) == NULL)
+	if ((Ifile = fopen(ztack(path,"/copy.in"), "w")) == NULL)
 		syserr(0,"Cannot create %s!",ztack(path,"/copy.in"));
-	if ((Ofile = fopen(ztack(path,"/copy.out"), "write", Obuf)) == NULL)
+	if ((Ofile = fopen(ztack(path,"/copy.out"), "w")) == NULL)
 		syserr(0,"Cannot create %s!",ztack(path,"/copy.out"));
 
 	Exitfn = &exitfn;
@@ -388,14 +389,14 @@ char	*relname;
 	register char	**wantlist;
 	register char	*nptr;
 
-	if (*(wantlist = Wanted) == -1)
+	if (*(wantlist = Wanted) == NULL)
 		return (0);
 
 	nptr = relname;
 	do
 		if (!scompare(nptr, 0, *wantlist++, 0))
 			return (0);
-	while (*wantlist != -1);
+	while (*wantlist != 0);
 	return (1);
 }
 

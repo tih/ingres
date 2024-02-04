@@ -22,7 +22,6 @@ extern jmp_buf		Env;
 **		semantic productions to manipulate input
 **
 **	Files:
-**		.../fileio.h
 **		constants.h
 **		globals.h
 **
@@ -32,7 +31,8 @@ extern jmp_buf		Env;
 */
 
 
-# include	"../fileio.h"
+# include	<stdio.h>
+
 # include	"constants.h"
 # include	"globals.h"
 
@@ -41,7 +41,7 @@ extern jmp_buf		Env;
 	 * routines, by making Cv_display a pointer to the pertinent
 	 * display structure.
 	 */
-extern struct display	*Cv_display	&Displays [0];
+extern struct display	*Cv_display	= &Displays [0];
 
 /*
 **  ENTER_DISPLAY -- enter a new string into a display
@@ -89,8 +89,9 @@ char		*string;
 {
 	register struct display		*d;
 	register struct disp_node	*node;
+	extern char			*nalloc();
 
-	node = nalloc(sizeof *node);
+	node = (struct disp_node *) nalloc(sizeof *node);
 	if (node == 0)
 	{
 		yysemerr("symbol space overflow", string);
@@ -357,7 +358,7 @@ char		right_ch;
 		if ((*++cp = getch()) == left_ch)
 			level++;
 		else if (*cp == right_ch)
-			level =- 1;
+			level -= 1;
 		else if (*cp == EOF_TOK)
 		{
 			backup(*cp);

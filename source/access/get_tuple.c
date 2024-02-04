@@ -84,7 +84,7 @@ struct tup_id	*tidx;
 	{
 		syserr("get_addr %s", locv(Acc_head->rel_tupid));
 	}
-	return (&Acc_head->acc_buf[offset]);
+	return (&((struct raw_accbuf *)Acc_head)->acc_buf[offset]);
 }
 
 

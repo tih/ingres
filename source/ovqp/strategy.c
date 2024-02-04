@@ -23,11 +23,12 @@
 strategy()
 {
 	register int			i, allexact;
-	struct accessparam		sourceparm, indexparm;
+	struct accessparam		sourceparam, indexparam;
 	struct index			itup, rtup;
 	struct key			lowikey[MAXKEYS+1], highikey[MAXKEYS+1];
 	register struct descriptor	*d;
 	extern struct descriptor	Inddes;
+	struct descriptor		*openindex();
 
 #	ifdef xOTR1
 	if (tTf(31, 0))
@@ -47,11 +48,11 @@ strategy()
 		if (!Qlist)
 			break;	/* if no qualification then you must scan entire rel */
 	
-		/* copy structure of source relation into sourceparm */
-		paramd(Source, &sourceparm);
+		/* copy structure of source relation into sourceparam */
+		paramd(Source, &sourceparam);
 	
 		/* if source is unkeyed and has no sec index then give up */
-		if (sourceparm.mode == NOKEY && Source->relindxd <= 0)
+		if (sourceparam.mode == NOKEY && Source->relindxd <= 0)
 			break;
 
 		/* find all simple clauses if any */
@@ -75,7 +76,7 @@ strategy()
 		*/
 	
 		/* step one. Try to find exact key on primary */
-		if (exactkey(&sourceparm, &Lkey_struct))
+		if (exactkey(&sourceparam, &Lkey_struct))
 		{
 			Fmode = EXACTKEY;
 			break;

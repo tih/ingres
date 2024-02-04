@@ -23,6 +23,7 @@ char *
 batchname()
 {
 	extern char	*Fileset;
+	char		*ztack();
 
 	return(ztack("_SYSbatch", Fileset));
 }

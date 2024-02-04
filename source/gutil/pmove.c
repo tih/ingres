@@ -7,7 +7,7 @@
 **	returned.
 */
 
-pmove(s1, b1, l1, c)
+char *pmove(s1, b1, l1, c)
 char	*s1;
 char	*b1;
 int	l1;
@@ -25,7 +25,7 @@ char	c;
 	while (*s && l > 0)
 	{
 		*b++ = *s++;
-		l =- 1;
+		l -= 1;
 	}
 
 	/* if we still have some `l', pad */

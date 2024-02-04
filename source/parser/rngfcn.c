@@ -96,6 +96,7 @@ int	atts;
 int	relstat;
 {
 	register struct rngtab	*rptr;
+	struct rngtab		*rngatndx();
 
 #	ifdef	xPTR2
 	if (tTf(21, 0))

@@ -21,4 +21,4 @@
 
 
 
-int	Alockdes	-1;	/* the concurrency device descriptor */
+int	Alockdes =	-1;	/* the concurrency device descriptor */

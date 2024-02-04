@@ -15,7 +15,6 @@
 **			Lex_debug for the "-v" flag.
 **
 **	Files:
-**		.../fileio.h -- for the FILE stuff
 **		constants.h -- for manifest constants
 **
 **	History:
@@ -100,7 +99,6 @@ struct inc_file
 	FILE		*inc_infile;	/* In_file */
 	FILE		*inc_outfile;	/* Out_file */
 	struct inc_file	*inc_next;
-	char		*inc_ibuf;	/* Ibuf */
 };
 
 
@@ -219,8 +217,6 @@ struct inc_file		*Inc_files;	/* stack of files pushed by #includes */
 
 FILE	*In_file;		/* input file */
 FILE	*Out_file;		/* output file */
-char	*Ibuf;			/* input buffer */
-char	Out_buf [IOBUFSIZ];	/* buffer for Out_file */
 
 # ifdef xDEBUG
 char	Lex_debug;		/* debugging info for lexemes in yylex()

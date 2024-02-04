@@ -46,7 +46,7 @@ int	value;
 
 	l = len;
 
-	tptr = need(Qbuf, l + 6);
+	tptr = (QTREE *) need(Qbuf, l + 6);
 	tptr->left = lptr;
 	tptr->right = rptr;
 	tptr->sym.type = typ;

@@ -43,6 +43,8 @@ getqry()
 	register int		qb_mark;
 	extern			ov_err();
 	extern char		*Ovqpbuf;
+	char			*rdsym();
+	struct symbol		**sym_ad();
 
 	/* initialize query buffer, and prepare for priming it later 
 	 * in this routine
@@ -56,7 +58,7 @@ getqry()
 	Userqry = Buflag = Newq = FALSE;		/* assume batch not needed */
 	/* read in initial info about query */
 
-	while ((sym = rdsym())->type != TREE)	/* process until TREE */
+	while ((sym = (struct symbol *) rdsym())->type != TREE)	/* process until TREE */
 	{
 		switch (sym->type)
 		{
@@ -149,7 +151,7 @@ getqry()
 	freebuf(Ovqpbuf, qb_mark);
 
 	/* read in (possibly null) target list */
-	while ((sym = rdsym())->type != AGHEAD)	/* read until an AGHEAD */
+	while ((sym = (struct symbol *) rdsym())->type != AGHEAD)	/* read until an AGHEAD */
 	{
 		switch (sym->type)
 		{
@@ -172,7 +174,7 @@ getqry()
 	/* next possibility is aggregate */
 
 	Agcount = 0;
-	while ((sym = rdsym())->type != ROOT)	/* process until ROOT */
+	while ((sym = (struct symbol *) rdsym())->type != ROOT)	/* process until ROOT */
 	{
 		switch (sym->type)
 		{
@@ -191,7 +193,7 @@ getqry()
 
 		  case BYHEAD:
 			/* aggregate function */
-			while ((sym = rdsym())->type != ROOT)	/* read until ROOT */
+			while ((sym = (struct symbol *) rdsym())->type != ROOT)	/* read until ROOT */
 			{
 				if (!Bylist)
 					Bylist = sym_ad();
@@ -205,7 +207,7 @@ getqry()
 qread:
 
 	/* read in the qualification */
-	while ((sym = rdsym())->type != QLEND)	/* read until end of qualification */
+	while ((sym = (struct symbol *) rdsym())->type != QLEND)	/* read until end of qualification */
 	{
 		if (!Qlist)
 			Qlist = sym_ad();

@@ -1,4 +1,3 @@
-.ds
 .po 10
 .de ph
 .sp 1
@@ -7,7 +6,7 @@
 .sp 1
 ..
 .de bb
-.in+8
+.in +8
 .sp
 ..
 .de be
@@ -17,9 +16,9 @@
 .tr & 
 .m3 3
 .m1 +1
-.he ''''
+.he ''''
 .bp
-.ce14
+.ce 14
 THE DESIGN AND IMPLEMENTATION
 OF INGRES
 
@@ -40,6 +39,7 @@ CUPERTINO, CA.
 
 
 ABSTRACT
+.ce 0
 .ph
 This paper describes the CURRENTLY OPERATIONAL
 version of the INGRES data base management system.
@@ -577,7 +577,6 @@ causes the process structure shown in Figure 1 to
 be created.
 
 .ne 15
-.ls 1
 .nf
 ________     ________     ________     ________     ________
 |      |     |      |  A  |      |  B  |      |  C  |      |
@@ -594,7 +593,6 @@ ________     ________     ________     ________     ________
                  INGRES Process Structure
 
                       Figure 1
-.ls 2
 
 .fi
 Process 1 is an interactive terminal monitor which allows the user to 
@@ -705,44 +703,44 @@ In this section we describe the EQUEL language and indicate how it
 operates in the INGRES environment.
 
 In the design of EQUEL, the following goals were set:
-.in+5
-.ti-3
+.in +5
+.ti -3
 1)&The new language must have the full capabilities of both
 "C" and QUEL.
-.ti-3
+.ti -3
 2)&The C program should have the capability for processing
 each tuple individually which satisfies the qualification
 in a QUEL RETRIEVE statement.
 (this is the "piped" return facility described in
 Data Language/ALPHA [CODD71]).
-.ti-3
+.ti -3
 3)&The implementation should make as much use as possible
 of the existing C and QUEL language processors. 
 (The implementation cost of EQUEL should be small).
-.in-5
+.in -5
 
 With these goals in mind, EQUEL was defined as follows:
-.in+5
-.ti-3
+.in +5
+.ti -3
 1)&Any C language statement is a valid EQUEL statement.
-.ti-3
+.ti -3
 2)&Any QUEL statement (or INGRES utility command)
 is a valid EQUEL statement as long as it is
 prefixed by two number signs ("##").
-.ti-3
+.ti -3
 3)&C program variables may be used in QUEL statements in place
 of relation names, domain names, target list elements,
 or domain values.
 The declaration statements of C variables used in this manner
 must also be prefixed by double number signs.
-.ti-3
+.ti -3
 4)&RETRIEVE statements without a result relation have the form
 	RETRIEVE (Target-list) 
 		 [WHERE Qualification] C-Block
 .br
 which results in the C-Block
 being executed once for each qualifying tuple.
-.in-5
+.in -5
 
 Two short examples illustrate EQUEL syntax.
 
@@ -831,7 +829,7 @@ produced by the C-compiler is used as the
 front end process in place of the interactive terminal monitor as noted 
 in Figure 2.
 .ne 15
-.ls 1
+.nf
 
              ________     ________     ________     ________
              |      |  A  |      |  B  |      |  C  |      |
@@ -849,9 +847,7 @@ in Figure 2.
 
                                 Figure 2
 
-.ls 2
-
-
+.fi
 During execution of the front-end program,
 data base requests (QUEL statements in the EQUEL program)
 are passed through pipe A and processed by INGRES.
@@ -863,7 +859,7 @@ through pipe F to indicate success or the type of error encountered.
 Consequently, the EQUEL translator must perform the following five 
 functions:
 
-.in+5
+.in +5
 1) insert system calls to "spawn" at run time the process structure 
 shown in Figure 2.
 
@@ -886,7 +882,7 @@ and continues.
 5) If data is to be returned through the data pipe (by a RETRIEVE with no result
 relation specified), EQUEL must also:
 
-.in+5
+.in +5
 a) insert C statements to read the data pipe for a tuple formatted as type/value
 pairs.
 
@@ -898,7 +894,7 @@ c) insert C statements to pass control to the C-block following the RETRIEVE.
 
 d) insert C statements following 
 the block to return to step a) if there are more tuples.
-.in-10
+.in -10
 
 
 2.3 COMMENTS ON THE PROCESS STRUCTURE
@@ -1140,23 +1136,23 @@ relations.)  The domains
 of this relation are:
 .in +24
 .na
-.ti8
+.ti 8
 relid		the name of the relation
-.ti8
+.ti 8
 owner		the UNIX user-id of the relation owner; 
 when appended to relid it produces a unique file name for storing
 the relation.
-.ti8
+.ti 8
 spec		indicates one of 5 possible storage
 schemes or else a special code indicating a virtual
 relation (or "view").
-.ti8
+.ti 8
 indexd		flag set if secondary index exists for this
 relation.  (This flag and the following two are
 present to improve performance by avoiding catalog
 lookup's when possible during query modification
 and one variable query processing.)
-.ti8
+.ti 8
 protect		flag set if this relation has protection predicates.
 .ti 8
 integ		flag set if there are integrity constraints.
@@ -1180,22 +1176,22 @@ for each domain of every relation in the data base:
 
 .in +24
 .na
-.ti8
+.ti 8
 relid		name of relation in which attribute appears
-.ti8
+.ti 8
 owner		relation owner
-.ti8
+.ti 8
 domain-name	domain name
-.ti8
+.ti 8
 domainno	domain number (position) in relation.  In processing
 interactions INGRES uses this number to reference this domain.
-.ti8
+.ti 8
 offset		offset in bytes from beginning of tuple to beginning of domain.
-.ti8
+.ti 8
 type		data type of domain (integer, floating point or character string).
-.ti8
+.ti 8
 length		length (in bytes) of domain; 
-.ti8
+.ti 8
 keyno		if this domain is part of a key, then "keyno"
 indicates the ordering of this domain within the key.
 .in -24
@@ -1279,7 +1275,7 @@ for retrieval only.
 b)  get(descriptor, tid, limit_tid, tuple, next_flag)
 .ph
 This function retrieves into 'tuple' a single tuple from the relation indicated by 'descriptor'.
-'tid' and 'limit_tid' are tuple-identifiers.
+\'tid' and 'limit_tid' are tuple-identifiers.
 There are two modes of retrieval, "scan" and "direct".
 In "scan" mode "get" is intended to be called successively to 
 retrieve all tuples within a range of tuple-id's. 
@@ -1287,7 +1283,7 @@ An initial value of 'tid' sets the low end of the range desired
 and 'limit_tid' sets the high end.
 Each time "get" is called with 'next_flag' = TRUE, the 
 tuple following
-'tid' is retrieved and its tuple-id placed into 'tid' in readiness
+\'tid' is retrieved and its tuple-id placed into 'tid' in readiness
 for the next call.
 Reaching 'limit_tid' is indicated by a special return code.
 The initial setting of 'tid' and 'limit_tid' is done
@@ -2484,7 +2480,7 @@ priority and issue queries against a statistics relation to be kept by
 INGRES.  It could then offer advice to a DBA concerning the choice of 
 access methods and the selection of indices.  This topic is discussed 
 further in [HELD75b].
-
+.bp
 ACKNOWLEDGEMENT
 .ph
 Besides the authors, the following
@@ -2500,172 +2496,165 @@ NESCN0039-76-C-0022,
 NSFF44620-71-C-0087,
 JSEPDCR75-03839, NSFENG74-06651-AO1,
 and a grant from the Sloan Foundation.
-.wh 0 tm
-.de tm
-.sp 6
-..
-.pl 60
-.po 5
+.bp
 REFERENCES
-
-
-.ls 2
-.in+9
-.ti-9
+.sp 2
+.in +9
+.ti -9
 ALLM76	
 Allman, E., Stonebraker, M., and Held, G. 
 "Embedding a Relational Data Sub-language in a General Purpose Programming Language.", 
 Proc. ACM SIGPLAN-SIGMOD Workshop on Data, 
 Salt Lake City, Utah, March, 1976.
-.ti-9
+.ti -9
 ASTR76	
 Astrahan, M. et. al., "SYSTEM R: A Relational Approach to
 Data Base Management," TODS, Vol 1, No. 2.
-.ti-9
+.ti -9
 BOYC73	
 Boyce, R. et. al., 
 "Specifying Queries as Relational Expressions: SQUARE", 
 IBM Research, San Jose, Ca., RJ 1291, Oct. 1973.
-.ti-9
+.ti -9
 CHAM74	
 Chamberlin, D. and Boyce, R., 
 "SEQUEL: A Structured English Query Language", 
 Proc. 1974 ACM-SIGFIDET Workshop on Data Description, Access and Control, Ann Arbor, Mich., May 1974.
-.ti-9
+.ti -9
 CHAM75	
 Chamberlin, D., Gray, J.N., and Traiger, I.L., 
 "Views, Authorization and Locking in a Relational Data Base System", 
 Proc. 1975 National Computer Conference, AFIPS Press, May 1975.
-.ti-9
+.ti -9
 CODA71	
 Committee on Data Systems Languages, 
 "CODASYL Data Base Task Group Report", 
 ACM, New York, 1971.
-.ti-9
+.ti -9
 CODD70	
 Codd, E.F., 
 "A Relational Model of Data for Large Shared Data Banks", 
 CACM, Vol. 13 No. 6, pp. 377-387, June, 1970.
-.ti-9
+.ti -9
 CODD71	
 Codd, E.F., 
 "A Data Base Sublanguage Founded on the Relational Calculus", 
 Proc. 1971 ACM-SIGFIDET Workshop on Data Description, Access and Control, San Diego, Ca., Nov. 1971.
-.ti-9
+.ti -9
 CODD72	
 Codd, E.F., 
 "Relational Completeness of Data Base Sublanguages", 
 Courant Computer Science Symposium 6, May 1972.
-.ti-9
+.ti -9
 CODD74	
 Codd, E.F. and Date, C.J., 
 "Interactive Support for Non-Programmers, The Relational and Network Approaches", 
 Proc. 1974 ACM-SIGFIDET Workshop on Data Description, Access and Control, Ann Arbor, Mich., May 1974.
-.ti-9
+.ti -9
 DATE74	
 Date, C.J. and Codd, E.F., 
 "The Relational and Network Approaches: Comparison of the Aplication Programming Interfaces", 
 Proc. 1974 ACM-SIGFIDET Workshop on Data Description, Access and Control, Ann Arbor, Mich., May 1974.
-.ti-9
+.ti -9
 GRAY75   Gray, J.N., Lorie, R.A., and Putzolu, G.R.
 "Granularity of Locks in a Shared Data Base"
 Proc. International Conference on Very Large
 Data Bases, Framingham, Mass., September, 1975.
-.ti-9
+.ti -9
 GO75	
 Go, A., Stonebraker, M., and Williams, C., 
 "An Approach to Implementing a Geo-data System", 
 Proc. ACM SIGGRAPH/SIGMOD Conference on Data Bases in Interactive Design,
 Waterloo, Ontario, Sept. 1975.
-.ti-9
+.ti -9
 GOTT75   Gottlieb, D., et. al.  "A Classification of
 Compression Methods and their
 Usefulness in a Large Data Processing Center"
 Proc. 1975 National Computer Conference,
 AFIPS Press, May, 1975.
-.ti-9
+.ti -9
 HELD75a	
 Held, G.D., Stonebraker, M. and Wong, E., 
 "INGRES - A Relational Data Base Management System", 
 Proc. 1975 National Computer Conference, AFIPS Press, 1975.
-.ti-9
+.ti -9
 HELD75b	
 Held, G.D., 
 "Storage Structures for Relational Data Base Management Systems", 
 Ph.D. Thesis, Dept. of Electrical Engineering and Computer Science, Univ. of California, Berkeley, 1975.
-.ti-9
+.ti -9
 HELD75c	
 Held, G., and Stonebraker M., 
 "B-Trees Re-examined", 
 to appear in CACM.
-.ti-9
+.ti -9
 IBM66	
 IBM Corp., 
 "OS ISAM Logic", 
 IBM, White Plains, N.Y., GY28-6618.
-.ti-9
+.ti -9
 JOHN74	
 Johnson, S.C., 
 "YACC, Yet Another Compiler-Compiler", 
 UNIX Programmer's Manual, Bell Telephone Labs, Murray Hill, N.J., July 1974.
-.ti-9
+.ti -9
 MCDO75a	
 McDonald, N. and Stonebraker, M., 
 "Cupid -- The Friendly Query Language", 
 Proc. ACM-Pacific-75, San Francisco, California, April 1975.
-.ti-9
+.ti -9
 MCDO75b	
 McDonald, Nancy., 
 "CUPID: A Graphics Oriented Facility for Support of Non-programmer Interactions with a Data Base", 
 Ph.D. Thesis, Dept. of Electrical Engineering and Computer Science,
 University of California, Berkeley, 1975.
-.ti-9
+.ti -9
 RITC74	
 Ritchie, D.M. and Thompson, K. 
 "The UNIX Tine-Sharing System,"
 CACM,
 Vol. 17, No. 3., March, 1974.
-.ti-9
+.ti -9
 SCHO75	
 Schoenberg, Iris, 
 "Implementation of Integrity Constraints in the Relational Data Base Management System, INGRES", 
 M.S. Thesis, Dept. of Electrical Engineering and Computer Science,
 University of California, Berkeley, 1975.
-.ti-9
+.ti -9
 STON74a	
 Stonebraker, M., "A Functional View of Data Independence,"
 Proc. 1974 SIGFIDET Workshop on Data
 Description, Access and Control, Ann Arbor, Mich., May 1974.
-.ti-9
+.ti -9
 STON74b	
 Stonebraker, M. and Wong, E., 
 "Access Control in a Relational Data Base Management System by Query Modification", 
 Proc. 1974 ACM National Conference, San Diego, Ca., Nov. 1974
-.ti-9
+.ti -9
 STON74c  Stonebraker, M., "High Level Integrity
 Assurance in Relational Data Base Systems", 
 University of California, Electronics Research
 Laboratory, Memo ERL-M473, August, 1974.
-.ti-9
+.ti -9
 STON75	
 Stonebraker, M., "Implementation of Integrity Constraints and
 Views by Query Modification", Proc 1975 SIGMOD Workshop
 on Management of Data, San Jose, Ca., May 1975.
-.ti-9
+.ti -9
 STON76	
 Stonebraker, M. and Rubinstein, P., "The INGRES Protection System,"
 Proc. 1976 ACM National Conference, Houston, Texas, October, 1976.
-.ti-9
+.ti -9
 TSIC75	
 Tsichritzis, D., 
 "A Network Framework for Relational Implementation", 
 University of Toronto, Computer Systems Research Group Report CSRG-51, Feb. 1975
-.ti-9
+.ti -9
 WONG76	
 Wong, E. and Youssefi, K., 
 "Decomposition-A Strategy for Query Processing,"
 TODS, (this issue).
-.ti-9
+.ti -9
 ZOOK76	
 Zook, W., et. al.,
 "INGRES - Reference Manual (Version 5)",

@@ -23,11 +23,9 @@
 char *nalloc(s)
 int	s;
 {
-	register	size;
+	extern char	*malloc();
 	
-	size = s;
-	size = malloc(size);
-	return (size);
+	return (malloc(s));
 }
 /*
 **	SALLOC -- allocate
@@ -41,14 +39,15 @@ char		*s;
 {
 	register int		i;
 	register char		*string;
+	extern char		*malloc();
 
 	string = s;
-	i = malloc(length(string) + 1);
+	i = (int) malloc(length(string) + 1);
 	if (i == 0)
 		return (0);
 
 	smove(string, i);
-	return (i);
+	return ((char *)i);
 }
 
 /*
@@ -67,8 +66,8 @@ char		*cp;
 	register char		*lcp, *lend, *lacp;
 
 	lcp = cp;
-	lacp = &cp;
-	lend = &end;
+	lacp = (char *) &cp;
+	lend = (char *) &end;
 	if (lcp >= lend && lcp < lacp)	/* make sure its in heap */
 	{
 		free(lcp);

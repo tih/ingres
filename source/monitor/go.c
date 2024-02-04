@@ -1,6 +1,7 @@
+# include	<stdio.h>
+
 # include	"../ingres.h"
 # include	"../aux.h"
-# include	"../fileio.h"
 # include	"../pipes.h"
 # include	"monitor.h"
 
@@ -24,16 +25,16 @@ go()
 {
 	struct pipfrmt	iobuf;
 	FILE		*iop;
-	char		bufx[IOBUFSIZ];
 	register int	i;
 	char		c;
-	extern int	getc();
+	extern int	fgetc();
 	struct retcode	rc;
 	register char	*p;
+	char		*macro();
 
 	clrline(1);
 	fflush(Qryiop);
-	if ((iop = fopen(Qbname, "r", bufx)) == NULL)
+	if ((iop = fopen(Qbname, "r")) == NULL)
 		syserr("go: open 1");
 	if (Nodayfile >= 0)
 		printf("Executing . . .\n\n");
@@ -47,7 +48,7 @@ go()
 		Autoclear = 1;
 
 	wrpipe(P_PRIME, &iobuf, 'M', 0, 0);
-	macinit(&getc, iop, 1);
+	macinit(&fgetc, iop, 1);
 
 	while ((c = macgetch()) > 0)
 	{

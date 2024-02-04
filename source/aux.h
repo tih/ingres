@@ -134,34 +134,15 @@ extern char	*Pathname;
 
 
 /*
-**	The following structs are for use in type conversion.
+**	This is for type conversion, to avoid ugly pointer
+**	casts all over the place:
 */
 
-struct
-{
-	char	i1type;
-};
-
-struct
-{
-	int	i2type;
-};
-
-struct
-{
-	long	i4type;
-};
-
-struct
-{
-	float	f4type;
-};
-
-struct
-{
-	double	f8type;
-};
-
+# define	i1deref(x)	(*((char *)(x)))
+# define	i2deref(x)	(*((int *)(x)))
+# define	i4deref(x)	(*((long *)(x)))
+# define	f4deref(x)	(*((float *)(x)))
+# define	f8deref(x)	(*((double *)(x)))
 
 
 /*
@@ -203,17 +184,10 @@ struct out_arg
 /*
 **  Assorted system stuff
 **
-**	VERSION is the version number of this incarnation of INGRES, in
-**		the form 9.9/99, where the number after the slash is
-**		the release, mod number, or whatever.  The info before
-**		the slash is used for determining the file names for
-**		the dayfile and proctab, and the whole thing is printed
-**		out at login time.
 **	FILEMODE is the file mode on a 'creat' call for all files in
 **		the database and probably other external files.
 */
 
-# define	VERSION		"6.2/4"		/* version number */
 # define	FILEMODE	0600		/* db file mode */
 
 /*
@@ -224,10 +198,10 @@ struct out_arg
 */
 # define	EXEC_DBU	'#'	/* data base utilities (or overlays) */
 # define	EXEC_DECOMP	'$'	/* decomposition process */
-# define	EXEC_OVQP	'*'	/* one variable query processor */
+# define	EXEC_OVQP	'&'	/* one variable query processor */
 # define	EXEC_QRYMOD	'*'	/* query modification for view, protection, integrity */
 # define	EXEC_PARSER	'@'	/* parser, scanner */
-# define	EXEC_FRONT		/* could be equel prog or terminal monitor */
+# define	EXEC_FRONT	'^'	/* could be equel prog or terminal monitor */
 # define	EXEC_ERROR	'%'	/* exec_id of an error block */
 
 /* stuff giving information about the machine */

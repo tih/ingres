@@ -23,10 +23,6 @@ int	len;
 	register char	*addr;
 	int		t;
 	double		d;
-	struct
-	{
-		float	flt;
-	};
 
 	t = type;	/* copy type of symbol */
 	length = len;	/* and its length */
@@ -37,8 +33,8 @@ int	len;
 
 	  case opFLOAT:
 		/* convert from f4 to f8 */
-		d = addr->flt;
-		addr = &d;
+		d = *((float *)addr);
+		addr = (char *) &d;
 		length = sizeof d;
 		t = opDOUBLE;
 		break;

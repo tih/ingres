@@ -1,7 +1,10 @@
+# include	<stdio.h>
+# include	<sys/types.h>
+# include	<sys/dir.h>
+
 # include	"../ingres.h"
 # include	"../aux.h"
 # include	"../lock.h"
-# include	"../fileio.h"
 
 /*
 **  PURGE DATABASE
@@ -44,12 +47,7 @@ extern int	Status;
 extern char	*Usercode;
 long		Today;
 
-struct directory
-{
-	int	inumber;
-	char	fname[14];
-	char	null;
-};
+
 
 main(argc, argv)
 int	argc;
@@ -58,6 +56,7 @@ char	*argv[];
 	register char	*db;
 	register int	i;
 	char		fake[256];
+	char		*getnxtdb();
 
 #	ifdef xTTR1
 	tTrace(&argc, argv, 'T');
@@ -74,7 +73,7 @@ char	*argv[];
 	{
 		purgedb(db);
 	}
-	printf("\npurge completed\n");
+	printf("Purge completed.\n");
 }
 
 
@@ -105,10 +104,8 @@ char	*db1;
 	struct tup_id		rtid, rlimtid;
 	register int		i;
 	register char		c;
-	long			l;
-	struct directory	direc;
-	FILE			*fd;
-	char			fdbuf[IOBUFSIZ];
+	DIR			*dirp;
+	struct direct		*directp;
 	int			darg[3];
 	char			*pv[2];
 	char			pbuff[MAXNAME + 3];
@@ -168,7 +165,7 @@ char	*db1;
 			bmove(rel.relid, pbuff, MAXNAME + 2);
 			pbuff[MAXNAME + 2] = '\0';
 			pv[0] = pbuff;
-			pv[1] = -1;
+			pv[1] = (char *) -1;
 			if (destroy(1, pv) != 0)
 				syserr("cannot destroy %s\n", pv[0]);
 			closecatalog(FALSE);	/* to flush */
@@ -176,7 +173,7 @@ char	*db1;
 	}
 
 	/* open the directory to check for extra files */
-	if ((fd = fopen(".", "read", fdbuf)) == NULL)
+	if ((dirp = opendir(".")) == NULL)
 	{
 		printf("\tcannot open .\n");
 		closecatalog(TRUE);		/* really */
@@ -184,30 +181,26 @@ char	*db1;
 		acc_close();
 		return;
 	}
-	direc.null = 0;
-	l = 32;		/* fseek needs a long address */
-	fseek(fd, l, 0);
+
+	readdir(dirp);	/* skip "." */
+	readdir(dirp);	/* skip ".." */
 
 	/* scan the directory */
-	while (fread(fd, &direc, 16) == 16)
-	{
-		/* throw out null entries */
-		if (direc.inumber == 0)
-			continue;
+	while ((directp = readdir(dirp)) != NULL) {
 
 		/* throw out legitimate files */
-		if (sequal(direc.fname, "admin"))
+		if (sequal(directp->d_name, "admin"))
 			continue;
 
 		/* always purge _SYS files */
-		if (!bequal(direc.fname, "_SYS", 4))
+		if (!bequal(directp->d_name, "_SYS", 4))
 		{
-			if (direc.fname[13] != 0)
+			if (directp->d_name[MAXNAME+1] != 0)
 			{
 				/* it might be a relation */
 				clearkeys(&Reldes);
-				setkey(&Reldes, &key, direc.fname, RELID);
-				setkey(&Reldes, &key, &direc.fname[MAXNAME], RELOWNER);
+				setkey(&Reldes, &key, directp->d_name, RELID);
+				setkey(&Reldes, &key, &directp->d_name[MAXNAME], RELOWNER);
 				if (getequal(&Reldes, &key, &rel, &rtid) <= 0)
 				{
 					/* it is a relation (or should be saved) */
@@ -218,18 +211,19 @@ char	*db1;
 			/* it is a funny file!!! */
 			if (!Clean)
 			{
-				printf("\t%s: file\n", direc.fname);
+				printf("\t%s: file\n", directp->d_name);
 				continue;
 			}
 		}
 
 		/* purge the file */
-		printf("\tunlinking %s\n", direc.fname);
-		if (unlink(direc.fname))
+		printf("\tunlinking %s\n", directp->d_name);
+		if (unlink(directp->d_name))
 			printf("\tcannot unlink\n");
 	}
 	closecatalog(TRUE);	/* close catalogs */
 	unldb();		/* unlock the database */
 	acc_close();
-	fclose(fd);
+
+	closedir(dirp);
 }

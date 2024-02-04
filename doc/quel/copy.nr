@@ -49,17 +49,17 @@ or all permissions for all users.
 The formats allowed by copy are:
 .in +5
 .s1
-.ti-5
+.ti -5
 .bd "i1,i2,i4"
 \- The data is
 stored as an integer of length 1, 2, or 4 bytes in the \*(UU file.
 .s1
-.ti-5
+.ti -5
 .bd "f4,f8"
 \- The data is stored as a floating point
 number (either single or double precision) in the \*(UU file.
 .s1
-.ti-5
+.ti -5
 .bd "c1,c2,...,c255"
 \- The data is stored as a fixed length string of
 characters.
@@ -102,7 +102,7 @@ or a copy
 .bd from.
 Delimitors for variable length strings and
 for dummy domains can be selected from the list of:
-.in+4
+.in +4
 .s3
 .bd "nl"
 \- new line character

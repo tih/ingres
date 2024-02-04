@@ -243,7 +243,7 @@ struct symbol	*sym;
 	if (s->type == CHAR)
 	{
 		flag = FALSE;
-		cp = s->value;	/* the string is a literal */
+		cp = (char *) s->value;	/* the string is a literal */
 		len = s->len & 0377;
 		while (len--)
 		{
@@ -288,12 +288,13 @@ int		op;
 	register int		i;
 	char			*sp, c, nc;
 	extern char		*Ovqpbuf;
+	extern char		*need();
 
 	i = len;
-	s = need(Ovqpbuf, op == opLTLE ? i + 3 : i + 2);
+	s = (struct symbol *) need(Ovqpbuf, op == opLTLE ? i + 3 : i + 2);
 	s->type = CHAR;
-	sp = s->value;
-	cp = const->value;
+	sp = (char *) s->value;
+	cp = (char *) const->value;
 
 	while (i--)
 	{
@@ -358,11 +359,11 @@ int		attno;
 	if (Nsimp == NSIMP)
 		return (TRUE);	/* no more room */
 
-	s = &Simp[Nsimp++];
+	s = (struct symbol *) &Simp[Nsimp++];
 
-	s->att = attno;
-	s->const = const;
-	s->relop = rel;
+	((struct simp *)s)->att = attno;
+	((struct simp *)s)->const = const;
+	((struct simp *)s)->relop = rel;
 
 #	ifdef xOTR1
 	if (tTf(21, 3))

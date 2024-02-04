@@ -20,7 +20,7 @@ struct tup_id		*tidx;
 
 	b = Acc_head;
 	b->mainpg = b->thispage + 1;
-	b->bufstatus =| BUF_DIRTY;
+	b->bufstatus |= BUF_DIRTY;
 	if (i = pageflush(b))
 		return (i);
 
@@ -33,7 +33,7 @@ struct tup_id		*tidx;
 	b->ovflopg = 0;
 	b->linetab[0] = b->firstup - b;
 	b->nxtlino = 0;
-	b->bufstatus =| BUF_DIRTY;
+	b->bufstatus |= BUF_DIRTY;
 
 	/*
 	** Update tid to be new page

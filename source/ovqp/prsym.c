@@ -16,7 +16,7 @@ struct symbol	*ss;
 	s = ss;
 	i = s->type;
 	j = s->len & 0377;
-	p = s->value;
+	p = (char *) s->value;
 	if (i == S_VAR)
 	{
 		i = VAR;	/* execute var portion */
@@ -26,9 +26,9 @@ struct symbol	*ss;
 	{
 		/* beware : do S_VAR's have attno's? */
 		printf("var:att#=%d:", *p);
-		i = s->vtype;
-		j = s->vlen & 0377;
-		p = s->vpoint;
+		i = ((struct qt_v *)s)->vtype;
+		j = ((struct qt_v *)s)->vlen & 0377;
+		p = (char *) ((struct qt_v *)s)->vpoint;
 		if (i != CHAR)
 		{
 			/* move INT & FLOAT to word boundary */
@@ -53,16 +53,25 @@ struct symbol	*ss;
 		switch(j)
 		{
 		  case 1:
+			printf("%d", i1deref(p));
+			break;
 		  case 2:
-			printf("%d", p->i2type);
+			printf("%d", i2deref(p));
 			break;
 		  case 4:
-			printf("%s", locv(p->i4type));
+			printf("%s", locv(i4deref(p)));
 		}
 		break;
 
 	  case FLOAT:
-		printf("%10.3f", p->f4type);
+		switch(j)
+		{
+		  case 4:
+			printf("%10.3f", f4deref(p));
+			break;
+		  case 8:
+			printf("%10.3f", f8deref(p));
+		}
 		break;
 
 	  case RESULTID:
@@ -108,7 +117,7 @@ struct symbol	*ss;
 	if (s->type == CHAR)
 	{
 		printf("%d:%d:value='", s->type, s->len);
-		prstr(s->value->stringp, s->len & 0377);
+		prstr(cpderef(s->value), s->len & 0377);
 		printf("'\n");
 	}
 	else

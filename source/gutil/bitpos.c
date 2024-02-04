@@ -16,12 +16,12 @@ int	word;
 
 	pos = -1;
 
-	for (i = 1, j = 0; wd; i =<< 1, j++)
+	for (i = 1, j = 0; wd; i <<= 1, j++)
 	{
 		if (wd & i)
 		{
 			pos = j;
-			wd =& ~i;
+			wd &= ~i;
 		}
 	}
 

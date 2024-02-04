@@ -1,7 +1,7 @@
 .po 5
 .de @h
 'sp 4
-'tl ''''
+'tl ''''
 'sp 2
 ..
 .de @f
@@ -25,7 +25,6 @@
 .de pp
 .sp
 ..
-.ls 2
 .sp 4
 .ce 2
 CONVERTING VERSION 5 DATABASES

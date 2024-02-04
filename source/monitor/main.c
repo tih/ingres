@@ -1,7 +1,8 @@
+# include	<stdio.h>
+
 # include	"../ingres.h"
 # include	"../aux.h"
 # include	"../unix.h"
-# include	"../fileio.h"
 # include	"../pipes.h"
 # include	"monitor.h"
 
@@ -60,7 +61,7 @@ char	*argv[];
 	extern int		Equel;
 	char			buff[100];
 	extern char		**Xparams;
-
+	char			*getufield();
 
 	/* insure that permissions are ok */
 	setuid(getuid());
@@ -76,7 +77,6 @@ char	*argv[];
 #	endif
 	initproc("MONITOR", argv);
 	Exitfn = &quit;
-	set_si_buf();
 
 	/* process arguments */
 	if (!setflag(argv, 'd', 1))
@@ -120,7 +120,7 @@ char	*argv[];
 		time(buff);
 		printf("INGRES version %s login\n%s", Version, ctime(buff));
 	}
-	if (Nodayfile == 0 && (Qryiop = fopen(ztack(ztack(Pathname, "/files/dayfile"), Versn), "r", Qryxxx)) != NULL)
+	if (Nodayfile == 0 && (Qryiop = fopen(ztack(ztack(Pathname, "/files/dayfile"), Versn), "r")) != NULL)
 	{
 		while ((ndx = getc(Qryiop)) > 0)
 			putchar(ndx);
@@ -129,7 +129,7 @@ char	*argv[];
 
 	/* SET UP LOGICAL QUERY-BUFFER FILE */
 	concat("/tmp/INGQ", Fileset, Qbname);
-	if ((Qryiop = fopen(Qbname, "w", Qryxxx)) == NULL)
+	if ((Qryiop = fopen(Qbname, "w")) == NULL)
 		syserr("main: open(%s)", Qbname);
 
 	/* GO TO IT ... */
@@ -233,8 +233,8 @@ int		rpipnum;
 	char			buf[sizeof parm + 30];
 	int			err;
 	FILE			*iop;
-	char			iobufx[IOBUFSIZ];
 	char			*errfilen();
+	char			*mcall();
 
 	s = s1;
 	err = s->err_id;
@@ -250,7 +250,7 @@ int		rpipnum;
 		if (tTf(11, 1))
 			printf("pv[%d] = %s, i=%d\n", pc, p, i);
 #		endif
-		p =+ i;
+		p += i;
 		pc++;
 		if (pc >= 10 || (p - parm) >= 500)
 		{
@@ -264,9 +264,9 @@ int		rpipnum;
 
 	/* try calling the {catcherror} macro -- maybe not print */
 	p = buf;
-	p =+ smove("{catcherror; ", p);
-	p =+ smove(iocv(err), p);
-	p =+ smove("}", p);
+	p += smove("{catcherror; ", p);
+	p += smove(iocv(err), p);
+	p += smove("}", p);
 
 	p = mcall(buf);
 	if (sequal(p, "0"))
@@ -282,7 +282,7 @@ int		rpipnum;
 		printf("%d, %s", err, p);
 #	endif
 
-	if ((iop = fopen(p, "r", iobufx)) == NULL)
+	if ((iop = fopen(p, "r")) == NULL)
 		syserr("proc_error: open(%s)", p);
 
 	/* read in the code and check for correct */

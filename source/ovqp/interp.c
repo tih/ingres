@@ -88,7 +88,7 @@ loop:
 #		endif
 
 		freebuf(Ovqpbuf, cb_mark);
-		return (tos);
+		return ((struct symbol *) tos);
 	}
 	optype = tos->type;
 	opval = *tos->value;
@@ -109,12 +109,12 @@ loop:
 		{
 
 		  case opDBA:
-			tos->value->stringp = Admin.adhdr.adowner;
+			cpderef(tos->value) = Admin.adhdr.adowner;
 			tos->len = 2;
 			goto loop;
 
 		  case opUSERCODE:
-			tos->value->stringp = Usercode;
+			cpderef(tos->value) = Usercode;
 			tos->len = 2;
 			goto loop;
 		}
@@ -127,7 +127,7 @@ loop:
 				timtrace(12, 0);
 #			endif
 			freebuf(Ovqpbuf, cb_mark);
-			return(tos);
+			return((struct symbol *) tos);
 		}
 		else
 			--tos;
@@ -162,7 +162,7 @@ loop:
 			}
 			else	/* opval refers to the tid and this is an update */
 			{
-				Uptid = tos->value->i4type;	/* copy tid */
+				Uptid = i4deref(tos->value);	/* copy tid */
 				if (Ov_qmode == mdREPL || (Diffrel && Ov_qmode == mdDEL && Result->relindxd > 0 ))
 				{
 					/* Origtup must be left with the orig
@@ -195,9 +195,9 @@ loop:
 			else
 			{
 				if (tos->type == CHAR)
-					s1 = tos->value->stringp;
+					s1 = cpderef(tos->value);
 				else
-					s1 = tos->value;
+					s1 = (char *) tos->value;
 				printatt(tos->type, tos->len & 0377, s1);	/* print attribute */
 			}
 		}
@@ -206,8 +206,8 @@ loop:
 
 
 	  case BOP:
-		op2 = tos--;
-		op1 = tos;
+		op2 = (struct symbol *) tos--;
+		op1 = (struct symbol *) tos;
 		typecheck(op1, op2, opval);
 		val1 = op1->value;
 		val2 = op2->value;
@@ -222,26 +222,26 @@ loop:
 				switch (opval)
 				{
 				  case opADD:
-					*val1 =+ *val2;
+					*val1 += *val2;
 					goto loop;
 				  case opSUB:
-					*val1 =- *val2;
+					*val1 -= *val2;
 					goto loop;
 				  case opMUL:
-					*val1 =* *val2;
+					*val1 *= *val2;
 					goto loop;
 				  case opDIV:
-					*val1 =/ *val2;
+					*val1 /= *val2;
 					goto loop;
 				  case opMOD:
-					*val1 =% *val2;
+					*val1 %= *val2;
 					goto loop;
 
 
 				  case opPOW:
 					itof(op1);
 					itof(op2);
-					val1->f8type = pow(val1->f8type, val2->f8type);
+					f8deref(val1) = pow(f8deref(val1), f8deref(val2));
 					goto loop;
 
 
@@ -256,38 +256,38 @@ loop:
 				switch(opval)
 				{
 				  case opADD:
-					val1->i4type =+ val2->i4type;
+					i4deref(val1) += i4deref(val2);
 					goto loop;
 
 				  case opSUB:
-					val1->i4type =- val2->i4type;
+					i4deref(val1) -= i4deref(val2);
 					goto loop;
 
 				  case opMUL:
-					val1->i4type =* val2->i4type;
+					i4deref(val1) *= i4deref(val2);
 					goto loop;
 
 				  case opDIV:
-					val1->i4type =/ val2->i4type;
+					i4deref(val1) /= i4deref(val2);
 					goto loop;
 
 				  case opMOD:
-					val1->i4type =% val2->i4type;
+					i4deref(val1) %= i4deref(val2);
 					goto loop;
 
 				  case opPOW:
 					itof(op1);
 					itof(op2);
-					val1->f8type = pow(val1->f8type, val2->f8type);
+					f8deref(val1) = pow(f8deref(val1), f8deref(val2));
 					goto loop;
 
 				  /* relational operator */
 				  default: 
 					tos->len =2;
-					if (val1->i4type > val2->i4type)
+					if (i4deref(val1) > i4deref(val2))
 						l1 = 1;
 					else
-						if (val1->i4type == val2->i4type)
+						if (i4deref(val1) == i4deref(val2))
 							l1 = 0;
 						else
 							l1 = -1;
@@ -302,32 +302,32 @@ loop:
 			switch (opval)
 			{
 			  case opADD:
-				val1->f8type =+ val2->f8type;
+				f8deref(val1) += f8deref(val2);
 				goto loop;
 
 			  case opSUB:
-				val1->f8type =- val2->f8type;
+				f8deref(val1) -= f8deref(val2);
 				goto loop;
 
 			  case opMUL:
-				val1->f8type =* val2->f8type;
+				f8deref(val1) *= f8deref(val2);
 				goto loop;
 
 			  case opDIV:
-				val1->f8type =/ val2->f8type;
+				f8deref(val1) /= f8deref(val2);
 				goto loop;
 
 			  case opPOW:
-				val1->f8type = pow(val1->f8type, val2->f8type);
+				f8deref(val1) = pow(f8deref(val1), f8deref(val2));
 				goto loop;
 
 			  default:
 				tos->type = INT;
 				tos->len = 2;
-				if (val1->f8type > val2->f8type)
+				if (f8deref(val1) > f8deref(val2))
 					l1 = 1;
 				else
-					if (val1->f8type == val2->f8type)
+					if (f8deref(val1) == f8deref(val2))
 						l1 = 0;
 					else
 						l1 = -1;
@@ -341,7 +341,7 @@ loop:
 				concatsym(op1, op2);	/* concatenate the two symbols */
 				goto loop;
 			}
-			l1 = lexcomp(val1->stringp, op1->len & 0377, val2->stringp, op2->len & 0377);
+			l1 = lexcomp(cpderef(val1), op1->len & 0377, cpderef(val2), op2->len & 0377);
 			tos->type = INT;
 			tos->len = 2;
 			*val1 = relop_interp(opval, l1);
@@ -369,14 +369,14 @@ loop:
 			   		goto loop;
 
 				  case 4:
-					if (l1 || (val1->i4type < 0))
-						val1->i4type = -val1->i4type;
+					if (l1 || (i4deref(val1) < 0))
+						i4deref(val1) = -i4deref(val1);
 					goto loop;
 				}
 
 			  case FLOAT:
-				if (l1 || (val1->f8type < 0.0))
-					val1->f8type = -(val1->f8type);
+				if (l1 || (f8deref(val1) < 0.0))
+					f8deref(val1) = -f8deref(val1);
 				goto loop;
 			}
 
@@ -419,31 +419,31 @@ loop:
 			switch (opval)
 			{
 			  case opATAN:
-				val1->f8type = atan(val1->f8type);
+				f8deref(val1) = atan(f8deref(val1));
 				goto loop;
 	
 			  case opGAMMA:
-				val1->f8type = gamma(val1->f8type);
+				f8deref(val1) = gamma(f8deref(val1));
 				goto loop;
 	
 			  case opLOG:
-				val1->f8type = log(val1->f8type);
+				f8deref(val1) = log(f8deref(val1));
 				goto loop;
 	
 			  case opSIN:
-				val1->f8type = sin(val1->f8type);
+				f8deref(val1) = sin(f8deref(val1));
 				goto loop;
 
 			  case opCOS:
-				val1->f8type = cos(val1->f8type);
+				f8deref(val1) = cos(f8deref(val1));
 				goto loop;
 
 			  case opSQRT:
-				val1->f8type = sqrt(val1->f8type);
+				f8deref(val1) = sqrt(f8deref(val1));
 				goto loop;
 
 			  case opEXP:
-				val1->f8type = exp(val1->f8type);
+				f8deref(val1) = exp(f8deref(val1));
 				goto loop;
 
 			  default:
@@ -538,22 +538,22 @@ struct stacksym	*tosp;
 			switch(tos->len)
 			{
 			  case 1:
-				*tos->value =+ number->i1type;
+				i1deref(tos->value) += i1deref(number);
 				goto puta;
 
 			  case 2:
-				tos->value->i2type =+ number->i2type;
+				i2deref(tos->value) += i2deref(number);
 				goto puta;
 
 			  case 4:
-				tos->value->i4type =+ number->i4type;
+				i4deref(tos->value) += i4deref(number);
 				goto puta;
 			}
 
 		  case FLOAT:
 			if (tos->len == 4)
-				number->f8type = number->f4type;
-			tos->value->f8type =+ number->f8type;
+				f8deref(number) = f4deref(number);
+			f8deref(tos->value) += f8deref(number);
 			goto puta;
 
 		  default:
@@ -564,7 +564,7 @@ struct stacksym	*tosp;
 	  case opCOUNT:
 		tos->type = CNTTYPE;
 		tos->len = CNTLEN;
-		tos->value->i4type = *Counter;
+		i4deref(tos->value) = *Counter;
 		goto puta;
 
 	  case opANY:
@@ -590,28 +590,28 @@ struct stacksym	*tosp;
 			switch (tos->len)
 			{
 			  case 1:
-				i = (tos->value->i1type < number->i1type);
+				i = (i1deref(tos->value) < i1deref(number));
 				break;
 
 			  case 2:
-				i = (*tos->value < number->i2type);
+				i = (i2deref(tos->value) < i2deref(number));
 				break;
 
 			  case 4:
-				i = (tos->value->i4type < number->i4type);
+				i = (i4deref(tos->value) < i4deref(number));
 				break;
 			}
 			break;
 
 		  case FLOAT:
 			if (tos->len == 4)
-				number->f8type = number->f4type;
-			i  = (tos->value->f8type < number->f8type);
+				f8deref(number) = f4deref(number);
+			i  = (f8deref(tos->value) < f8deref(number));
 			break;
 
 		  case CHAR:
 			l1 = tos->len & 0377;
-			i = (lexcomp(tos->value->stringp, l1, Tend, l1) < 0);
+			i = (lexcomp(cpderef(tos->value), l1, Tend, l1) < 0);
 			break;
 
 		  default:	
@@ -637,7 +637,7 @@ struct stacksym	*tosp;
 				ov_err(BADAVG);
 		if (*Counter > 1)
 		{
-			tos->value->f8type = number->f8type + (tos->value->f8type - number->f8type)/ *Counter;
+			f8deref(tos->value) = f8deref(number) + (f8deref(tos->value) - f8deref(number))/ *Counter;
 		}
 		tos->len = 8;
 		goto puta;
@@ -649,5 +649,5 @@ struct stacksym	*tosp;
 puta:
 	tout(tos, Tend, tos->len);
 done:
-	Tend =+ tos->len & 0377;
+	Tend += tos->len & 0377;
 }

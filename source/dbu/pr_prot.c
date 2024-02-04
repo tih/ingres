@@ -36,7 +36,7 @@
 
 QTREE	*gettree();	/* gets a tree from "tree" catalog [readtree.c] */
 
-char	*Days []
+char	*Days [] =
 {
 	"sunday",
 	"monday",
@@ -127,8 +127,8 @@ struct relation		*rel;
 	   || !(r->relstat & S_PROTRET))
 		printf("Permissions on %s are:\n\n", relid);
 	/* print out special permissions, if any */
-	flag =+ pr_spec_permit(r, S_PROTALL);
-	flag =+ pr_spec_permit(r, S_PROTRET);
+	flag += pr_spec_permit(r, S_PROTALL);
+	flag += pr_spec_permit(r, S_PROTRET);
 
 	if (!(r->relstat & S_PROTUPS))
 		if (flag)
@@ -211,7 +211,7 @@ int			relst_bit;
 	if (relst_bit == S_PROTALL)
 		p->propermid = 0;
 	else if (relst_bit == S_PROTRET)
-		p->propermit = 1;
+		p->propermid = 1;
 	else
 		syserr("pr_spec_permit(relst_bit == 0%o)", relst_bit);
 
@@ -385,7 +385,7 @@ int		relstat;
 			printf("delete");
 		else if (op & (j = PRO_APP))
 			printf("append");
-		op =^ j;
+		op ^= j;
 		if (op)
 			printf(", ");
 		else
@@ -465,7 +465,7 @@ int	relstat;
 		putchar('(');
 		for (d = doms, word = 0; word < 8; word++, d++)
 		{
-			for (shift = 0; shift < 16; shift++, *d =>> 1)
+			for (shift = 0; shift < 16; shift++, *d >>= 1)
 			{
 				if (*d & 01)
 				{
@@ -654,10 +654,10 @@ char		term;
 #	ifdef xZTR1
 	if (tTf(11, 7))
 # ifdef xV7_UNIX
-		printf("pr_trem(term='%2s')\n", term);
+		printf("pr_term(term='%2s')\n", term);
 # endif
 # ifndef xV7_UNIX
-		printf("pr_trem(term='%c')\n", term);
+		printf("pr_term(term='%c')\n", term);
 # endif
 #	endif
 
@@ -667,6 +667,6 @@ char		term;
 # endif
 # ifdef xV7_UNIX
 	if (*term != ' ')
-		printf("at tty%2s", term);
+		printf("at tty%2s ", term);
 # endif
 }

@@ -45,13 +45,14 @@ int			checkdups;
 {
 	register struct descriptor	*d;
 	register int			i;
-	register struct tud_id		*tid;
+	register struct tup_id		*tid;
 	char				oldtuple[MAXTUP];
 	struct tup_id			primtid;
 	long				primpage;
 	int				need, same;
 	int				len, oldlength;
 	char				*new, *old, *oldt;
+	char				*getint_tuple();
 
 	d = dx;
 	tid = tidx;
@@ -102,8 +103,8 @@ int			checkdups;
 				}
 				same = SAMEKEYS;
 			}
-			old =+ len;
-			new =+ len;
+			old += len;
+			new += len;
 		}
 	}
 

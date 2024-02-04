@@ -1,5 +1,6 @@
 # include	"../ingres.h"
 # include	"../aux.h"
+# include	"../unix.h"
 # include	"../symbol.h"
 # include	"../tree.h"
 # include	"../batch.h"
@@ -26,7 +27,6 @@ char	**argv;
 	W_decomp = W_down;
 	Batchupd = setflag(argv, 'b', 1);
 	acc_init();	/* init access methods */
-	set_so_buf();	/* buffer standard output if appropriate */
 
 	setexit();
 

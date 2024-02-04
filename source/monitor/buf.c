@@ -21,13 +21,14 @@ struct buf	**buffer;
 	register struct buf	*b;
 	register struct buf	*a;
 	register struct buf	**bp;
+	char			*bufalloc();
 
 	bp = buffer;
 	b = *bp;
 	if (b == 0 || b->ptr >= &b->buffer[BUFSIZE])
 	{
 		/* allocate new buffer segment */
-		a = bufalloc(sizeof *a);
+		a = (struct buf *) bufalloc(sizeof(struct buf));
 		a->nextb = b;
 		a->ptr = a->buffer;
 		*bp = b = a;
@@ -145,10 +146,11 @@ struct buf	**buffer;
 
 char	*Buf_flat;
 
-bufcrunch(buffer)
+char *bufcrunch(buffer)
 struct buf	**buffer;
 {
 	register char	*p;
+	char		*bufflatten();
 
 	p = bufflatten(*buffer, 1);
 	*p = 0;
@@ -156,13 +158,14 @@ struct buf	**buffer;
 	return (Buf_flat);
 }
 
-bufflatten(buf, length)
+char *bufflatten(buf, length)
 struct buf	*buf;
 int		length;
 {
 	register struct buf	*b;
 	register char		*p;
 	register char		*q;
+	char			*bufalloc();
 
 	b = buf;
 
@@ -206,11 +209,12 @@ int		length;
 **	other than INGRES.
 */
 
-bufalloc(size)
+char *bufalloc(size)
 int	size;
 {
 	register char	*p;
 	extern int	(*Exitfn)();	/* defined in syserr.c */
+	char		*malloc();
 
 	p = malloc(size);
 	if (p == 0)

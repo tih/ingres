@@ -33,8 +33,8 @@ struct symbol	***p;		/* pointer to list */
 	register char			*cp;	/* the item in the list */
 	register struct stacksym	*tops;	/* target location on stack */
 
-	tops = ts;	/* copy stack pointer */
-	cp = **p;	/* get list pointer */
+	tops = (struct stacksym *) ts;	/* copy stack pointer */
+	cp = (char *) **p;		/* get list pointer */
 #	ifdef xOTR1
 	if(tTf(24, 0))
 	{
@@ -43,21 +43,22 @@ struct symbol	***p;		/* pointer to list */
 	}
 #	endif
 
-	if (cp->type == VAR || cp->type == S_VAR)
+	if (((struct stacksym *)cp)->type == VAR || 
+	    ((struct stacksym *)cp)->type == S_VAR)
 	{
-		tops->type = cp->vtype;
-		len = tops->len = cp->vlen;
-		d = cp->vpoint;
+		tops->type = ((struct qt_v *)cp)->vtype;
+		len = tops->len = ((struct qt_v *)cp)->vlen;
+		d = (char *) ((struct qt_v *)cp)->vpoint;
 	}
 	else
 	{
-		tops->type = cp->type;
-		len = tops->len = cp->len;
-		len =& 0377;
-		d = cp->value;
+		tops->type = ((struct stacksym *)cp)->type;
+		len = tops->len = ((struct stacksym *)cp)->len;
+		len &= 0377;
+		d = (char *) ((struct stacksym *)cp)->value;
 	}
 	/* advance Qvect sequencing pointer p */
-	*p =+ 1;
+	*p += 1;
 
 	switch(tops->type)
 	{
@@ -80,14 +81,14 @@ struct symbol	***p;		/* pointer to list */
 	  case FLOAT:
 		bmove(d, tops->value, len);
 		if (len == 4)
-			tops->value->f4type = tops->value->f4type;	/* convert to double precision */
+			f8deref(tops->value) = f4deref(tops->value);	/* convert to double precision */
 		else
 			if (len != 8)
 				syserr("getsym:bad FLOAT len %d",len);
 		break;
 
 	  case CHAR:
-		tops->value->stringp = d;
+		cpderef(tops->value) = d;
 		break;
 
 	  case AOP:
@@ -135,6 +136,8 @@ char		*offp;
 	register int		i;
 	register char		*p;
 	int			slen;
+	extern char		*bmove();
+
 	s = sp;	/* copy pointer */
 
 #	ifdef xOTR1
@@ -148,13 +151,13 @@ char		*offp;
 	if (s->type == CHAR)
 	{
 		slen = s->len & 0377;
-		rlen =& 0377;
+		rlen &= 0377;
 		i = rlen - slen;	/* compute difference between sizes */
 		if (i <= 0)
-			bmove(s->value->stringp, offp, rlen);
+			bmove(cpderef(s->value), offp, rlen);
 		else
 		{
-			p = bmove(s->value->stringp, offp, slen);
+			p = bmove(cpderef(s->value), offp, slen);
 			while (i--)
 				*p++ = ' ';	/* blank out remainder */
 		}

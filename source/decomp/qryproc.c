@@ -15,6 +15,7 @@ qryproc()
 	struct querytree		*trbuild();
 	extern long			Accuread, Accuwrite, Accusread;
 	extern int			derror();
+	extern struct querytree		*readqry();
 
 #	ifdef xDTM
 	if (tTf(76, 1))

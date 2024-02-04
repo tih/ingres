@@ -19,6 +19,7 @@ struct optab	*op;
 	register int	save;
 	register char	*ptr;
 	char		buf[MAXSTRING + 1];
+	char		*syment();
 
 	/* disable case conversion and fill in string */
 	ptr = buf;

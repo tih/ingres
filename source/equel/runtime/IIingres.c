@@ -6,7 +6,7 @@
 # include	"IIglobals.h"
 # define	CLOSED	'?'
 
-char	*IImainpr	"bin/ingres";
+char	*IImainpr	= "/usr/bin/ingres";
 char	IIPathname[41];
 
 IIingres(p1, p2, p3, p4, p5, p6, p7, p8, p9)
@@ -143,7 +143,7 @@ IIgetpath()
 	if (reenter)
 		return;
 	else
-		reenter =+ 1;
+		reenter += 1;
 
 	if ((i = IIfopen("/etc/passwd", &iobuf)) < 0)
 		IIsyserr("IIgetpath: no /etc/passwd");

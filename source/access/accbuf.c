@@ -25,7 +25,7 @@ struct admin	Admin;
 **	have been initialized.
 */
 
-int	Acc_init	FALSE;
+int	Acc_init =	FALSE;
 
 /* tTf flag 80	TTF	resetacc()*/
 
@@ -103,8 +103,8 @@ acc_init()
 	*/
 	Lockrel = (Admin.adhdr.adflags & A_DBCONCUR) != 0;
 	if (Lockrel && Alockdes < 0)
-		Alockdes = open("/dev/lock", 1);
-	errno = 0;	/* clear in case /dev/lock isn't available */
+		Alockdes = open("/dev/ingreslock", 1);
+	errno = 0;	/* clear in case /dev/ingreslock isn't available */
 	Acclock = TRUE;
 	stat(".", &stbuf);
 	bmove(&stbuf, Lock.dbnode, 4);
@@ -164,9 +164,9 @@ int			resetflag;
 		if (d->reltid == b->rel_tupid)
 		{
 			if (resetflag)
-				i =| resetacc(b);
+				i |= resetacc(b);
 			else
-				i =| pageflush(b);
+				i |= pageflush(b);
 		}
 	}
 

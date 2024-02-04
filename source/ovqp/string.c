@@ -34,6 +34,7 @@ struct symbol	*ss1, *ss2;
 	int			size1, size2, i;
 	char			*px;
 	char			*bmove();
+	char			*need();
 
 	s1 = ss1;
 	s2 = ss2;
@@ -49,12 +50,12 @@ struct symbol	*ss1, *ss2;
 		size2 = 255 - size1;	/* adjust size2 to not exceed 255 */
 
 	px = p = need(Ovqpbuf, i);	/* request the needed space */
-	p = bmove(s1->value->stringp, p, size1);	/* copy first string */
-	p = bmove(s2->value->stringp, p, size2);
-	s1->value->stringp = px;
+	p = bmove(cpderef(s1->value), p, size1);	/* copy first string */
+	p = bmove(cpderef(s2->value), p, size2);
+	cpderef(s1->value) = px;
 	s1->len = i;
 	/* pad with blanks if necessary */
-	i =- size1 - size2;
+	i -= size1 - size2;
 	while (i--)
 		*p++ = ' ';
 
@@ -81,10 +82,10 @@ struct symbol	*sym;
 	register struct symbol	*s;
 
 	s = sym;
-	c = s->value->stringp;
+	c = cpderef(s->value);
 	i = s->len & 0377;
 
-	for (c =+ i; i; i--)
+	for (c += i; i; i--)
 		if(*--c != ' ')
 			break;
 
@@ -106,6 +107,8 @@ struct symbol	*ss;
 	register char		*p;
 	char			temp[MAXFIELD];
 	extern struct out_arg	Out_arg;	/* used for float conversions */
+	char			*locv();
+	char			*need();
 
 	s = ss;
 	p = temp;
@@ -116,11 +119,11 @@ struct symbol	*ss;
 		if (s->len == 4)
 		{
 			i = Out_arg.i4width;
-			p = locv(s->value->i4type);
+			p = locv(i4deref(s->value));
 		}
 		else
 		{
-			itoa(s->value->i2type, p);
+			itoa(i2deref(s->value), p);
 			if (s->len == 2)
 				i = Out_arg.i2width;
 			else
@@ -135,16 +138,16 @@ struct symbol	*ss;
 		if (s->len == 4)
 		{
 			i = Out_arg.f4width;
-			ftoa(s->value->f4type, p, i, Out_arg.f4prec, Out_arg.f4style);
+			ftoa(f4deref(s->value), p, i, Out_arg.f4prec, Out_arg.f4style);
 		}
 		else
 		{
 			i = Out_arg.f8width;
-			ftoa(s->value->f8type, p, i, Out_arg.f8prec, Out_arg.f8style);
+			ftoa(f8deref(s->value), p, i, Out_arg.f8prec, Out_arg.f8style);
 		}
 	}
-	s->value->stringp = need(Ovqpbuf, i);
-	pmove(p, s->value->stringp, i, ' ');	/* blank pad to fixed length i */
+	cpderef(s->value) = need(Ovqpbuf, i);
+	pmove(p, cpderef(s->value), i, ' ');	/* blank pad to fixed length i */
 	s->type = CHAR;
 	s->len = i;
 }

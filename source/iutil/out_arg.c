@@ -5,7 +5,7 @@
 **  OUTPUT ARGUMENTS GLOBAL INITIALIZATION
 */
 
-struct out_arg	Out_arg		/* output arguments */
+struct out_arg	Out_arg	=	/* output arguments */
 {
 	6,		/* c0width */
 	6,		/* i1width */

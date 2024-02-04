@@ -55,7 +55,7 @@ char	chr;
 			Lastok.toktyp = Tokens.sconst;
 			Lastok.tok = Keyword[curr].term;
 			Lastok.tokop = Keyword[curr].opcode;
-			yylval = Keyword[curr].opcode;
+			yylval = (char *) Keyword[curr].opcode;
 			return (Keyword[curr].token);
 		}
 	}

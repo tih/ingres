@@ -74,7 +74,7 @@ int			resultnum;
 				printf("relid=%s\t", rangename(Sourcevar));
 			if (resultnum >= 0)
 				printf("Resultname=%s", rnum_convert(resultnum));
-			if (tree->rootuser)
+			if (((struct qt_root *) tree)->rootuser)
 				printf(", userquery");
 			printf("\n");
 		}
@@ -117,7 +117,7 @@ int			resultnum;
 	 *	encounters USERQRY.
 	 */
 
-	if (tree->rootuser)
+	if (((struct qt_root *) tree)->rootuser)
 	{
 		pipesym(USERQRY, 0);
 	}
@@ -170,7 +170,7 @@ int			resultnum;
 
 	  case NONEMPTY:
 		i = TRUE;
-		if (tree->rootuser)
+		if (((struct qt_root *) tree)->rootuser)
 			Retcode.rc_tupcount = ret.rc_tupcount;
 		break;
 
@@ -281,7 +281,7 @@ int	val;
 	char			temp[4];
 	register int		i;
 
-	s = temp;
+	s = (struct symbol *) temp;
 	i = length;
 
 	s->type = token;
@@ -300,9 +300,10 @@ struct querytree	*node;
 	register struct symbol		*s;
 	int				i;
 	char				temp[4];
+	struct querytree		*ckvar();
 
 	q = node;
-	s = temp;
+	s = (struct symbol *) temp;
 
 	typ = q->sym.type;
 	s->type = typ;
@@ -315,21 +316,21 @@ struct querytree	*node;
 		/*  check to see if this variable has been substituted for.
 		**  if so, pass the constant value to OVQP		      */
 
-		if (q->valptr)
+		if (((struct qt_var *)q)->valptr)
 		{
-			s->type = q->frmt;
-			s->len = q->frml;
+			s->type = ((struct qt_var *)q)->frmt;
+			s->len = ((struct qt_var *)q)->frml;
 			wrpipe(P_NORM, &Outpipe, W_ovqp, s, 2);
-			wrpipe(P_NORM, &Outpipe, W_ovqp, q->valptr, s->len & 0377);
+			wrpipe(P_NORM, &Outpipe, W_ovqp, ((struct qt_var *)q)->valptr, s->len & 0377);
 			return;
 		}
 		else
 		{
 			/* double check that variable is sourcevar */
-			if (q->varno != Sourcevar)
-				syserr("mklist:src=%d,var=%d", Sourcevar, q->varno);
+			if (((struct qt_var *)q)->varno != Sourcevar)
+				syserr("mklist:src=%d,var=%d", Sourcevar, ((struct qt_var *)q)->varno);
 			s->len = 1;
-			s->value[0] = q->attno;
+			s->value[0] = ((struct qt_var *)q)->attno;
 			break;
 		}
 
@@ -362,7 +363,7 @@ struct querytree	*node;
 **	desc_close in openrs.c for details.
 */
 extern int	inpcloser();
-int		(*Des_closefunc)()	inpcloser;
+int		(*Des_closefunc)()	= inpcloser;
 
 
 init_decomp()

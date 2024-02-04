@@ -159,9 +159,9 @@ d_prot()
 		{
 			if (t->right->sym.type != VAR ||
 			    t->sym.type != RESDOM ||
-			    t->right->varno != Resultvar)
+			    ((struct qt_var *)t->right)->varno != Resultvar)
 				syserr("d_prot: garbage tree");
-			lsetbit(t->right->attno, protup.prodomset);
+			lsetbit(((struct qt_var *)t->right)->attno, protup.prodomset);
 		}
 		all_pro = FALSE;
 	}
@@ -211,10 +211,10 @@ d_prot()
 	if (all_pro && (protup.proopset & PRO_RETR) != 0)
 	{
 		if (protup.proopset == -1)
-			relstat =& ~S_PROTALL;
+			relstat &= ~S_PROTALL;
 		else
 		{
-			relstat =& ~S_PROTRET;
+			relstat &= ~S_PROTRET;
 			if ((protup.proopset & ~(PRO_RETR|PRO_AGGR|PRO_TEST)) != 0)
 			{
 				/* some special case: still insert prot tuple */
@@ -227,7 +227,7 @@ d_prot()
 
 	/* see if we are adding any tuples */
 	if (!all_pro)
-		relstat =| S_PROTUPS;
+		relstat |= S_PROTUPS;
 	
 	/*
 	**  Change relstat field in relation catalog
@@ -324,7 +324,7 @@ struct downame
 	int	dow_num;
 };
 
-struct downame	Dowlist[]
+struct downame	Dowlist[] =
 {
 	"sun",		0,
 	"sunday",	0,

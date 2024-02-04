@@ -31,7 +31,7 @@ int		Qvptr;		/* index into available Qvect space in ovqpnod() */
 struct symbol	*Qvect[MAXNODES];
 char		*Ovqpbuf;
 
-char		D_ovqp70 1;	/* used for loading only. forces call_ovqp70 to be
+char		D_ovqp70 = 1;	/* used for loading only. forces call_ovqp70 to be
 			** loaded instead of call_ovqp
 			*/
 
@@ -62,7 +62,7 @@ int			resultnum;
 	extern int			Batchupd;
 	extern struct descriptor	Inddes;
 	char				ovqpbuf[LBUFSIZE];
-	struct descriptor		*readopen();
+	struct descriptor		*readopen(), *specopen();
 
 #	ifdef xOTM
 	if (tTf(76, 1))
@@ -89,7 +89,7 @@ int			resultnum;
 				printf("relid=%s\t", rangename(Sourcevar));
 			if (resultnum >= 0)
 				printf("Resultname=%s", rnum_convert(resultnum));
-			if (tree->rootuser)
+			if (((struct qt_root *)tree)->rootuser)
 				printf(", userqry");
 			printf("\n");
 		}
@@ -119,7 +119,7 @@ int			resultnum;
 	/* assume this will be direct update */
 	Userqry = Buflag = FALSE;
 
-	if (tree->rootuser)
+	if (((struct qt_root *)tree)->rootuser)
 	{
 		Userqry = TRUE;
 		/* handle batch file */
@@ -147,8 +147,8 @@ int			resultnum;
 		initbuf(Ovqpbuf, LBUFSIZE, LISTFULL, &derror);
 		Qvptr = 0;
 		Alist = Bylist = Qlist = Tlist = NULL;
-		Targvc = tree->lvarc;
-		Qualvc = bitcnt(tree->rvarm);
+		Targvc = ((struct qt_root *)tree)->lvarc;
+		Qualvc = bitcnt(((struct qt_root *)tree)->rvarm);
 		Agcount = 0;
 
 		if (tree->sym.type == AGHEAD)
@@ -281,6 +281,7 @@ struct querytree	*n;
 	register struct symbol		*s;
 	register struct querytree	*q;
 	register int			i;
+	extern struct querytree		*ckvar(), *need();
 
 	q = n;
 	s = &q->sym;
@@ -292,33 +293,33 @@ struct querytree	*n;
 		q = ckvar(q);
 
 		/* Allocate an ovqp var node for the VAR */
-		s = need(Ovqpbuf, 8);
+		s = (struct symbol *) need(Ovqpbuf, 8);
 		s->len = 6;
-		s->value[0] = q->attno;
-		s->vtype = q->frmt;
-		s->vlen = q->frml;
+		s->value[0] = ((struct qt_var *)q)->attno;
+		((struct qt_v *)s)->vtype = ((struct qt_var *)q)->frmt;
+		((struct qt_v *)s)->vlen = ((struct qt_var *)q)->frml;
 
 		/* If VAR has been substituted for, get value */
-		if (q->valptr)
+		if (((struct qt_var *)q)->valptr)
 		{
 
 			/* This is a substituted variable */
-			if (q->varno == Sourcevar)
-				syserr("ovqpnod:bd sub %d,%d", q->varno, Sourcevar);
+			if (((struct qt_var *)q)->varno == Sourcevar)
+				syserr("ovqpnod:bd sub %d,%d", ((struct qt_var *)q)->varno, Sourcevar);
 
 			s->type = S_VAR;
-			s->vpoint = q->valptr;
+			((struct qt_v *)s)->vpoint = (int *) ((struct qt_var *)q)->valptr;
 		}
 		else
 		{
 			/* Var for one variable query */
-			if (q->varno != Sourcevar)
-				syserr("ovqpnod:src var %d,%d", q->varno, Sourcevar);
+			if (((struct qt_var *)q)->varno != Sourcevar)
+				syserr("ovqpnod:src var %d,%d", ((struct qt_var *)q)->varno, Sourcevar);
 			s->type = VAR;
-			if (q->attno)
-				s->vpoint = Intup + Source->reloff[q->attno];
+			if (((struct qt_var *)q)->attno)
+				((struct qt_v *)s)->vpoint = (int *) (Intup + Source->reloff[((struct qt_var *)q)->attno]);
 			else
-				s->vpoint = &Intid;
+				((struct qt_v *)s)->vpoint = (int *) &Intid;
 		}
 
 	}
@@ -356,7 +357,7 @@ struct querytree	*result[];
 
 		bmove(Tend, aop->sym.value, i);
 
-		Tend =+ i;
+		Tend += i;
 #		ifdef xDTR1
 		if (tTf(8, 3))
 			writenod(aop);
@@ -391,14 +392,13 @@ char	*name;
 **	desc_close in openrs.c for details.
 */
 extern int	closer();
-int		(*Des_closefunc)()	closer;
+int		(*Des_closefunc)()	= closer;
 
 init_decomp()
 {
 	static struct accbuf	xtrabufs[12];
 
-	set_so_buf();
-	acc_addbufs(xtrabufs, 12);
+	acc_addbuf(xtrabufs, 12);
 }
 
 

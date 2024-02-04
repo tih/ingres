@@ -34,18 +34,18 @@ struct querytree	*result1;
 	switch (result->sym.type)
 	{
 	  case VAR:
-		rfrmt = result->frmt;
-		rfrml = result->frml;
+		rfrmt = ((struct qt_var *)result)->frmt;
+		rfrml = ((struct qt_var *)result)->frml;
       		break;
 
 	  case AOP:
-		switch (result->opno)
+		switch (((struct qt_op *)result)->opno)
 		{
 		  case opAVG:
 		  case opAVGU:
 			rfrmt = FLOAT;
 			rfrml = 8;
-			if (result->agfrmt == CHAR)
+			if (((struct qt_ag *)result)->agfrmt == CHAR)
 				/* character domain not allowed in these aggs */
 				yyerror(AVGTYPE, 0);
 			break;
@@ -63,16 +63,16 @@ struct querytree	*result1;
 
 		  case opSUM:
 		  case opSUMU:
-			rfrmt = result->agfrmt;
-			rfrml = result->agfrml;
+			rfrmt = ((struct qt_ag *)result)->agfrmt;
+			rfrml = ((struct qt_ag *)result)->agfrml;
 			if (rfrmt == CHAR)
 				/* no char domains for these aggs */
 				yyerror(SUMTYPE, 0);
 			break;
 
 		  default:
-			rfrmt = result->agfrmt;
-			rfrml = result->agfrml;
+			rfrmt = ((struct qt_ag *)result)->agfrmt;
+			rfrml = ((struct qt_ag *)result)->agfrml;
 			break;
 		}
 		break;
@@ -85,14 +85,14 @@ struct querytree	*result1;
 		if (result->left->sym.type == AOP)
 		{
 			/* no by-list */
-			rfrmt = result->left->frmt;
-			rfrml = result->left->frml;
+			rfrmt = ((struct qt_var *)result->left)->frmt;
+			rfrml = ((struct qt_var *)result->left)->frml;
 		}
 		else
 		{
 			/* skip over by-list */
-			rfrmt = result->left->right->frmt;
-			rfrml = result->left->right->frml;
+			rfrmt = ((struct qt_var *)result->left->right)->frmt;
+			rfrml = ((struct qt_var *)result->left->right)->frml;
 		}
 		break;
 
@@ -110,7 +110,7 @@ struct querytree	*result1;
 	  case COP:
 		for (cpt = Coptab; cpt->copname; cpt++)
 		{
-			if (result->opno == cpt->copnum)
+			if (((struct qt_op *)result)->opno == cpt->copnum)
 			{
 				rfrmt = cpt->coptype;
 				rfrml = cpt->coplen;
@@ -118,11 +118,11 @@ struct querytree	*result1;
 			}
 		}
 		if (!cpt->copname)
-			syserr("bad cop in format(%d)", result->opno);
+			syserr("bad cop in format(%d)", ((struct qt_op *)result)->opno);
 		break;
 
 	  case UOP:
-		switch (result->opno)
+		switch (((struct qt_op *)result)->opno)
 		{
 		  case opATAN:
 		  case opCOS:
@@ -215,12 +215,12 @@ struct querytree	*result1;
 			return;
 
 		  default:
-			syserr("bad UOP in format %d", result->opno);
+			syserr("bad UOP in format %d", ((struct qt_op *)result)->opno);
 		}
 		break;
 
 	  case BOP:
-		switch (result->opno)
+		switch (((struct qt_op *)result)->opno)
 		{
 
 		  case opEQ:
@@ -306,11 +306,11 @@ struct querytree	*result1;
 			if (rfrmt != CHAR || Trfrmt != CHAR)
 				/* only character domains allowed */
 				yyerror(CONCATTYPE, 0);
-			rfrml =+ Trfrml;
+			rfrml += Trfrml;
 			break;
 
 		  default:
-			syserr("bad BOP in format %d", result->opno);
+			syserr("bad BOP in format %d", ((struct qt_op *)result)->opno);
 		}
 	}
 	Trfrmt = rfrmt;

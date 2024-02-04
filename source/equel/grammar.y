@@ -26,7 +26,6 @@
 **		constants.h -- for manifest constants
 **		globals.h -- for global variables
 **		tokens.y -- for operator, keyword tables
-**		.../fileio.h -- for FILE stuff for globals.h
 **
 **	Diagnostics:
 **		Several self-explanatory diagnostics.
@@ -100,9 +99,12 @@
 %{
 	/* STANDARD SCANNER & PARSER GLOBALS */
 
+# include	<stdio.h>
+
 # include	"constants.h"
-# include	"../fileio.h"
 # include	"globals.h"
+
+extern struct cvar *getcvar(), *getfield();
 
 %}
 
@@ -155,12 +157,12 @@ startquel:	=
  */
 c_code: 	C_CODE	
 	|	beginblock =
-			Block_level =+ 1;
+			Block_level += 1;
 	|	endblock =
 		{
 			if (Block_level == 0)
 				yyserror("extra '}'", $1);
-			else if ((Block_level =- 1) == 0)
+			else if ((Block_level -= 1) == 0)
 			{
 				freecvar(&C_locals);
 				freecvar(&F_locals);
@@ -172,10 +174,10 @@ c_code: 	C_CODE
 	 * "tupret".
 	 */
 beginblock:	LBRACE  %prec LBOP =
-			w_op($1->d_elm);
+			w_op(((struct disp_node *)$1)->d_elm);
 ;
 endblock:	RBRACE =
-			w_op($1->d_elm);
+			w_op(((struct disp_node *)$1)->d_elm);
 ;
 quel_statement: append	 
 	|	copy 
@@ -281,13 +283,13 @@ modfill:	id is mod_var
 	 * or a quel name
 	 */
 mod_var:	I2CONST =
-			w_con(I2CONST, $1->d_elm);
+			w_con(I2CONST, ((struct disp_node *)$1)->d_elm);
 	|	c_variable =
 		{
 			if ($1)
 			{
 				if (!Cvarp)
-					w_key($1->d_elm);
+					w_key(((struct disp_node *)$1)->d_elm);
 				else if (Fieldp && Fieldp->c_type == opINT
 					|| Cvarp->c_type == opINT)
 						w_var(Cv_display, opINT);
@@ -314,13 +316,13 @@ permit_list:	permlistelm
 	|	permit_list comma permlistelm
 ;
 permlistelm:	RETRIEVE =
-			w_key($1->d_elm);
+			w_key(((struct disp_node *)$1)->d_elm);
 	|	APPEND =
-			w_key($1->d_elm);
+			w_key(((struct disp_node *)$1)->d_elm);
 	|	DELETE =
-			w_key($1->d_elm);
+			w_key(((struct disp_node *)$1)->d_elm);
 	|	REPLACE = 
-			w_key($1->d_elm);
+			w_key(((struct disp_node *)$1)->d_elm);
 	|	all
 ;
 on_of_to:	on
@@ -419,7 +421,7 @@ param:		id  =
 			w_op(",");
 	|	SCONST =
 		{
-			w_string($1->d_elm, 0);
+			w_string(((struct disp_node *)$1)->d_elm, 0);
 			w_op(",");
 		}
 ;
@@ -444,7 +446,7 @@ tupret_keyw:	retrieve_key unique c_tlclause qualclause	=
 unique: 	UNIQUE =
 		{
 			Opflag = mdTUPRET;
-			w_key($1->d_elm);
+			w_key(((struct disp_node *)$1)->d_elm);
 		}
 	|	=
 			Opflag = mdTUPRET;
@@ -505,12 +507,12 @@ view_p:		PARAM define_key view_key id param_tl qualclause
 
 declaration:	decl_specifer declarator_list SEMICOL	=
 		{
-			w_op($3->d_elm);
+			w_op(((struct disp_node *)$3)->d_elm);
 			Type_spec = 0;
 		}
 	| 	decl_specifer SEMICOL = 
 		{ 
-			w_op($2->d_elm);
+			w_op(((struct disp_node *)$2)->d_elm);
 			Type_spec = 0;
 		}
 ;
@@ -532,7 +534,7 @@ decl_specifer:	type_specifier
 sc_specifier:	ALLOC	=
 		{
 			Opflag = mdDECL;
-			w_key($1->d_elm);
+			w_key(((struct disp_node *)$1)->d_elm);
 			/* in case the default "int" should be assumed,
 			 * the Type_spec is set up for it, if a previous
 			 * type hasn't been given
@@ -544,7 +546,7 @@ sc_specifier:	ALLOC	=
 type_specifier:	TYPE	=
 		{
 			Opflag = mdDECL;
-			w_key($1->d_elm);
+			w_key(((struct disp_node *)$1)->d_elm);
 			Type_spec = Opcode;
 		}
 ;
@@ -553,11 +555,11 @@ struct_dec:	struct_name field_declaration
 	|	struct_key field_declaration
 ;
 struct_name:	struct_key NAME =
-			w_key($2->d_elm);
+			w_key(((struct disp_node *)$2)->d_elm);
 ;
 field_declaration:	lbrace field_seq RBRACE =
 		{
-			w_op($3->d_elm);
+			w_op(((struct disp_node *)$3)->d_elm);
 			Type_spec = $3;
 		}
 ;
@@ -566,7 +568,7 @@ field_seq:	field_seq field
 ;
 field:		type_specifier declarator_list SEMICOL =
 		{
-			w_op($3->d_elm);
+			w_op(((struct disp_node *)$3)->d_elm);
 			Type_spec = 0;
 		}
 	|	C_CODE
@@ -577,12 +579,12 @@ declarator_list:	cvar_dec
 cvar_dec:	cvarx =
 		{
 			if (Type_spec == opSTRING)
-				Indir_level =- 1;
+				Indir_level -= 1;
 			if (Struct_flag)
-				decl_field($1->d_elm, Type_spec,
+				decl_field(((struct disp_node *)$1)->d_elm, Type_spec,
 					Indir_level, Block_level);
 			else
-				decl_cvar($1->d_elm, Type_spec,
+				decl_cvar(((struct disp_node *)$1)->d_elm, Type_spec,
 					Indir_level, Block_level);
 			free_display(Cv_display);
 			Indir_level = Field_indir = 0;
@@ -601,13 +603,13 @@ c_variable:	cvarx =
 		}
 	|	NONREF NAME =
 		{
-			enter_display(Cv_display, salloc($1->d_elm));
+			enter_display(Cv_display, salloc(((struct disp_node *)$1)->d_elm));
 			Cvarp = Fieldp = 0;
 			$$ = $2;
 		}
 	|	NONREF STRUCT_VAR =
 		{
-			enter_display(Cv_display, salloc($1->d_elm));
+			enter_display(Cv_display, salloc(((struct disp_node *)$1)->d_elm));
 			Cvarp = Fieldp = 0;
 			$$ = $2;
 		}
@@ -635,39 +637,39 @@ c_variable:	cvarx =
 ;
 struct_var:	ptr struct_var	%prec unaryop =
 		{
-			if ($1->d_elm [1] == '*')
-				Field_indir =+ 1;
-			Field_indir =+ 1;
+			if (((struct disp_node *)$1)->d_elm [1] == '*')
+				Field_indir += 1;
+			Field_indir += 1;
 			$$ = $2;
 		}
 	|	struct_var arraysub	%prec LBRKT =
-			Field_indir =+ 1;
+			Field_indir += 1;
 	|	str_var_key selector_part
 ;
 str_var_key:	STRUCT_VAR =
 		{
-			Cvarp = getcvar($1->d_elm);
-			enter_display(Cv_display, $1->d_elm);
+			Cvarp = getcvar(((struct disp_node *)$1)->d_elm);
+			enter_display(Cv_display, ((struct disp_node *)$1)->d_elm);
 		}
 ;
 selector_part:	arraysub selector_part =
 		{
-			Indir_level =+ 1;
+			Indir_level += 1;
 			$$ = $2;
 		}
 	|	select_op NAME =
 		{
-			enter_display(Cv_display, $2->d_elm);
-			Fieldp = getfield($2->d_elm);
+			enter_display(Cv_display, ((struct disp_node *)$2)->d_elm);
+			Fieldp = getfield(((struct disp_node *)$2)->d_elm);
 			$$ = $2;
 		}
 ;
 select_op:	PERIOD =
-			enter_display(Cv_display, $1->d_elm);
+			enter_display(Cv_display, ((struct disp_node *)$1)->d_elm);
 	|	POINTER =
 		{
-			enter_display(Cv_display, $1->d_elm);
-			Indir_level =+ 1;
+			enter_display(Cv_display, ((struct disp_node *)$1)->d_elm);
+			Indir_level += 1;
 		}
 ;
 
@@ -679,10 +681,10 @@ cvar:		c_variable =
 				if (!Fieldp && ! Cvarp)
 				{
 					if (!Field_indir && !Indir_level
-					  && (sequal($1->d_elm, "dba")
-					    || sequal($1->d_elm, "usercode")))
+					  && (sequal(((struct disp_node *)$1)->d_elm, "dba")
+					    || sequal(((struct disp_node *)$1)->d_elm, "usercode")))
 						/* constant operator COP */
-						w_key($1->d_elm);
+						w_key(((struct disp_node *)$1)->d_elm);
 					else
 						yyserror("C var expected", $1);
 				}
@@ -704,36 +706,36 @@ cvar:		c_variable =
 cvarx: 		NAME =
 		{
 			if (Opflag == mdDECL)
-				w_con(NAME, $1->d_elm);
+				w_con(NAME, ((struct disp_node *)$1)->d_elm);
 			else
 			{
-				Cvarp = getcvar($1->d_elm);
-				enter_display(Cv_display, salloc($1->d_elm));
+				Cvarp = getcvar(((struct disp_node *)$1)->d_elm);
+				enter_display(Cv_display, salloc(((struct disp_node *)$1)->d_elm));
 			}
 		}
 	|	ptr cvarx %prec unaryop =
 		{
-			if ($1->d_elm [1] == '*')
-				Indir_level =+ 1;
-			Indir_level =+ 1;
+			if (((struct disp_node *)$1)->d_elm [1] == '*')
+				Indir_level += 1;
+			Indir_level += 1;
 			$$ = $2;
 		}
 	|	cvarx arraysub	%prec LBRKT =
 		{
-			Indir_level =+ 1;
+			Indir_level += 1;
 		}
 ;
 ptr:		BOP =
 		{
-			if (!sequal($1->d_elm, "*") && !sequal($1->d_elm, "**"))
+			if (!sequal(((struct disp_node *)$1)->d_elm, "*") && !sequal(((struct disp_node *)$1)->d_elm, "**"))
 				yyserror(Opflag == mdDECL ?
 				"invalid operator in declaration":
 				"invalid operator in C variable",
 				$1);
 			if (Opflag == mdDECL)
-				w_op($1->d_elm);
+				w_op(((struct disp_node *)$1)->d_elm);
 			else
-				enter_display(Cv_display, salloc($1->d_elm));
+				enter_display(Cv_display, salloc(((struct disp_node *)$1)->d_elm));
 		}
 ;
 arraysub:	LBRKT =
@@ -766,12 +768,12 @@ id:		c_variable =
 						w_var(Cv_display, opIDSTRING);
 				}
 				else if (Opflag == mdINGRES)
-					w_string($1->d_elm, 0);
+					w_string(((struct disp_node *)$1)->d_elm, 0);
 				else if (Opflag == mdFILENAME)
 					yyserror("file for a COPY must be a string or string variable",
 					$1);
 				else
-					w_key($1->d_elm);
+					w_key(((struct disp_node *)$1)->d_elm);
 			}
 			free_display(Cv_display);
 			Fieldp = Cvarp = 0;
@@ -783,7 +785,7 @@ idlist:		id
 ;
 
 integer:	I2CONST	=
-			w_con(I2CONST, $1->d_elm);
+			w_con(I2CONST, ((struct disp_node *)$1)->d_elm);
 	|	c_variable =
 		{
 			if ($1)
@@ -860,7 +862,7 @@ ctl:		id is id
 ;
 
 sconst:		SCONST = 
-			w_con(SCONST, $1->d_elm);
+			w_con(SCONST, ((struct disp_node *)$1)->d_elm);
 ;
 
 tlclause:	lparen tlist rparen	
@@ -890,13 +892,13 @@ aggr:		aop lparen afcn qualclause rparen
 aggrfcn: 	aop lparen afcn by aseq qualclause rparen
 ;
 attribfcn:	I2CONST	= 
-			w_con(I2CONST, $1->d_elm);
+			w_con(I2CONST, ((struct disp_node *)$1)->d_elm);
 	| 	I4CONST	= 
-			w_con(I4CONST, $1->d_elm);
+			w_con(I4CONST, ((struct disp_node *)$1)->d_elm);
 	|	F8CONST	= 
-			w_con(F8CONST, $1->d_elm);
+			w_con(F8CONST, ((struct disp_node *)$1)->d_elm);
 	| 	SCONST	= 
-			w_con(SCONST, $1->d_elm);
+			w_con(SCONST, ((struct disp_node *)$1)->d_elm);
 	|	cvar
 	| 	attrib	
 ;
@@ -914,40 +916,40 @@ attrib:		id period id
 		}
 ;
 lbop:		LBOP	= 
-			w_key($1->d_elm);
+			w_key(((struct disp_node *)$1)->d_elm);
 ;
 luop:		LUOP	= 
-			w_key($1->d_elm);
+			w_key(((struct disp_node *)$1)->d_elm);
 ;
 bdop:		BDOP	= 
-			w_op($1->d_elm);
+			w_op(((struct disp_node *)$1)->d_elm);
 ;
 rop:		EOP	= 
-			w_op($1->d_elm);
+			w_op(((struct disp_node *)$1)->d_elm);
 	| 	BDOP	= 
-			w_op($1->d_elm);
+			w_op(((struct disp_node *)$1)->d_elm);
 	| 	IS	= 
 			w_op("=");
 ;
 uop:		UOP = 
-			w_op($1->d_elm);
+			w_op(((struct disp_node *)$1)->d_elm);
 ;
 fop:		FOP = 
-			w_key($1->d_elm);
+			w_key(((struct disp_node *)$1)->d_elm);
 ;
 fbop:		FBOP = 
-			w_key($1->d_elm);
+			w_key(((struct disp_node *)$1)->d_elm);
 ;
 bop:		BOP = 
-			w_op($1->d_elm);
+			w_op(((struct disp_node *)$1)->d_elm);
 	| 	UOP = 
-			w_op($1->d_elm);
+			w_op(((struct disp_node *)$1)->d_elm);
 ;
 by:		BY =
-			w_key($1->d_elm);
+			w_key(((struct disp_node *)$1)->d_elm);
 ;
 aop:		AOP = 
-			w_key($1->d_elm);
+			w_key(((struct disp_node *)$1)->d_elm);
 ;
 	
 /*
@@ -957,7 +959,7 @@ aop:		AOP =
 append_p_key:	PARAM APPEND =
 		{
 			begin_quote();
-			w_key($2->d_elm);
+			w_key(((struct disp_node *)$2)->d_elm);
 			Opflag = mdAPPEND;
 		}
 ;
@@ -965,31 +967,31 @@ append_key:	APPEND	=
 		{
 			Opflag = mdAPPEND;
 			begin_quote();
-			w_key($1->d_elm);
+			w_key(((struct disp_node *)$1)->d_elm);
 		}
 ;
 copy_key:	COPY	=
 		{
 			Opflag = mdCOPY;
 			begin_quote();
-			w_key($1->d_elm);
+			w_key(((struct disp_node *)$1)->d_elm);
 		}
 ;
 copy_p_key:	PARAM COPY =
 		{
 			Opflag = mdCOPY;
 			begin_quote();
-			w_key($2->d_elm);
+			w_key(((struct disp_node *)$2)->d_elm);
 		}
 ;
 cp_kword:	INTO	= 
 		{
-			w_key($1->d_elm);
+			w_key(((struct disp_node *)$1)->d_elm);
 			Opflag = mdFILENAME;
 		}
 	| 	FROM	= 
 		{
-			w_key($1->d_elm);
+			w_key(((struct disp_node *)$1)->d_elm);
 			Opflag = mdFILENAME;
 		}
 ;
@@ -997,50 +999,50 @@ create_key:	CREATE	=
 		{
 			Opflag = mdCREATE;
 			begin_quote();
-			w_key($1->d_elm);
+			w_key(((struct disp_node *)$1)->d_elm);
 		}
 ;
 create_p_key:	PARAM CREATE =
 		{
 			Opflag = mdCREATE;
 			begin_quote();
-			w_key($2->d_elm);
+			w_key(((struct disp_node *)$2)->d_elm);
 		}
 ;
 define_key:	DEFINE =
 		{
 			Opflag = mdDEFINE;
 			begin_quote();
-			w_key($1->d_elm);
+			w_key(((struct disp_node *)$1)->d_elm);
 		}
 ;
 delete_key:	DELETE	=
 		{
 			Opflag = mdDELETE;
 			begin_quote();
-			w_key($1->d_elm);
+			w_key(((struct disp_node *)$1)->d_elm);
 		}
 ;
 destroy_key:	DESTROY	=
 		{
 			Opflag = mdDESTROY;
 			begin_quote();
-			w_key($1->d_elm);
+			w_key(((struct disp_node *)$1)->d_elm);
 		}
 ;
 help_key:	HELP =
 		{
 			Opflag = mdHELP;
 			begin_quote();
-			w_key($1->d_elm);
+			w_key(((struct disp_node *)$1)->d_elm);
 		}
 ;
 index_key:	INDEX ON =
 		{
 			Opflag = mdINDEX;
 			begin_quote();
-			w_key($1->d_elm);
-			w_key($2->d_elm);
+			w_key(((struct disp_node *)$1)->d_elm);
+			w_key(((struct disp_node *)$2)->d_elm);
 		}
 ;
 ingres_key:	INGRES	=
@@ -1053,7 +1055,7 @@ integ_key:	INTEGRITY=
 		{
 			if (Opflag == mdDEFINE)
 				Opflag = mdINTEGRITY;
-			w_key($1->d_elm);
+			w_key(((struct disp_node *)$1)->d_elm);
 		}
 ;
 is_key:		IS =
@@ -1063,83 +1065,83 @@ is_key:		IS =
 			w_op("=");
 		}
 	| 	BY = 
-			w_key($1->d_elm);
+			w_key(((struct disp_node *)$1)->d_elm);
 ;
 modify_key:	MODIFY	=
 		{
 			Opflag = mdMODIFY;
 			begin_quote();
-			w_key($1->d_elm);
+			w_key(((struct disp_node *)$1)->d_elm);
 		}
 ;
 permit_key:	PERMIT=
 		{
 			if (Opflag == mdDEFINE)
 				Opflag = mdINTEGRITY;
-			w_key($1->d_elm);
+			w_key(((struct disp_node *)$1)->d_elm);
 		}
 ;
 print_key:	PRINT	=  
 		{ 
 			Opflag = mdPRINT;
 			begin_quote();
-			w_key($1->d_elm);
+			w_key(((struct disp_node *)$1)->d_elm);
 		}
 ;
 range_of:	RANGE OF = 
 		{
 			Opflag = mdRANGE;
 			begin_quote();
-			w_key($1->d_elm);
-			w_key($2->d_elm);
+			w_key(((struct disp_node *)$1)->d_elm);
+			w_key(((struct disp_node *)$2)->d_elm);
 		}
 ;
 replace_key:	REPLACE	=
 		{
 			Opflag = mdREPLACE;
 			begin_quote();
-			w_key($1->d_elm);
+			w_key(((struct disp_node *)$1)->d_elm);
 		}
 ;
 replace_p_key:	PARAM REPLACE =
 		{
 			begin_quote();
 			Opflag = mdREPLACE;
-			w_key($2->d_elm);
+			w_key(((struct disp_node *)$2)->d_elm);
 		}
 ;
 retrieve_key:	RETRIEVE	=
 		{
 			Opflag = mdRETRIEVE;
 			begin_quote();
-			w_key($1->d_elm);
+			w_key(((struct disp_node *)$1)->d_elm);
 		}
 ;
 retrieve_p_key: PARAM RETRIEVE =
 		{
 			Opflag = mdRETRIEVE;
 			begin_quote();
-			w_key($2->d_elm);
+			w_key(((struct disp_node *)$2)->d_elm);
 		}
 ;
 save_key:	SAVE	=
 		{
 			Opflag = mdSAVE;
 			begin_quote();
-			w_key($1->d_elm);
+			w_key(((struct disp_node *)$1)->d_elm);
 		}
 ;
 struct_key: 	STRUCT =
 		{
 			Opflag = mdDECL;
 			Struct_flag = 1;
-			w_key($1->d_elm);
+			w_key(((struct disp_node *)$1)->d_elm);
 		}
 ;
 tupret_p_key:	PARAM RETRIEVE =
 		{
 			begin_quote();
-			w_key($2->d_elm);
+			w_key(((struct disp_node *)$2)->d_elm);
 			Opflag = mdTUPRET;
 		}
 ;
@@ -1147,7 +1149,7 @@ view_key:	VIEW=
 		{
 			if (Opflag == mdDEFINE)
 				Opflag = mdVIEW;
-			w_key($1->d_elm);
+			w_key(((struct disp_node *)$1)->d_elm);
 		}
 ;
 
@@ -1156,7 +1158,7 @@ view_key:	VIEW=
  */
 
 all:		ALL=
-			w_key($1->d_elm);
+			w_key(((struct disp_node *)$1)->d_elm);
 ;
 apkword:	INTO	
 	|	ONTO	
@@ -1165,13 +1167,13 @@ apkword:	INTO
 	|	;
 ;
 at:		AT =
-			w_key($1->d_elm);
+			w_key(((struct disp_node *)$1)->d_elm);
 ;
 colon:		COLON =
-			w_op($1->d_elm);
+			w_op(((struct disp_node *)$1)->d_elm);
 ;
 comma:		COMMA	= 
-			w_op($1->d_elm);
+			w_op(((struct disp_node *)$1)->d_elm);
 ;
 delnoise:	IN	
 	|	ON	
@@ -1179,7 +1181,7 @@ delnoise:	IN
 	|	;
 ;
 from:		FROM =
-			w_key($1->d_elm);
+			w_key(((struct disp_node *)$1)->d_elm);
 ;
 integnoise:	ON
 	|	ONTO
@@ -1193,19 +1195,19 @@ isnoise:	IS
 	|	;
 ;
 lbrace:		LBRACE =
-			w_op($1->d_elm);
+			w_op(((struct disp_node *)$1)->d_elm);
 ;
 lparen:		LPAREN	= 
-			w_op($1->d_elm);
+			w_op(((struct disp_node *)$1)->d_elm);
 ;
 of:		OF=
-			w_key($1->d_elm);
+			w_key(((struct disp_node *)$1)->d_elm);
 ;
 on:		ON =
-			w_key($1->d_elm);
+			w_key(((struct disp_node *)$1)->d_elm);
 ;
 period:		PERIOD =
-			w_op($1->d_elm);
+			w_op(((struct disp_node *)$1)->d_elm);
 ;
 repkword:	INTO	
 	|	IN	
@@ -1213,20 +1215,20 @@ repkword:	INTO
 	|	;
 ;
 rparen:		RPAREN	=
-			w_op($1->d_elm);
+			w_op(((struct disp_node *)$1)->d_elm);
 ;
 to:		TO = 
-			w_key($1->d_elm);
+			w_key(((struct disp_node *)$1)->d_elm);
 ;
 retkword:	INTO	
 	|	TO	
 	|	;
 ;
 until:		UNTIL	= 
-			w_key($1->d_elm);
+			w_key(((struct disp_node *)$1)->d_elm);
 ;
 where:		WHERE	= 
-			w_key($1->d_elm);
+			w_key(((struct disp_node *)$1)->d_elm);
 ;
 %%
 

@@ -26,9 +26,9 @@ int			resvar;
 	int				k;
 
 	r = root;
-	bmap = r->lvarm | r->rvarm;
+	bmap = ((struct qt_root *)r)->lvarm | ((struct qt_root *)r)->rvarm;
 	if (resvar >= 0)
-		bmap =| 01 << resvar;
+		bmap |= 01 << resvar;
 	else
 		restid = -1;
 	i = 0;

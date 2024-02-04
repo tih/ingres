@@ -62,7 +62,7 @@ struct accbuf
 # define	BUF_DIRECT	004	/* this is a page from isam direct */
 
 /* access method buffer typed differently for various internal operations */
-struct
+struct raw_accbuf
 {
 	char	acc_buf[NACCBUFS];
 };

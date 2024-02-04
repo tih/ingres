@@ -28,6 +28,7 @@ char			*tuple;
 	register struct querytree	*tree;
 	register int			mask, nvc;
 	struct descriptor		*readopen();
+	extern struct querytree		*ckvar();
 
 	tree = tree1;
 	if (!tree) 
@@ -35,7 +36,7 @@ char			*tuple;
 	switch (tree->sym.type)
 	{
 	  case VAR:
-		if ((tree=ckvar(tree))->varno == var)
+		if (((struct qt_var *)(tree=ckvar(tree)))->varno == var)
 		{
 #			ifdef xDTR1
 			if (tTf(12, 0))
@@ -44,32 +45,32 @@ char			*tuple;
 				writenod(tree);
 			}
 #			endif
-			if (tree->attno)
-				tree->valptr = tuple +
-					readopen(var)->reloff[tree->attno];
+			if (((struct qt_var *)tree)->attno)
+				((struct qt_var *)tree)->valptr = tuple +
+					readopen(var)->reloff[((struct qt_var *)tree)->attno];
 			else
-				tree->valptr = intid;
+				((struct qt_var *)tree)->valptr = (char *) intid;
 		}
 		return;
 
 	  case ROOT:
 	  case AND:
 		mask = 01 << var;
-		nvc = tree->tvarc;
-		if (tree->lvarm & mask)
+		nvc = ((struct qt_root *)tree)->tvarc;
+		if (((struct qt_root *)tree)->lvarm & mask)
 		{
 			setvar(tree->left, var, intid, tuple);
-			tree->lvarm =&  ~mask;
-			--tree->lvarc;
-			nvc = tree->tvarc - 1;
+			((struct qt_root *)tree)->lvarm &=  ~mask;
+			--((struct qt_root *)tree)->lvarc;
+			nvc = ((struct qt_root *)tree)->tvarc - 1;
 		}
-		if (tree->rvarm & mask)
+		if (((struct qt_root *)tree)->rvarm & mask)
 		{
 			setvar(tree->right, var, intid, tuple);
-			tree->rvarm =&  ~mask;
-			nvc = tree->tvarc - 1;
+			((struct qt_root *)tree)->rvarm &=  ~mask;
+			nvc = ((struct qt_root *)tree)->tvarc - 1;
 		}
-		tree->tvarc = nvc;
+		((struct qt_root *)tree)->tvarc = nvc;
 		return;
 
 	  default:
@@ -93,6 +94,7 @@ int			var1;
 {
 	register struct querytree	*tree;
 	int				var;
+	extern struct querytree		*ckvar();
 
 	tree = tree1;
 	if (!tree)
@@ -101,8 +103,8 @@ int			var1;
 	var = var1;
 	if (tree->sym.type == VAR)
 	{
-		if ((tree = ckvar(tree))->varno == var)
-			tree->valptr = 0;
+		if (((struct qt_var *)(tree = ckvar(tree)))->varno == var)
+			((struct qt_var *)tree)->valptr = 0;
 		return;
 	}
 	clearvar(tree->left, var);

@@ -65,10 +65,10 @@ int			nbytes;
 			(*buf->err_func)(buf->err_num);
 			return (0);
 	}
-	i =+ i & 01;
+	i += i & 01;
 	x = buf->xfree;
-	buf->xfree =+ i;
-	buf->nleft =- i;
+	buf->xfree += i;
+	buf->nleft -= i;
 	return(x);
 }
 
@@ -95,16 +95,15 @@ int			nbytes;
 */
 
 initbuf(bf, size, err_num, err_func)
-char	*bf;
-int	size;
-int	err_num;
-int	(*err_func)();
+struct nodbuffer	*bf;
+int			size;
+int			err_num;
+int			(*err_func)();
 {
 	register struct nodbuffer	*buf;
-	register			i;
 
-	i = buf = bf;
-	if (i & 01)
+	buf = bf;
+	if ((unsigned int) buf & 01)
 		syserr("initbuf : odd buffer adress 0%o", buf);
 	buf->nleft = size - sizeof *buf;
 	buf->xfree = buf->buffer;

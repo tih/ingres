@@ -73,6 +73,7 @@ int	num;
 	register char	*ret, *cp;
 	static char	temp[MAXNAME+1];
 	extern char	*Fileset;
+	extern char	*concat();
 
 	i = num;
 	if (i > LASTNUM || Num_used[i] == 0)
@@ -89,7 +90,7 @@ int	num;
 		/* compute temp name */
 		cp = concat("_SYS", Fileset, ret);
 		pad(ret, MAXNAME);
-		i =- FIRSTNUM;
+		i -= FIRSTNUM;
 		*cp++ = i/26 + 'a';
 		*cp = i%26 + 'a';
 	}

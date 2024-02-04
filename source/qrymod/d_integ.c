@@ -183,7 +183,7 @@ d_integ()
 		i = getequal(&Reldes, &relkey, &reltup, &tid);
 		if (i != 0)
 			syserr("d_integ: geteq");
-		reltup.relstat =| S_INTEG;
+		reltup.relstat |= S_INTEG;
 		i = replace(&Reldes, &tid, &reltup, FALSE);
 		if (i != 0)
 			syserr("d_integ: replace");
@@ -206,8 +206,8 @@ int	dset[8];
 
 	while (t != NULL)
 	{
-		if (t->sym.type == VAR && t->varno == vn)
-			lsetbit(t->attno, dset);
+		if (t->sym.type == VAR && ((struct qt_var *)t)->varno == vn)
+			lsetbit(((struct qt_var *)t)->attno, dset);
 		
 		/* handle left subtree recursively */
 		makeidset(vn, t->left, dset);

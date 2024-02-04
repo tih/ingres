@@ -1,6 +1,7 @@
+# include	<stdio.h>
+
 # include	"../ingres.h"
 # include	"../aux.h"
-# include	"../fileio.h"
 # include	"monitor.h"
 
 /*
@@ -24,7 +25,7 @@ char	*filename;
 	FILE			*saveinp;
 	register char		*f;
 	register FILE		*b;
-	char			inpbuf[IOBUFSIZ];
+	char			*getfilename();
 
 	f = filename;
 	if (f == 0)
@@ -43,7 +44,7 @@ char	*filename;
 	else
 	{
 		/* read file */
-		if ((b = fopen(f, "r", inpbuf)) == NULL)
+		if ((b = fopen(f, "r")) == NULL)
 		{
 			if (filename == 0)
 				printf("Cannot open \"%s\"\n", f);

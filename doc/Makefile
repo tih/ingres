@@ -1,27 +1,48 @@
-NROFF=	nroff $(RFLAGS)
+# tbl is used just in case the files are changed to use tables in the future
+
+TBL=	tbl
+
+NROFF=	nroff
 NMACS=	naa
-TROFF=	troff $(RFLAGS)
+
+TROFF=	troff
 TMACS=	taa
-VROFF=	csh /usr/ucb/vtroff $(RFLAGS)
-VMACS=	taa
+
+GMACS=	naa
+GROFF=	groff -t -mps -Tps
 
 ref:
-	-@$(NROFF) $(NMACS) 0aa.nr 1aa.nr toc.nr
-	-@chdir quel; $(NROFF) ../$(NMACS) *.nr
-	-@chdir unix; $(NROFF) ../$(NMACS) *.nr
-	-@chdir files; $(NROFF) ../$(NMACS) *.nr
-	-@chdir error; $(NROFF) ../$(NMACS) *.nr
+	$(TBL) $(NMACS) 0aa.nr 1aa.nr toc.nr | $(NROFF) > ref.NROFF
+	chdir quel; $(TBL) ../$(NMACS) *.nr  | $(NROFF) >> ../ref.NROFF
+	chdir unix; $(TBL) ../$(NMACS) *.nr  | $(NROFF) >> ../ref.NROFF
+	chdir files; $(TBL) ../$(NMACS) *.nr | $(NROFF) >> ../ref.NROFF
+	chdir error; $(TBL) ../$(NMACS) *.nr | $(NROFF) >> ../ref.NROFF
+	chdir access; make ref
+	chdir geoquel; make ref
+	chdir other; make ref
 
 tref:
-	-@$(TROFF) $(TMACS) 0aa.nr 1aa.nr toc.nr
-	-@chdir quel; $(TROFF) ../$(TMACS) *.nr
-	-@chdir unix; $(TROFF) ../$(TMACS) *.nr
-	-@chdir files; $(TROFF) ../$(TMACS) *.nr
-	-@chdir error; $(TROFF) ../$(TMACS) *.nr
+	$(TBL) $(TMACS) 0aa.nr 1aa.nr toc.nr | $(TROFF) > ref.TROFF
+	chdir quel; $(TBL) ../$(TMACS) *.nr | $(TROFF) >> ../ref.TROFF
+	chdir unix; $(TBL) ../$(TMACS) *.nr | $(TROFF) >> ../ref.TROFF
+	chdir files; $(TBL) ../$(TMACS) *.nr | $(TROFF) >> ../ref.TROFF
+	chdir error; $(TBL) ../$(TMACS) *.nr | $(TROFF) >> ../ref.TROFF
+	chdir access; make tref
+	chdir geoquel; make tref
+	chdir other; make tref
 
-vref:
-	-@$(VROFF) $(VMACS) 0aa.nr 1aa.nr toc.nr
-	-@chdir quel; $(VROFF) ../$(VMACS) *.nr
-	-@chdir unix; $(VROFF) ../$(VMACS) *.nr
-	-@chdir files; $(VROFF) ../$(VMACS) *.nr
-	-@chdir error; $(VROFF) ../$(VMACS) *.nr
+gref:
+	$(GROFF) $(GMACS) 0aa.nr 1aa.nr toc.nr > ref.PS
+	chdir quel; $(GROFF) ../$(GMACS) *.nr >> ../ref.PS
+	chdir unix; $(GROFF) ../$(GMACS) *.nr >> ../ref.PS
+	chdir files; $(GROFF) ../$(GMACS) *.nr >> ../ref.PS
+	chdir error; $(GROFF) ../$(GMACS) *.nr >> ../ref.PS
+	chdir access; make gref
+	chdir geoquel; make gref
+	chdir other; make gref
+
+clean:
+	-rm -f *.NROFF *.TROFF *.PS
+	cd access; make clean
+	cd geoquel; make clean
+	cd other; make clean

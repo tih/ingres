@@ -15,7 +15,7 @@ struct descriptor	Prodes;
 struct descriptor	Intdes;
 
 
-struct desxx	Desxx[]
+struct desxx	Desxx[] =
 {
 	"relation",	&Reldes,	&Admin.adreld,
 	"attribute",	&Attdes,	&Admin.adattd,

@@ -106,12 +106,12 @@ struct stacksym	*ss;
 	if (s->type  == CHAR)
 	{
 		wrpipe(P_NORM, pipedesc, filedesc, s, 2);	/* write the type and length */
-		p = ss->value->stringp;	/* p points to the string */
+		p = cpderef(ss->value);		/* p points to the string */
 	}
 	else
 	{
-		p = ss;
-		length =+ 2;	/* include two bytes for type and length */
+		p = (char *) ss;
+		length += 2;	/* include two bytes for type and length */
 	}
 	wrpipe(P_NORM, pipedesc, filedesc, p, length);
 }

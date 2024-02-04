@@ -69,9 +69,9 @@ struct querytree	*tree;
 
 	/* if the main tree is single var then put it in sq list */
 	mainvar = -1;
-	if (tree->tvarc == 1)
+	if (((struct qt_root *)tree)->tvarc == 1)
 	{
-		mainvar = bitpos(tree->lvarm | tree->rvarm);
+		mainvar = bitpos(((struct qt_root *)tree)->lvarm | ((struct qt_root *)tree)->rvarm);
 		if (sqlist[mainvar] != 0)
 			syserr("help reformat");
 		sqlist[mainvar] = tree;
@@ -129,6 +129,7 @@ char			linkmap[];
 	register struct querytree 	*b, *a;
 	register int 			s;
 	struct querytree		*temp;
+	extern struct querytree		*ckvar();
 
 	a = node;
 #	ifdef xDTR1
@@ -155,19 +156,19 @@ char			linkmap[];
 
 	a = ckvar(b->left);
 	b = ckvar(b->right);
-	if (b->varno == linkv) 
+	if (((struct qt_var *)b)->varno == linkv) 
 	{
 		temp = a;
 		a = b;
 		b = temp;
 	}
-	if (a->varno != linkv || (selv >= 0 && b->varno != selv))
+	if (((struct qt_var *)a)->varno != linkv || (selv >= 0 && ((struct qt_var *)b)->varno != selv))
 		return (s);
 
-	linkmap[a->attno] = 1;
+	linkmap[((struct qt_var *)a)->attno] = 1;
 #	ifdef xDTR1
 	if (tTf(13, 3))
-		printf("found:attno=%d\n", a->attno);
+		printf("found:attno=%d\n", ((struct qt_var *)a)->attno);
 #	endif
 	return (1);
 }
@@ -204,7 +205,7 @@ int			locrang[];
 	long				origcost, modcost, projcost;
 	char				*rangename();
 	long				rel_pages(), hashcost();
-
+	extern struct querytree		*makroot();
 
 
 	r = &Rangev[var];
@@ -391,15 +392,15 @@ int			locrang[];
 
 	/* renumber RESDOMs to match their VARs */
 	for (q = pq->left; q->sym.type != TREE; q = q->left)
-		q->resno = q->right->attno;
+		((struct qt_res *)q)->resno = ((struct qt_var *)q->right)->attno;
 
 	/* form list of RESDOMs from outermost inward */
 	node1[lnode(pq->left, node1, 0)] = 0;
 
 	/* form a dummy RESDOM with type CHAR and length 0 */
-	q = czero;
-	q->frmt = CHAR;
-	q->frml = 0;
+	q = (struct querytree *) czero;
+	((struct qt_var *)q)->frmt = CHAR;
+	((struct qt_var *)q)->frml = 0;
 
 	/* zero node2 */
 	for (np = node2, i = 0; i < MAXDOM + 1; i++)
@@ -409,7 +410,7 @@ int			locrang[];
 	maxresno = 0;
 	for (np = node1; q = *np++; )
 	{
-		if ((i = q->resno) == 0)
+		if ((i = ((struct qt_res *)q)->resno) == 0)
 			return (1);	/* abort. Tid is referenced */
 		if (i > maxresno)
 			maxresno = i;
@@ -419,7 +420,7 @@ int			locrang[];
 	/* fill missing RESDOMs with czero */
 	for (np = node2, i = 0; i < maxresno; i++, np++)
 		if (*np == 0)
-			*np = czero;
+			*np = (struct querytree *) czero;
 
 
 	/* set up params for the create */
@@ -560,7 +561,7 @@ struct querytree	*tree;
 
 	for (nod = t->left; nod && nod->sym.type != TREE; nod = nod->left)
 	{
-		wid =+ nod->frml & 0377;
+		wid += ((struct qt_var *)nod)->frml & 0377;
 	}
 
 	return (wid);
@@ -609,7 +610,7 @@ long	npages;
 	while (nfiles > 1)
 	{
 		nfiles = (nfiles + MERGESIZE - 1) / MERGESIZE;
-		sortpages =+ 2 * npages;
+		sortpages += 2 * npages;
 	}
 
 	total = sortpages + npages + npages + npages;

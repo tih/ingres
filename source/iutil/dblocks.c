@@ -25,7 +25,7 @@ char	mod;			/* mod of lock: = 1 for exclusive, = 2 for shared*/
 	r = Lock.lrel;
 	for (i = 0; i < 8; i++)
 		*r++ = 0;
-	i = write(Alockdes, &Lock, KEYSIZE + 3);
+	i = write(Alockdes, &Lock, sizeof(struct lockreq));
 	return (i);
 }
 /*
@@ -47,6 +47,6 @@ unldb()
 	r = Lock.lrel;
 	for (i = 0; i < 8; i++)		/* zero out part of key*/
 		*r++ = 0;
-	i = write(Alockdes, &Lock, KEYSIZE + 3);
+	i = write(Alockdes, &Lock, sizeof(struct lockreq));
 	return (i);
 }

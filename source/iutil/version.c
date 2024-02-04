@@ -7,6 +7,6 @@
 **	to make releases easier.
 */
 
-char	Version[]	VERSION;
-char	Rel_date[]	REL_DATE;
-char	Mod_date[]	MOD_DATE;
+char	Version[] =	VERSION;
+char	Rel_date[] =	REL_DATE;
+char	Mod_date[] =	MOD_DATE;

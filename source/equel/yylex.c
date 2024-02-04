@@ -1,5 +1,6 @@
 #
-# include	"../fileio.h"
+# include	<stdio.h>
+
 # include	"constants.h"
 # include	"globals.h"
 
@@ -104,7 +105,7 @@ yylex()
 	}
 	if (Lex_debug)
 		printf("YYLEX : %s: '%s'\n", yysterm [rtval - 256],
-		yylval ? yylval->d_elm : "");
+		yylval ? ((struct disp_node *)yylval)->d_elm : "");
 	return (rtval);
 }
 
@@ -124,7 +125,7 @@ yylex()
 */
 
 
-copy_c_code()
+char *copy_c_code()
 {
 	char	ch [2];
 

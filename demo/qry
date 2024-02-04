@@ -123,26 +123,26 @@ copy supply (
 from "{pathname}/demo/supply"
 
 range of i is item
-define permit all on i to all
+define permit retrieve of i to all
 
 range of s is sale
-define permit all on s to all
+define permit retrieve of s to all
 
 range of e is employee
-define permit all on e to all
+define permit retrieve of e to all
 
 range of d is dept
-define permit all on d to all
+define permit retrieve of d to all
 
 range of s is supplier
-define permit all on s to all
+define permit retrieve of s to all
 
 range of s is store
-define permit all on s to all
+define permit retrieve of s to all
 
 range of p is parts
-define permit all on p to all
+define permit retrieve of p to all
 
 range of s is supply
-define permit all on s to all
+define permit retrieve of s to all
 \g

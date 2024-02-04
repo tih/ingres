@@ -1,6 +1,7 @@
+# include	<stdio.h>
+
 # include	"../ingres.h"
 # include	"../aux.h"
-# include	"../fileio.h"
 # include	"monitor.h"
 
 /*
@@ -16,14 +17,13 @@
 print()
 {
 	FILE		*iop;
-	char		iobufx[IOBUFSIZ];
 	register char	c;
 
 	/* BACK UP FILE & UPDATE LAST PAGE */
 	Autoclear = 0;
 	clrline(1);
 	fflush(Qryiop);
-	if ((iop = fopen(Qbname, "r", iobufx)) == NULL)
+	if ((iop = fopen(Qbname, "r")) == NULL)
 		syserr("print: open 1");
 
 	/* list file on standard output */

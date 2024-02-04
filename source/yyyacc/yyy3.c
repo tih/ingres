@@ -25,7 +25,7 @@ cpres(){ /* conpute an array with the beginnings of  productions yielding given 
 		}
 	}
 
-int indebug 0;
+int indebug = 0;
 cpfir() {
   /* compute an array with the first of nonterminals */
   int i, ch, **s, **t, changes, *p;
@@ -37,7 +37,7 @@ cpfir() {
     for( s=pres[i]; s<t; ++s ){ /* initially fill the sets */
       for( p = *s; (ch = *p) > 0 ; ++p ) {
         if( ch < NTBASE ) {
-          wsets[i].ws[ch>>4] =| (1 << (ch&017) );
+          wsets[i].ws[ch>>4] |= (1 << (ch&017) );
           break;
           }
         else if( !pempty[ch-NTBASE] ) break;
@@ -54,7 +54,7 @@ cpfir() {
       t = pres[i+1];
       for( s=pres[i]; s<t; ++s ){
         for( p = *s; ( ch = (*p-NTBASE) ) >= 0; ++p ) {
-          changes =| sunion( wsets[i].ws, wsets[i].ws, wsets[ch].ws );
+          changes |= sunion( wsets[i].ws, wsets[i].ws, wsets[ch].ws );
           if( !pempty[ch] ) break;
           }
         }
@@ -132,7 +132,7 @@ state(c){ /* sorts last state,and sees if it equals earlier ones. returns state 
 	return(nstate++);
 	}
 
-int pidebug 0; /* debugging flag for putitem */
+int pidebug = 0; /* debugging flag for putitem */
 putitem ( ptr, lptr )		int *ptr; struct looksets *lptr;{
 	int *jip, k;
 	struct item *i, *j;
@@ -183,7 +183,7 @@ again:
     }
   }
 
-int gsdebug 0;
+int gsdebug = 0;
 stagen(){ /* generate the states */
 
   int i, j, k, c;
@@ -246,7 +246,7 @@ stagen(){ /* generate the states */
   /* no more to do... stop */
   }
 
-int cldebug 0; /* debugging flag for closure */
+int cldebug = 0; /* debugging flag for closure */
 closure(i){ /* generate the closure of state i */
 
   int c, ch, work;
@@ -295,7 +295,7 @@ closure(i){ /* generate the closure of state i */
           if( nolook ) continue;
           while( (ch= *++pi)>0 ){
             if( ch < NTBASE ){ /* terminal symbol */
-              clset.lset[ch>>4] =| (1<<(ch&017));
+              clset.lset[ch>>4] |= (1<<(ch&017));
               break;
               }
             /* nonterminal symbol */
@@ -308,7 +308,7 @@ closure(i){ /* generate the closure of state i */
   
       /*  now loop over productions derived from c */
   
-      c =- NTBASE; /* c is now nonterminal number */
+      c -= NTBASE; /* c is now nonterminal number */
   
       t = pres[c+1];
       for( s=pres[c]; s<t; ++s ){

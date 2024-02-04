@@ -54,7 +54,7 @@ char	*name;
 		if (i & 0200)
 		{
 			coredump = " -- core dumped";
-			i =& 0177;
+			i &= 0177;
 		}
 		else
 		{

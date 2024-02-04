@@ -1,5 +1,6 @@
 #
-# include	"../fileio.h"
+# include	<stdio.h>
+
 # include	"constants.h"
 # include	"globals.h"
 
@@ -21,7 +22,6 @@
 **
 **	Files:
 **		globals.h
-**		../fileio.h
 **		constants.h
 **
 **	History:
@@ -65,7 +65,7 @@ int			type;
 		{
 			if (i < MAXSTRING)
 			{
-				i =+ 1;
+				i += 1;
 				*++dest = *srce++;
 			}
 			else
@@ -104,6 +104,7 @@ int		type;
 {
 	register struct ret_list	*list;
 	register struct ret_var		*node;
+	extern char			*nalloc();
 
 	if (!s)
 	{
@@ -111,7 +112,7 @@ int		type;
 		yysemerr("alloc error", s);
 	}
 	list = &Ret_list;
-	node = nalloc(sizeof *node);
+	node = (struct ret_var *) nalloc(sizeof *node);
 	if (!node)
 	{
 		yysemerr("alloc error", s);
