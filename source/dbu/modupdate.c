@@ -1,48 +1,48 @@
 #
 /*
 ** MODUPDATE
-**	This routine is used to exicute the updates 
-**	for modifies so they are recoverable.
-**	It is also used by restore to complete an aborted modify.
-**	During a restore the Batch_recover flag should be set to 1;
+**      This routine is used to exicute the updates
+**      for modifies so they are recoverable.
+**      It is also used by restore to complete an aborted modify.
+**      During a restore the Batch_recover flag should be set to 1;
 */
 
-# include	"../ingres.h"
-# include	"../aux.h"
-# include	"../catalog.h"
-# include	"../access.h"
-# include	"../batch.h"
-# include	"../unix.h"
+# include       "../unix.h"
+# include       "../ingres.h"
+# include       "../aux.h"
+# include       "../catalog.h"
+# include       "../access.h"
+# include       "../batch.h"
 
 modupdate()
 {
-	char			batchname[MAXNAME + 3];
-	char			temprel[MAXNAME+ 3];
-	char			relfile[MAXNAME + 3];
-	register int		i;
-	register int		j;
-	struct stat		sbuf;
-	char			aflag;
-	struct tup_id		tid;
-	struct descriptor	desx;
-	struct attribute	atttup;
-	struct relation		oldreltup;
-	struct index		ikey, itup;
-	char			*newpv[2];
-	extern struct descriptor	Inddes, Attdes, Reldes;
-	register struct descriptor	*desp;
-	char			*trim_relname();
-	long			ltemp1, ltemp2;
+	char                    batchname[MAXNAME + 3];
+	char                    temprel[MAXNAME+ 3];
+	char                    relfile[MAXNAME + 3];
+	register int            i;
+	register int            j;
+	struct stat             sbuf;
+	char                    aflag;
+	struct tup_id           tid;
+	struct descriptor       desx;
+	struct attribute        atttup;
+	struct relation         oldreltup;
+	struct index            ikey, itup;
+	char                    *newpv[2];
+	extern struct descriptor        Inddes, Attdes, Reldes;
+	register struct descriptor      *desp;
+	char                    *trim_relname();
+	long                    ltemp1, ltemp2;
 
 
 	desp =  &desx;
 	concat(MODBATCH,Fileset,batchname);
 	concat(MODTEMP, Fileset, temprel);
 
-#	ifdef xZTR1
+#       ifdef xZTR1
 	if (tTf(20, 8))
 		printf("Modupdate: %s, %s\n",batchname, temprel);
-#	endif
+#       endif
 	if ((Batch_fp = open(batchname, 0)) < 0)
 		syserr("MODUPDATE:Can't open %s", batchname);
 	Batch_cnt = BATCHSIZE;
@@ -53,7 +53,7 @@ modupdate()
 	/* don't loose old file before verifying new file */
 	if (stat(temprel, &sbuf) != -1)
 	{
-		unlink(relfile);	/* Ok if failure */
+		unlink(relfile);        /* Ok if failure */
 		if (link(temprel, relfile) == -1)
 			syserr("MODUPDATE:Can't link: %s, %s", temprel, relfile);
 		unlink(temprel);
@@ -66,7 +66,7 @@ modupdate()
 
 
 	/* Update admin if this is relation or atribute relations */
-	/* Should only happen in Sysmod				  */
+	/* Should only happen in Sysmod                           */
 	if ((aflag = bequal(desp->relid, "attribute   ", 12)) ||
 		bequal(desp->relid, "relation    ", 12))
 	{
@@ -170,9 +170,9 @@ modupdate()
 
 	/* clean things up and exit */
 	unlink(batchname);
-#	ifdef xZTR1
+#       ifdef xZTR1
 	if (tTf(20, 8))
 		printf("Leaving modupdate\n");
-#	endif
+#       endif
 	return (0);
 }

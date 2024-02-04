@@ -1,63 +1,63 @@
 #
-# include	"../fileio.h"
-# include	"constants.h"
-# include	"globals.h"
-# include	"../unix.h"
+# include       "../fileio.h"
+# include       "constants.h"
+# include       "globals.h"
+# include       "../unix.h"
 
-jmp_buf		Env;	/* used by setjmp and longjmp */
+int         Env[3];    /* used by setjmp and longjmp */
 
 /*
 **  MAIN.C -- Start up routines
 **
-**	Usage:
-**		equel {-d | -v | -c | -y | -f | -f<integer> | <name>.q}
+**      Usage:
+**              equel {-d | -v | -c | -y | -f | -f<integer> | <name>.q}
 **
-**	Files:
-**		standard output -- for diagnostics
-**		<name>.q -- read
-**		<name>.c -- created and written
-**		any file appearing in a "#include" with a name
-**		<name>.q.h -- read
-**		<name>.c.h -- created and written
+**      Files:
+**              standard output -- for diagnostics
+**              <name>.q -- read
+**              <name>.c -- created and written
+**              any file appearing in a "#include" with a name
+**              <name>.q.h -- read
+**              <name>.c.h -- created and written
 **
-**	Flags:
-**		possible arguments are:
-**		-d -- enables run-time errors to have the file name
-**		      and line number where they occurred reported
-**		      Defaults to off.
-**		-f -- specify the number of characters to fill
-**		      an output line on quel commands 
-**		      as being very high (to get C code on the 
-**		      right line invariably).
-**		-f<integer> -- fill output lines to integer chars
-**		      (0 is like -f alone)
-**		      Defaults to FILLCNT.
-**		-y -- have the parser print debugging info
-**		      Defaults to off.
-**		-v -- (verbose) have the lexical analizer
-**		      print the kind of token it sees.
-**		      (only available if xDEBUG is defined)
-**		      Defaults to off.
-**		-c -- have every character read or backed up
-**		      echoed (only if xDEBUG is defined)
-**		      Defaults to off.
-**		-r -- reset all previous flags to default
-**		<name>.q -- name of a file to be equel'ed
+**      Flags:
+**              possible arguments are:
+**              -d -- enables run-time errors to have the file name
+**                    and line number where they occurred reported
+**                    Defaults to off.
+**              -f -- specify the number of characters to fill
+**                    an output line on quel commands 
+**                    as being very high (to get C code on the 
+**                    right line invariably).
+**              -f<integer> -- fill output lines to integer chars
+**                    (0 is like -f alone)
+**                    Defaults to FILLCNT.
+**              -y -- have the parser print debugging info
+**                    Defaults to off.
+**              -v -- (verbose) have the lexical analizer
+**                    print the kind of token it sees.
+**                    (only available if xDEBUG is defined)
+**                    Defaults to off.
+**              -c -- have every character read or backed up
+**                    echoed (only if xDEBUG is defined)
+**                    Defaults to off.
+**              -r -- reset all previous flags to default
+**              <name>.q -- name of a file to be equel'ed
 **
-**	Defines:
-**		main()
-**		argproc()
-**		equel()
+**      Defines:
+**              main()
+**              argproc()
+**              equel()
 **
-**	Compilation Flags:
-**		xDEBUG -- enables debugging flags -v and -c
+**      Compilation Flags:
+**              xDEBUG -- enables debugging flags -v and -c
 **
-**	Compilation Instructions:
-**		to setup equel do :
-**			setup equel; setup libq
+**      Compilation Instructions:
+**              to setup equel do :
+**                      setup equel; setup libq
 **
-**	History:
-**		6/1/78 -- (marc) written
+**      History:
+**              6/1/78 -- (marc) written
 */
 
 
@@ -67,22 +67,22 @@ jmp_buf		Env;	/* used by setjmp and longjmp */
 /*
 **  MAIN --  invokes the pre-compiler on all the argument files
 **
-**	Parameters:
-**		argc
-**		argv
+**      Parameters:
+**              argc
+**              argv
 **
-**	Returns:
-**		none
+**      Returns:
+**              none
 **
-**	History:
-**		6/1/78 -- (marc) written
+**      History:
+**              6/1/78 -- (marc) written
 */
 
 main(argc, argv)
-int	argc;
-char	**argv;
+int     argc;
+char    **argv;
 {
-	extern char	**argproc();
+	extern char     **argproc();
 
 	argv [argc] = 0;
 
@@ -100,43 +100,43 @@ char	**argv;
 
 /*
 **  ARGPROC -- process arguments on the command line
-**	Arguments have effect on all the files following them
-**	until a "-r" or an argument cancelling the first
+**      Arguments have effect on all the files following them
+**      until a "-r" or an argument cancelling the first
 **
-**	Also performs global initializations.
+**      Also performs global initializations.
 **
-**	Parameters:
-**		argv -- a 0 terminated string vector with the
-**		        command lines components.
+**      Parameters:
+**              argv -- a 0 terminated string vector with the
+**                      command lines components.
 **
-**	Returns:
-**		a new argv with all the leading arguments taken out
+**      Returns:
+**              a new argv with all the leading arguments taken out
 **
-**	Side Effects:
-**		sets certain variables for certain flags
-**		  -d -- Rtdb
-**		  -c -- Chardebug
-**		  -v -- Lex_debug
-**		  -y -- yydebug
-**		  -f -- Fillcnt
-**		  -r -- resets all variables to default values
-**		Sets Arg_error on an argument error that should abort
-**		the pre-processing of the file read.
+**      Side Effects:
+**              sets certain variables for certain flags
+**                -d -- Rtdb
+**                -c -- Chardebug
+**                -v -- Lex_debug
+**                -y -- yydebug
+**                -f -- Fillcnt
+**                -r -- resets all variables to default values
+**              Sets Arg_error on an argument error that should abort
+**              the pre-processing of the file read.
 **
-**	Called By:
-**		main() -- before the first file, and between all others
+**      Called By:
+**              main() -- before the first file, and between all others
 **
-**	Diagnostics:
-**		"invalid option : '-%c'\n"
-**		"missing file name after arguments" -- indicates user probably
-**			didn't equel a file he'd intended to
+**      Diagnostics:
+**              "invalid option : '-%c'\n"
+**              "missing file name after arguments" -- indicates user probably
+**                      didn't equel a file he'd intended to
 **
-**	History:
-**		6/1/78 -- (marc) written
+**      History:
+**              6/1/78 -- (marc) written
 */
 
 char **argproc(argv)
-char	**argv;
+char    **argv;
 {
 
 	/* initializations for a new file */
@@ -159,8 +159,8 @@ char	**argv;
 	{
 		switch (*++*argv)
 		{
-			
-#		  ifdef xDEBUG
+
+#                 ifdef xDEBUG
 		  case 'v' :
 			Lex_debug = 'v';
 			break;
@@ -168,7 +168,7 @@ char	**argv;
 		  case 'c' :
 			Chardebug = 'c';
 			break;
-#		  endif
+#                 endif
 
 		  case 'y' :
 			yydebug = 1;
@@ -178,7 +178,7 @@ char	**argv;
 			Rtdb = 1;
 			break;
 
-		  case 'f' :		/* line fill */
+		  case 'f' :            /* line fill */
 			if (atoi(++*argv, &Fillcnt))
 				printf("bad fill count \"%s\"\n",
 				*argv);
@@ -189,14 +189,14 @@ char	**argv;
 				Fillcnt = 30000;
 			break;
 
-		  case 'r' :		/* reset all flags to 
+		  case 'r' :            /* reset all flags to 
 					 * their default values.
 					 */
 			yydebug = Rtdb = 0;
 			Fillcnt = FILLCNT;
-#			ifdef xDEBUG
+#                       ifdef xDEBUG
 			Lex_debug = Chardebug = 0;
-#			endif
+#                       endif
 			break;
 
 		  default :
@@ -217,31 +217,31 @@ char	**argv;
 /*
 **  EQUEL -- invokes the precompiler for a non-included file
 **
-**	Parameters:
-**		filename -- the name of the file to pre-compile
+**      Parameters:
+**              filename -- the name of the file to pre-compile
 **
-**	Returns:
-**		none
+**      Returns:
+**              none
 **
-**	Side Effects:
-**		performs the preprocessing on <filename>
+**      Side Effects:
+**              performs the preprocessing on <filename>
 **
-**	Called By:
-**		main()
+**      Called By:
+**              main()
 **
-**	Diagnostics:
-**		self-explanatory
+**      Diagnostics:
+**              self-explanatory
 **
-**	History:
-**		6/1/78 -- (marc) written
+**      History:
+**              6/1/78 -- (marc) written
 */
 
 equel(filename)
-char		*filename;
+char            *filename;
 {
-	char		in_buf [IOBUFSIZ];
-	char		o_file [100];
-	register	l;
+	char            in_buf [IOBUFSIZ];
+	char            o_file [100];
+	register        l;
 
 	l = length(filename);
 	if (l > sizeof o_file - 1)

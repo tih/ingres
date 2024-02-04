@@ -1,38 +1,29 @@
-INGRES=	../..
-CC=	cc
-CFLAGS=	-O
-AR=	-ar
-ARFLAGS=rvu
-LIB=	$(INGRES)/lib
-ACCESS=	$(LIB)/access
-GUTIL=	$(LIB)/gutil
-IUTIL=	$(LIB)/iutil
+CC = cc
+CFLAGS = -O
+AR = ar
+ARFLAGS = ruv
 
-LIBS=	$(ACCESS) $(IUTIL) $(GUTIL)
+BIN = ../../bin
+LIB = ../../lib
 
-OBJS=	main.o \
-	ovqp.o \
-	startovqp.o \
-	getqry.o \
-	rdsym.o \
-	strategy.o \
-	findsimps.o \
-	key.o \
-	scan.o \
-	interp.o \
-	interp1.o \
-	equelpr.o \
-	string.o \
-	typecheck.o \
-	support.o \
-	prsym.o \
-	copyreturn.o
+LIBS = ../../lib/access ../../lib/iutil ../../lib/gutil
+
+OBJS =  ovqp.o startovqp.o getqry.o rdsym.o strategy.o findsimps.o \
+	key.o scan.o interp.o interp1.o equelpr.o string.o typecheck.o \
+	support.o prsym.o copyreturn.o
+
+all: ovqplib ovqp
 
 ovqplib: $(OBJS)
-	-$(AR) $(ARFLAGS) ovqplib $(OBJS)
+	$(AR) $(ARFLAGS) ovqplib $(OBJS)
 
-install: ovqplib
+ovqp:   main.o $(OBJS)
+	$(CC) $(LDFLAGS) -o ovqp main.o $(OBJS) $(LIBS) -lf
+
+install: all
+	cp ovqp $(BIN)/ovqp
 	cp ovqplib $(LIB)/ovqplib
 
 clean:
-	rm *.o
+	-rm -f *.o
+	-rm -f ovqplib ovqp

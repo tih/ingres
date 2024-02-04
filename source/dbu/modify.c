@@ -1,116 +1,116 @@
-# include	"../ingres.h"
-# include	"../aux.h"
-# include	"../access.h"
-# include	"../batch.h"
-# include	"../lock.h"
-# include	"../fileio.h"
-# include	"../unix.h"
+# include       "../unix.h"
+# include       "../ingres.h"
+# include       "../aux.h"
+# include       "../access.h"
+# include       "../batch.h"
+# include       "../lock.h"
+# include       "../fileio.h"
 
 /*
 **  MODIFY -- converts any relation to the specified
-**		storage structure
+**              storage structure
 **
-**	arguments:
-**	0 - relation name
-**	1 - storage structure ("heap", "cheap", "hash", "chash",
-**		"isam", "cisam")
-**	2 - "name" for attribute names, or "num" for numbers
-**	3 - key1
-**	4 - key2
-**	    .
-**	    .
-**	i - null
-**	i+1 - option name (e.g., "fillfactor")
-**	i+2 - option value
-**	    .
-**	    .
+**      arguments:
+**      0 - relation name
+**      1 - storage structure ("heap", "cheap", "hash", "chash",
+**              "isam", "cisam")
+**      2 - "name" for attribute names, or "num" for numbers
+**      3 - key1
+**      4 - key2
+**          .
+**          .
+**      i - null
+**      i+1 - option name (e.g., "fillfactor")
+**      i+2 - option value
+**          .
+**          .
 **
-**	If all the options default, parameter i -> pc are omitted.
-**	If no keys are provided, parameter 2 is omitted.
+**      If all the options default, parameter i -> pc are omitted.
+**      If no keys are provided, parameter 2 is omitted.
 **
-**	History:
-**		6/2/80 (eric) -- moved formatpg call from make_newrel
-**			into modify so that it would not be necessary
-**			to have 3x space.
-**		12/28/78 (rse) -- added descending sort option
-**		9/25/78 -- (marc) 2 openr's replaced by one
-**			as view error code put in openr
-**		9/12/78 -- (marc) modified to give error message
-**			5519 when someone tries to modify a view.
-**			For this I split the openr mode 0 into 2,
-**			mode -1 then -2.
+**      History:
+**              6/2/80 (eric) -- moved formatpg call from make_newrel
+**                      into modify so that it would not be necessary
+**                      to have 3x space.
+**              12/28/78 (rse) -- added descending sort option
+**              9/25/78 -- (marc) 2 openr's replaced by one
+**                      as view error code put in openr
+**              9/12/78 -- (marc) modified to give error message
+**                      5519 when someone tries to modify a view.
+**                      For this I split the openr mode 0 into 2,
+**                      mode -1 then -2.
 */
 
-int		F_fac, Mn_pages, Mx_pages;
+int             F_fac, Mn_pages, Mx_pages;
 
 struct modtab
 {
-	char	*type;
-	char	newrelspec;
-	char	yeskeys;
-	char	sortit;
-	char	yes_seq;
-	int	f_fac;
-	int	mn_pages;
-	int	mx_pages;
+	char    *type;
+	char    newrelspec;
+	char    yeskeys;
+	char    sortit;
+	char    yes_seq;
+	int     f_fac;
+	int     mn_pages;
+	int     mx_pages;
 };
 
 
-struct modtab	Modtab[]
+struct modtab   Modtab[]
 {
-	/* type		spec	keys	sort	seq	ffac	min	max */
+	/* type         spec    keys    sort    seq     ffac    min     max */
 
-	"heap",		M_HEAP,	FALSE,	FALSE,	FALSE,	0,	0,	0,
-	"cheap",	-M_HEAP,FALSE,	FALSE,	FALSE,	0,	0,	0,
-	"hash",		M_HASH,	TRUE,	TRUE,	FALSE,	50,	10,	-1,
-	"chash",	-M_HASH,TRUE,	TRUE,	FALSE,	75,	1,	-1,
-	"isam",		M_ISAM,	TRUE,	TRUE,	FALSE,	80,	0,	0,
-	"cisam",	-M_ISAM,TRUE,	TRUE,	FALSE,	100,	0,	0,
-	"heapsort",	M_HEAP,	TRUE,	TRUE,	TRUE,	0,	0,	0,
-	"cheapsort",	-M_HEAP,TRUE,	TRUE,	TRUE,	0,	0,	0,
-	"truncated",	M_TRUNC,FALSE,	FALSE,	FALSE,	0,	0,	0,
+	"heap",         M_HEAP, FALSE,  FALSE,  FALSE,  0,      0,      0,
+	"cheap",        -M_HEAP,FALSE,  FALSE,  FALSE,  0,      0,      0,
+	"hash",         M_HASH, TRUE,   TRUE,   FALSE,  50,     10,     -1,
+	"chash",        -M_HASH,TRUE,   TRUE,   FALSE,  75,     1,      -1,
+	"isam",         M_ISAM, TRUE,   TRUE,   FALSE,  80,     0,      0,
+	"cisam",        -M_ISAM,TRUE,   TRUE,   FALSE,  100,    0,      0,
+	"heapsort",     M_HEAP, TRUE,   TRUE,   TRUE,   0,      0,      0,
+	"cheapsort",    -M_HEAP,TRUE,   TRUE,   TRUE,   0,      0,      0,
+	"truncated",    M_TRUNC,FALSE,  FALSE,  FALSE,  0,      0,      0,
 	0
 };
 
 struct mod_info
 {
-	char	outfile[MAXNAME + 4];	/* result file filled by ksort */
-	char	formfile[MAXNAME + 4];	/* file with descriptor for ksort */
-	char	infile[MAXNAME + 4];	/* input file for ksort (relation itself */
-	char	reltemp[MAXNAME + 4];	/* file holding new relation */
-	char	spfile[MAXNAME + 4], spflag;	/* isam spool file for overflow */
+	char    outfile[MAXNAME + 4];   /* result file filled by ksort */
+	char    formfile[MAXNAME + 4];  /* file with descriptor for ksort */
+	char    infile[MAXNAME + 4];    /* input file for ksort (relation itself */
+	char    reltemp[MAXNAME + 4];   /* file holding new relation */
+	char    spfile[MAXNAME + 4], spflag;    /* isam spool file for overflow */
 };
 
-struct mod_info	Mod_info;
+struct mod_info Mod_info;
 
 modify(pc, pv)
-int	pc;
-char	**pv;
+int     pc;
+char    **pv;
 {
-	register int		i;
-	register char		*rname;
-	register struct modtab	*mp;
-	int			sorted;
-	struct descriptor	dold, dnew;
-	char			namemode;
-	long			temptid;
-	extern int		Noupdt;
+	register int            i;
+	register char           *rname;
+	register struct modtab  *mp;
+	int                     sorted;
+	struct descriptor       dold, dnew;
+	char                    namemode;
+	long                    temptid;
+	extern int              Noupdt;
 
-#	ifdef xZTR1
+#       ifdef xZTR1
 	if (tTf(20, -1))
 		printf("enter modify\n");
-#	endif
-#	ifdef xZTM
+#       endif
+#       ifdef xZTM
 	if (tTf(76, 1))
 		timtrace(15, 0);
-#	endif
+#       endif
 
 	/* check for nice parameters */
 	if (pc < 2)
 		syserr("MODIFY: pc %d", pc);
 
 	/* save relation name for error messages */
-	rname = *pv++;	/* *pv now pointes to storage spec */
+	rname = *pv++;  /* *pv now pointes to storage spec */
 
 	/* check for good relation */
 	i = openr(&dold, 0, rname);
@@ -118,11 +118,11 @@ char	**pv;
 		return (error(5519, rname, 0));
 	if (i > 0)
 		/* reln does not exist */
-		return (error(5500, rname, 0));	
+		return (error(5500, rname, 0)); 
 	else if (i < 0)
 		syserr("MODIFY: openr (%.14s) %d", rname, i);
 	/* can only modify a relation you own and isn't a sys rel */
-	
+
 	if (!bequal(Usercode, dold.relowner, 2))
 	{
 		i = 5501;
@@ -146,7 +146,7 @@ char	**pv;
 	** the new relation.
 	*/
 	bmove(&dold, &dnew, sizeof dnew);
-	dnew.reltid.line_id = -2;	/* choose impossible reltid */
+	dnew.reltid.line_id = -2;       /* choose impossible reltid */
 
 	/* In case of an interrupt from a previous modify,
 	** there might be pages around. Get rid of them.
@@ -164,13 +164,13 @@ char	**pv;
 	if (!mp->type)
 	{
 		closer(&dold);
-		return (error(5510, rname, *pv, 0));	/* bad relspec */
+		return (error(5510, rname, *pv, 0));    /* bad relspec */
 	}
 	dnew.relspec = mp->newrelspec;
 	if (dnew.relspec == M_TRUNC)
 		dnew.relspec = M_HEAP;
 
-	pv++;	/* now points to first parameter */
+	pv++;   /* now points to first parameter */
 
 	F_fac = mp->f_fac;
 	Mn_pages = mp->mn_pages;
@@ -180,14 +180,14 @@ char	**pv;
 	if (i = getkeys(&pv, rname, &dnew, mp))
 	{
 		closer(&dold);
-		return (i);	/* user error */
+		return (i);     /* user error */
 	}
 
 	/* get fillfactor and other options if any */
 	if (i = getfill(pv, rname, mp))
 	{
 		closer(&dold);
-		return (i);	/* user error */
+		return (i);     /* user error */
 	}
 
 
@@ -217,7 +217,7 @@ char	**pv;
 	if (mp->newrelspec != M_TRUNC)
 		fill_rel(&dold, &dnew, sorted);
 
-	closer(&dold);	/* error return is impossible */
+	closer(&dold);  /* error return is impossible */
 	if (abs(dnew.relspec) == M_ISAM)
 	{
 		if (i = bldindex(&dnew))
@@ -249,31 +249,31 @@ char	**pv;
 	if (Lockrel)
 		unlrl(temptid);
 
-#	ifdef xZTM
+#       ifdef xZTM
 	if (tTf(76, 1))
 		timtrace(16, 0);
-#	endif
+#       endif
 	return (0);
 }
 
 
 getkeys(ppv, relname, desc, mp)
-char			***ppv;
-char			*relname;
-struct descriptor	*desc;
-struct modtab		*mp;
+char                    ***ppv;
+char                    *relname;
+struct descriptor       *desc;
+struct modtab           *mp;
 {
-	register char			**pv;
-	register char			*cp;
-	register struct descriptor	*d;
-	int				namemode, sort_only, as_ds;
-	int				i, keyno, keywid;
-	struct attribute		attkey, atttup;
-	struct tup_id			tid;
-	struct tup_id			atttid, attlim;
-	extern struct descriptor	Attdes;
+	register char                   **pv;
+	register char                   *cp;
+	register struct descriptor      *d;
+	int                             namemode, sort_only, as_ds;
+	int                             i, keyno, keywid;
+	struct attribute                attkey, atttup;
+	struct tup_id                   tid;
+	struct tup_id                   atttid, attlim;
+	extern struct descriptor        Attdes;
 
-	pv = *ppv;	/* copy list of params */
+	pv = *ppv;      /* copy list of params */
 	d = desc;
 
 	/* zero key info */
@@ -291,11 +291,11 @@ struct modtab		*mp;
 		/* no key information. default as needed */
 		if (mp->yeskeys)
 		{
-			cp = "\1";	/* default to first key */
+			cp = "\1";      /* default to first key */
 			namemode = FALSE;
 		}
 		else
-			pv++;	/* point one to far */
+			pv++;   /* point one to far */
 	}
 	else
 	{
@@ -308,8 +308,8 @@ struct modtab		*mp;
 			setkey(&Attdes, &attkey, Mod_info.infile, ATTRELID);
 			setkey(&Attdes, &attkey, Usercode, ATTOWNER);
 		}
-		pv++;	/* inc to next key */
-		cp = *pv++;	/* pick up first key */
+		pv++;   /* inc to next key */
+		cp = *pv++;     /* pick up first key */
 	}
 
 
@@ -319,7 +319,7 @@ struct modtab		*mp;
 		/* check for separator between keys & options */
 		if (*cp == NULL)
 		{
-			pv++;	/* point two past NULL */
+			pv++;   /* point two past NULL */
 			break;
 		}
 
@@ -328,13 +328,13 @@ struct modtab		*mp;
 			/* check for "sort only" attribute */
 			if (*cp == '#')
 			{
-				cp++;	/* inc to start of name */
+				cp++;   /* inc to start of name */
 				sort_only = TRUE;
 			}
 
 			/* check for ascending/descending modifier */
 			if ((as_ds = modseqkey(cp, relname, mp->yes_seq)) > 0)
-				return (as_ds);	/* error */
+				return (as_ds); /* error */
 
 			setkey(&Attdes, &attkey, cp, ATTNAME);
 			i = getequal(&Attdes, &attkey, &atttup, &tid);
@@ -342,7 +342,7 @@ struct modtab		*mp;
 				syserr("MODIFY: geteq(att) %d", i);
 			if (i > 0)
 			{
-				return (error(5511, relname, cp, 0));	/* bad att name */
+				return (error(5511, relname, cp, 0));   /* bad att name */
 			}
 			i = atttup.attid;
 		}
@@ -360,10 +360,10 @@ struct modtab		*mp;
 			keywid =+ (d->relfrml[i] & I1MASK);
 		}
 		if (d->relgiven[i])
-			return (error(5507, relname, cp, 0));	/* duplicate attribute */
+			return (error(5507, relname, cp, 0));   /* duplicate attribute */
 		d->relgiven[i] = as_ds == 0 ? keyno : -keyno;
 	}
-	pv--;	/* back up one to point to "-1" terminator */
+	pv--;   /* back up one to point to "-1" terminator */
 
 
 	if (abs(d->relspec) == M_ISAM && keywid > (MAXTUP / 2 - 4))
@@ -374,7 +374,7 @@ struct modtab		*mp;
 	/* if a heap, there can be no keys */
 	if (!mp->yeskeys && keyno != 0)
 	{
-		return (error(5502, relname, mp->type, 0));	/* no keys allowed on heap */
+		return (error(5502, relname, mp->type, 0));     /* no keys allowed on heap */
 	}
 
 	/* fill out default sort on remainder of keys */
@@ -388,12 +388,12 @@ struct modtab		*mp;
 
 
 modseqkey(domain, relname, seq_ok)
-char	*domain;
-char	*relname;
-int	seq_ok;
+char    *domain;
+char    *relname;
+int     seq_ok;
 {
-	register char	*cp, c;
-	register int	ret;
+	register char   *cp, c;
+	register int    ret;
 
 	ret = 0;
 
@@ -421,23 +421,23 @@ int	seq_ok;
 
 
 /*
-**	GETFILL -- Get fill factor and minimum pages parameters
-**		from argument list, convert them from ascii to integer
-**		and store them in global variables.  If the global
-**		variable for the corresponding parameter is zero,
-**		it means that that parameter is not allowed and an
-**		error is generated.
+**      GETFILL -- Get fill factor and minimum pages parameters
+**              from argument list, convert them from ascii to integer
+**              and store them in global variables.  If the global
+**              variable for the corresponding parameter is zero,
+**              it means that that parameter is not allowed and an
+**              error is generated.
 */
 
 getfill(pvx, rel, mp)
-char		**pvx;
-char		*rel;
-struct modinfo	*mp;
+char            **pvx;
+char            *rel;
+struct modinfo  *mp;
 {
-	register char	**pv, *p1;
-	register int	err;
-	char		*p2;
-	int		fill_flag, min_flag, max_flag;
+	register char   **pv, *p1;
+	register int    err;
+	char            *p2;
+	int             fill_flag, min_flag, max_flag;
 
 	pv = pvx;
 	err = 0;
@@ -516,22 +516,22 @@ struct modinfo	*mp;
 }
 
 /*
-**	MAKE_NEWREL -- Create a file for the modified relation
-**		and build one or more primary pages for the
-**		relation based on its storage structure and the
-**		number of tuples it must hold.
+**      MAKE_NEWREL -- Create a file for the modified relation
+**              and build one or more primary pages for the
+**              relation based on its storage structure and the
+**              number of tuples it must hold.
 **
-**	History:
-**		6/2/80 (eric, mod 11) -- removed formatpg call so
-**			that disk space will not be grabbed until
-**			sort is done.
+**      History:
+**              6/2/80 (eric, mod 11) -- removed formatpg call so
+**                      that disk space will not be grabbed until
+**                      sort is done.
 */
 
 make_newrel(descx)
-struct descriptor	*descx;
+struct descriptor       *descx;
 {
-	register struct descriptor	*desc;
-	register int			i, tups_p_page;
+	register struct descriptor      *desc;
+	register int                    i, tups_p_page;
 
 	desc = descx;
 	concat(MODTEMP, Fileset, Mod_info.reltemp);
@@ -562,29 +562,29 @@ struct descriptor	*descx;
 			desc->relprim = Mn_pages;
 		if (Mx_pages > 0 && desc->relprim > Mx_pages)
 			desc->relprim = Mx_pages;
-#		ifdef xZTR1
+#               ifdef xZTR1
 		if (tTf(22, 0))
 			printf("using %s prim pages\n", locv(desc->relprim));
-#		endif
+#               endif
 	}
 	desc->reltups = 0;
 	return (0);
 }
 
 /*
-**	SORTREL - Call KSORT to sort the given relation.  SORTREL
-**		sets up the descriptor struct specifying the sort
-**		keys and tells KSORT whether or not the hash key should
-**		be included as a sort key.
+**      SORTREL - Call KSORT to sort the given relation.  SORTREL
+**              sets up the descriptor struct specifying the sort
+**              keys and tells KSORT whether or not the hash key should
+**              be included as a sort key.
 */
 
 sortrel(odesc, descx)
-struct descriptor	*odesc, *descx;
+struct descriptor       *odesc, *descx;
 {
-	extern char			**Xparams;
-	register struct descriptor	*desc;
-	register int			fp, i;
-	char				savespec;
+	extern char                     **Xparams;
+	register struct descriptor      *desc;
+	register int                    fp, i;
+	char                            savespec;
 
 	desc = descx;
 	concat(ISAM_SORTED, Fileset, Mod_info.outfile);
@@ -619,7 +619,7 @@ struct descriptor	*odesc, *descx;
 			Mod_info.outfile, 0);
 		syserr("SORTREL: exec %s", Xparams[0]);
 	}
-	if (fp = fullwait(i, "modify"))	/* wait for ksort to complete */
+	if (fp = fullwait(i, "modify")) /* wait for ksort to complete */
 		syserr("modify:ksort failed %d", fp);
 
 	unlink(Mod_info.formfile);
@@ -627,23 +627,23 @@ struct descriptor	*odesc, *descx;
 }
 
 /*
-**	FILL_REL -- Fill the new relation with tuples from either
-**		the old relation or the output file of KSORT.
+**      FILL_REL -- Fill the new relation with tuples from either
+**              the old relation or the output file of KSORT.
 */
 
 fill_rel(sdescx, descx, sortit)
-struct descriptor	*sdescx, *descx;
-char			sortit;
+struct descriptor       *sdescx, *descx;
+char                    sortit;
 {
-	register struct descriptor	*sdesc, *desc;
-	register int			i;
-	char				tup_buf[MAXTUP], last_tup[MAXTUP];
-	char				junk[4], newreltype, anytups, chkdups;
-	char				sortbuf[IOBUFSIZ], spoolbuf[IOBUFSIZ];
-	int				need, j;
-	long				lnum;
-	struct tup_id			tid, stid, stidlim;
-	FILE				*fp, *spfp;
+	register struct descriptor      *sdesc, *desc;
+	register int                    i;
+	char                            tup_buf[MAXTUP], last_tup[MAXTUP];
+	char                            junk[4], newreltype, anytups, chkdups;
+	char                            sortbuf[IOBUFSIZ], spoolbuf[IOBUFSIZ];
+	int                             need, j;
+	long                            lnum;
+	struct tup_id                   tid, stid, stidlim;
+	FILE                            *fp, *spfp;
 
 	sdesc = sdescx;
 	desc = descx;
@@ -655,7 +655,7 @@ char			sortit;
 	}
 	else
 	{
-		cleanrel(sdesc);	/* make sure each page is read fresh */
+		cleanrel(sdesc);        /* make sure each page is read fresh */
 		find(sdesc, NOKEY, &stid, &stidlim);
 	}
 	if (newreltype == M_ISAM)
@@ -692,7 +692,7 @@ char			sortit;
 		}
 		else
 		{
-#			ifdef xZTR2
+#                       ifdef xZTR2
 			if (tTf(22, 1))
 			{
 				printf("FILL_REL: stid ");
@@ -700,15 +700,15 @@ char			sortit;
 				printf("FILL_REL: stidlim ");
 				dumptid(&stidlim);
 			}
-#			endif
+#                       endif
 			i = get(sdesc, &stid, &stidlim, tup_buf, TRUE);
-#			ifdef xZTR2
+#                       ifdef xZTR2
 			if (tTf(22, 1))
 			{
 				printf("FILLREL: get %d ", i);
 				printup(sdesc, tup_buf);
 			}
-#			endif
+#                       endif
 			if (i < 0)
 				syserr("FILL_REL: get %d", i);
 			if (i == 1)
@@ -718,7 +718,7 @@ char			sortit;
 		{
 			if ((i = insert(desc, &tid, tup_buf, chkdups)) < 0)
 				syserr("FILL_REL: insert %d", i);
-#			ifdef xZTR2
+#                       ifdef xZTR2
 			if (tTf(22, 2))
 			{
 				printf("FILL_REL: insert ");
@@ -726,7 +726,7 @@ char			sortit;
 				printf("FILL_REL: insert ret %d at", i);
 				dumptid(&tid);
 			}
-#			endif
+#                       endif
 			continue;
 		}
 		if (anytups)
@@ -782,18 +782,18 @@ char			sortit;
 
 
 bldindex(dx)
-struct descriptor	*dx;
+struct descriptor       *dx;
 
 {
-	register struct descriptor	*d;
-	register struct tup_id		*tid;
-	register int			tmp;
-	struct tup_id			tidx;
-	struct accbuf			dirbuf;
-	int				keywid, level, savespec, keyx[MAXDOM];
-	int				offset, len;
-	char				tuple[MAXTUP], temptup[MAXTUP], *key;
-	long				pageid, start, stop, newstart, newstop;
+	register struct descriptor      *d;
+	register struct tup_id          *tid;
+	register int                    tmp;
+	struct tup_id                   tidx;
+	struct accbuf                   dirbuf;
+	int                             keywid, level, savespec, keyx[MAXDOM];
+	int                             offset, len;
+	char                            tuple[MAXTUP], temptup[MAXTUP], *key;
+	long                            pageid, start, stop, newstart, newstop;
 
 	d = dx;
 	tid = &tidx;
@@ -820,10 +820,10 @@ struct descriptor	*dx;
 	savespec = d->relspec;
 	for (;;)
 	{
-#		ifdef xZTR2
+#               ifdef xZTR2
 		if (tTf(21, 7))
 			printf("isam: level %d\n", level);
-#		endif
+#               endif
 		dirbuf.ovflopg = start;
 		dirbuf.mainpg = level;
 		dirbuf.thispage = stop + 1;
@@ -835,10 +835,10 @@ struct descriptor	*dx;
 		newstop = newstart;
 		for (pageid = start; pageid <= stop; pageid++)
 		{
-#			ifdef xZTR2
+#                       ifdef xZTR2
 			if (tTf(21, 8))
 				printf("isam:get key from %s\n", locv(pageid));
-#			endif
+#                       endif
 			stuff_page(tid, &pageid);
 			tid->line_id = 0;
 			if (tmp = get(d, tid, tid, tuple, FALSE))
@@ -912,18 +912,18 @@ struct descriptor	*dx;
 }
 
 /*
-**	UNSPOOL -- Take tuples saved in spool file and insert them
-**		in new relation.  This is only for ISAM relations.
+**      UNSPOOL -- Take tuples saved in spool file and insert them
+**              in new relation.  This is only for ISAM relations.
 */
 
 unspool(descx)
-struct descriptor	*descx;
+struct descriptor       *descx;
 {
-	register struct descriptor	*desc;
-	register int			i;
-	struct tup_id			tid;
-	char				tup_buf[MAXTUP], spoolbuf[IOBUFSIZ];
-	FILE				*spfp;
+	register struct descriptor      *desc;
+	register int                    i;
+	struct tup_id                   tid;
+	char                            tup_buf[MAXTUP], spoolbuf[IOBUFSIZ];
+	FILE                            *spfp;
 
 	desc = descx;
 	if (Mod_info.spflag)
@@ -944,21 +944,21 @@ struct descriptor	*descx;
 }
 
 /*
-**	FILL_BATCH -- Create and fill a batch file containing the
-**		updates for the system catalog so that MODIFY will
-**		be recoverable if the system crashes.
+**      FILL_BATCH -- Create and fill a batch file containing the
+**              updates for the system catalog so that MODIFY will
+**              be recoverable if the system crashes.
 */
 
 fill_batch(odesc, descx)
-struct descriptor	*odesc, *descx;
+struct descriptor       *odesc, *descx;
 {
-	register struct descriptor	*desc, *dessys;
-	register int			i;
-	struct relation			reltup, rkey;
-	struct tup_id			tid, lotid, hitid;
-	struct attribute		atttup, akey;
-	int				j;
-	char				prebatch[MAXNAME + 4], modbatch[MAXNAME + 4];
+	register struct descriptor      *desc, *dessys;
+	register int                    i;
+	struct relation                 reltup, rkey;
+	struct tup_id                   tid, lotid, hitid;
+	struct attribute                atttup, akey;
+	int                             j;
+	char                            prebatch[MAXNAME + 4], modbatch[MAXNAME + 4];
 
 	desc = descx;
 	if (bequal(desc->relid, "relation    ", 12))

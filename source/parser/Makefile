@@ -1,44 +1,35 @@
-CC=cc
-LIB=../../lib
-BIN=../../bin
-LIBS=$(LIB)/scanner $(LIB)/access $(LIB)/gutil $(LIB)/iutil -lm
-CFLAGS=-O
-LDFLAGS=-i
-YACC=$(BIN)/yyyacc
-YFLAGS=-s
-MODE=4700
-LIBMOD=644
+CC = cc
+CFLAGS = -O
+LDFLAGS =
 AR= ar
-OBJS= 	attfcn.o\
-	xdot.o\
-	main.o\
-	rngfcn.o\
-	tree.o\
-	norml.o\
-	call_p.o\
-	call_tree.o\
-	control.o\
-	format.o\
-	p_util.o\
-	getscr.o
+ARFLAGS = ruv
+YACC = ../../bin/yyyacc
+YFLAGS = -s
+
+LIB = ../../lib
+BIN = ../../bin
+LIBS = ../../lib/scanner ../../lib/access ../../lib/gutil ../../lib/iutil
+
+OBJS =  attfcn.o xdot.o main.o rngfcn.o tree.o norml.o call_p.o \
+	call_tree.o control.o format.o p_util.o getscr.o
 
 parser: y.tab.o parlib
-	$(CC) $(LDFLAGS) y.tab.o parlib $(LIBS) -o parser
+	$(CC) $(LDFLAGS) -o parser y.tab.o parlib $(LIBS) -lf -lS
 
 parlib: $(OBJS)
-	-$(AR) rvuc parlib $(OBJS)
-	cp parlib $(LIB)/parlib
-	chmod $(LIBMOD) $(LIB)/parlib
+	$(AR) $(ARFLAGS) parlib $(OBJS)
 
 y.tab.c: grammar.y yyerror.y tables.y
 	$(YACC) $(YFLAGS) grammar.y
 
 grammar.y: master.grammar
-	grep -v "DDD" master.grammar > grammar.y 
+	grep -v "DDD" master.grammar > grammar.y
 
-install: parser
+install: parlib parser
+	cp parlib $(LIB)/parlib
 	cp parser $(BIN)/parser
-	chmod $(MODE) $(BIN)/parser
+	chmod 4700 $(BIN)/parser
 
 clean:
-	rm *.o
+	-rm -f *.o y.tab.c
+	-rm -f parlib parser

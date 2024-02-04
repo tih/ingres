@@ -1,28 +1,19 @@
-INGRES=	../..
-LIB=	$(INGRES)/lib
-CC=	cc
-CFLAGS=	-O
-AR=	-ar
-ARFLAGS=rvu
+CC = cc
+CFLAGS = -O
+AR = ar
+ARFLAGS = ruv
 
+LIB = ../../lib
 
-OBJS=	parser.o \
-	yylex.o \
-	inout.o \
-	name.o \
-	number.o \
-	operator.o \
-	string.o \
-	symtab.o \
-	comment.o \
-	cmap.o
+OBJS =  parser.o yylex.o inout.o name.o number.o operator.o \
+	string.o symtab.o comment.o cmap.o
 
 scanner: $(OBJS)
-	-$(AR) $(ARFLAGS) scanner $(OBJS)
+	$(AR) $(ARFLAGS) scanner $(OBJS)
 
 install: scanner
-	chmod 644 scanner
 	cp scanner $(LIB)/scanner
 
 clean:
-	rm *.o
+	-rm -f *.o
+	-rm -f scanner

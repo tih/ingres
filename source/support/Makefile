@@ -1,67 +1,61 @@
-BIN=	../../bin
-LIB=	../../lib
-LIBS=	$(LIB)/dbulib $(LIB)/access $(LIB)/iutil $(LIB)/iutil $(LIB)/gutil
-CFLAGS= -O
-LDFLAGS=-i
-OBJS=	error.o
-MODE=	4711
-ALL=	creatdb destroydb purge helpr ingres printr restore sysmod \
-	usersetup drtst timefix
+CFLAGS = -O
+LDFLAGS =
 
-all: $(ALL)
+BIN = ../../bin
+LIBS = ../../lib/dbulib ../../lib/access ../../lib/iutil ../../lib/gutil
 
-creatdb: creatdb.o $(OBJS)
-	$(CC) $(LDFLAGS) creatdb.o $(OBJS) $(LIBS) -o creatdb
+all:    creatdb destroydb purge helpr ingres printr \
+	restore sysmod usersetup timefix drtst
+
+creatdb: creatdb.o error.o
+	$(CC) $(LDFLAGS) -o creatdb creatdb.o error.o $(LIBS)
 
 destroydb: destroydb.o
-	$(CC) $(LDFLAGS) destroydb.o $(LIBS) -o destroydb
+	$(CC) $(LDFLAGS) -o destroydb destroydb.o $(LIBS)
 
-purge: purge.o subs.o $(OBJS)
-	$(CC) $(LDFLAGS) purge.o subs.o $(OBJS) $(LIBS) -o purge
-		
-helpr: helpr.o $(OBJS)
-	$(CC) $(LDFLAGS) helpr.o $(OBJS) $(LIBS) -o helpr
+purge: purge.o subs.o error.o
+	$(CC) $(LDFLAGS) -o purge purge.o subs.o error.o $(LIBS)
+
+helpr: helpr.o error.o
+	$(CC) $(LDFLAGS) -o helpr helpr.o error.o $(LIBS)
 
 ingres: ingres.o
-	$(CC) $(LDFLAGS) ingres.o $(LIBS) -o ingres
+	$(CC) $(LDFLAGS) -o ingres ingres.o $(LIBS)
 
 printr: printr.o
-	$(CC) $(LDFLAGS) printr.o $(LIBS) -o printr
+	$(CC) $(LDFLAGS) -o printr printr.o $(LIBS) ../../lib/iutil
 
-restore: restore.o $(OBJS) subs.o
-	$(CC) $(LDFLAGS) restore.o $(OBJS) subs.o $(LIBS) -o restore
+restore: restore.o error.o subs.o
+	$(CC) $(LDFLAGS) -o restore restore.o error.o subs.o $(LIBS)
 
-sysmod: sysmod.o $(OBJS)
-	$(CC) $(LDFLAGS) sysmod.o $(OBJS) $(LIBS) -o sysmod
+sysmod: sysmod.o error.o
+	$(CC) $(LDFLAGS) -o sysmod sysmod.o error.o $(LIBS)
 
 usersetup: usersetup.o
-	$(CC) $(LDFLAGS) usersetup.o $(LIBS) -o usersetup
+	$(CC) $(LDFLAGS) -o usersetup usersetup.o $(LIBS)
 
 drtst: drtst.o
-	$(CC) $(LDFLAGS) drtst.o $(LIBS) -o drtst
+	$(CC) $(LDFLAGS) -o drtst drtst.o $(LIBS)
 
 timefix: timefix.o
-	$(CC) $(LDFLAGS) timefix.o $(LIBS) -o timefix
+	$(CC) $(LDFLAGS) -o timefix timefix.o $(LIBS)
 
-install: creatdb destroydb helpr ingres printr restore sysmod purge usersetup
+install: all
 	cp usersetup $(BIN)/usersetup
-	chmod 700 $(BIN)/usersetup
 	cp purge $(BIN)/purge
-	chmod $(MODE) $(BIN)/purge
 	cp creatdb $(BIN)/creatdb
-	chmod $(MODE) $(BIN)/creatdb
 	cp destroydb $(BIN)/destroydb
-	chmod $(MODE) $(BIN)/destroydb
 	cp helpr $(BIN)/helpr
-	chmod $(MODE) $(BIN)/helpr
 	cp ingres $(BIN)/ingres
-	chmod $(MODE) $(BIN)/ingres
 	cp printr $(BIN)/printr
-	chmod $(MODE) $(BIN)/printr
 	cp restore $(BIN)/restore
-	chmod $(MODE) $(BIN)/restore
 	cp sysmod $(BIN)/sysmod
-	chmod $(MODE) $(BIN)/sysmod
-
+	cp demodb.sh $(BIN)/demodb
+	chmod 700 $(BIN)/usersetup
+	chdir $(BIN); chmod 4711 purge creatdb destroydb helpr
+	chdir $(BIN); chmod 4711 ingres printr restore sysmod
 clean:
-	rm *.o
+	-rm -f *.o
+	-rm -f usersetup timefix
+	-rm -f purge creatdb destroydb helpr
+	-rm -f ingres printr restore sysmod

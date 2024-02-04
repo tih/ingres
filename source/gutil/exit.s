@@ -4,11 +4,11 @@
 / code is return in r0 to system
 
 / modified by INGRES group to call _cleanup (standard v7)
-/ and to require the loading of '_strout' (so that
+/ and to require the loading of '_putchar' (so that
 / the library loads correctly).
 
 .globl	_exit
-.globl	__strout
+.globl	_putchar
 .globl	__cleanup
 
 _exit:
@@ -17,4 +17,3 @@ _exit:
 	jsr	pc,__cleanup
 	mov	4(r5),r0
 	sys	exit
-	jsr	pc,__strout

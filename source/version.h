@@ -22,6 +22,6 @@
 **		out at login time.
 */
 
-# define	VERSION		"6.3/-1"		/* version number */
+# define	VERSION		"6.3/0"			/* version number */
 # define	REL_DATE	"February 1, 1981"	/* release date */
 # define	MOD_DATE	"February 1, 1981"	/* modification date */

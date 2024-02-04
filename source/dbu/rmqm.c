@@ -3,108 +3,107 @@
 /*
 **  RMQM -- DBU to delete protection and integrity constraints
 **
-**	Defines:
-**		dest_const
-**		dest_integ
-**		dest_prot
-**		i_cat
-**		dl_all
-**		del_int
-**		del_tree
-**		chk_const
-**		r_relstat
-**		tree_const
-**		tree_prot
-**		prot_protree
-**		int_inttree
+**      Defines:
+**              dest_const
+**              dest_integ
+**              dest_prot
+**              i_cat
+**              dl_all
+**              del_int
+**              del_tree
+**              chk_const
+**              r_relstat
+**              tree_const
+**              tree_prot
+**              prot_protree
+**              int_inttree
 **
-**	Required By:
-**		DBU driver
+**      Required By:
+**              DBU driver
 **
-**	Files:
-**		../ingres.h
-**		../access.h
-**		../aux.h
-**		../catalog.h
-**		../symbol.h
+**      Files:
+**              ../ingres.h
+**              ../access.h
+**              ../aux.h
+**              ../catalog.h
+**              ../symbol.h
 **
-**	Compilation Flags:
-**		xZTR1
+**      Compilation Flags:
+**              xZTR1
 **
-**	Trace Flags:
-**		13
+**      Trace Flags:
+**              13
 **
-**	History:
-**		1/10/79 -- (marc) written
+**      History:
+**              1/10/79 -- (marc) written
 */
 
 
 
 
 
-
-# include	"../ingres.h"
-# include	"../access.h"
-# include	"../aux.h"
-# include	"../unix.h"
-# include	"../catalog.h"
-# include	"../symbol.h"
+# include       "../unix.h"
+# include       "../ingres.h"
+# include       "../access.h"
+# include       "../aux.h"
+# include       "../catalog.h"
+# include       "../symbol.h"
 
 /*
 **  DEST_CONST -- destroy constraints
 **
-**	Parameters:
-**		argc -- number of parameters in argv
-**		argv -- argv [0] == 5 destroy permission
-**			         == 6 destroy integrity constraint
-**		        argv [1]    relation from which to destroy constrain
-**		        argv [2] == if (argc != 2) relation from which to delete
-**				     	constraints
-**		        argv[3] ... argv[argc - 1] == id of constraint
+**      Parameters:
+**              argc -- number of parameters in argv
+**              argv -- argv [0] == 5 destroy permission
+**                               == 6 destroy integrity constraint
+**                      argv [1]    relation from which to destroy constrain
+**                      argv [2] == if (argc != 2) relation from which to delete
+**                                      constraints
+**                      argv[3] ... argv[argc - 1] == id of constraint
 **
-**	Returns:
-**		0
+**      Returns:
+**              0
 **
-**	Side Effects:
-**		destroys constraints. Involves activity on catalogs 'relation',
-**		protect, integrities, and tree.
+**      Side Effects:
+**              destroys constraints. Involves activity on catalogs 'relation',
+**              protect, integrities, and tree.
 **
-**	Requires:
-**		dest_integ()
-**		dest_prot()
+**      Requires:
+**              dest_integ()
+**              dest_prot()
 **
-**	Called By:
-**		DBU driver
+**      Called By:
+**              DBU driver
 **
-**	Trace Flags:
-**		13, 0
+**      Trace Flags:
+**              13, 0
 **
-**	Diagnostics:
-**		5202	no relation user owns by the name given
+**      Diagnostics:
+**              5202    no relation user owns by the name given
 **
-**	Syserrs:
-**		bad openr, bad function mode !(5 || 6)
+**      Syserrs:
+**              bad openr, bad function mode !(5 || 6)
 **
-**	History:
-**		1/10/79 -- (marc) written
+**      History:
+**              1/10/79 -- (marc) written
 */
 
 dest_const(argc, argv)
-int		argc;
-char		**argv;
+int             argc;
+char            **argv;
 {
-	struct descriptor	d;
-	register		i;
-	int			mode;
-	extern struct admin	Admin;
+	struct descriptor       d;
+	register                i;
+	int                     mode;
+	extern struct admin     Admin;
 
-#	ifdef xZTR1
+#       ifdef xZTR1
 	if (tTf(13, 0))
 	{
 		printf("dest_const\n");
 		prargs(argc, argv);
 	}
-#	endif
+#       endif
 
 	if (!(Admin.adhdr.adflags & A_QRYMOD))
 		return (0);
@@ -133,56 +132,56 @@ char		**argv;
 /*
 **  DEST_INTEG -- directs destruction of integrity constraints
 **
-**	Parameters:
-**		desc -- descriptor for relation
-**		intv -- 0 terminated list of id strings, if first element
-**		        is 0 means "all"
+**      Parameters:
+**              desc -- descriptor for relation
+**              intv -- 0 terminated list of id strings, if first element
+**                      is 0 means "all"
 **
-**	Returns:
-**		none
+**      Returns:
+**              none
 **
-**	Side Effects:
-**		deletes integrity constraint. Activity on 'relation', integrities,
-**		and tree.
+**      Side Effects:
+**              deletes integrity constraint. Activity on 'relation', integrities,
+**              and tree.
 **
-**	Requires:
-**		i_cat()
-**		del_all()
-**		del_int()
-**		chk_const()
-**		tree_const()
-**		int_inttree()
+**      Requires:
+**              i_cat()
+**              del_all()
+**              del_int()
+**              chk_const()
+**              tree_const()
+**              int_inttree()
 **
-**	Called By:
-**		dest_const
+**      Called By:
+**              dest_const
 **
-**	Trace Flags:
-**		13, 1
+**      Trace Flags:
+**              13, 1
 **
-**	Diagnostics:
-**		5203	no integrity constraint by given id
+**      Diagnostics:
+**              5203    no integrity constraint by given id
 **
-**	History:
-**		1/10/79 -- (marc) written
+**      History:
+**              1/10/79 -- (marc) written
 */
 
 dest_integ(desc, intv)
-struct descriptor	*desc;
-char			*intv[];
+struct descriptor       *desc;
+char                    *intv[];
 {
-	register struct descriptor	*d;
-	extern struct descriptor	Intdes;
-	struct integrity		tuple, key;
-	struct tree			tkey;
-	register			i, j;
-	int				tree_const();
-	int				int_inttree();
+	register struct descriptor      *d;
+	extern struct descriptor        Intdes;
+	struct integrity                tuple, key;
+	struct tree                     tkey;
+	register                        i, j;
+	int                             tree_const();
+	int                             int_inttree();
 
 	d = desc;
-#	ifdef xZTR1
+#       ifdef xZTR1
 	if (tTf(13, 1))
 		printf("dest_integ((%s, %s)...)\n", d->relid, d->relowner);
-#	endif
+#       endif
 
 	i_cat("integrities", &Intdes, &key, d->relid, INTRELID,
 	d->relowner, INTRELOWNER, mdINTEG, &tkey);
@@ -218,58 +217,58 @@ char			*intv[];
 /*
 **  DEST_PROT -- directs destruction of protection constraints
 **
-**	Parameters:
-**		desc -- descriptor for relation
-**		intv -- 0 terminated list of id strings, if first element
-**		        is 0 means "all"
+**      Parameters:
+**              desc -- descriptor for relation
+**              intv -- 0 terminated list of id strings, if first element
+**                      is 0 means "all"
 **
-**	Returns:
-**		none
+**      Returns:
+**              none
 **
-**	Side Effects:
-**		deletes protection constraint. Activity on 'relation', 
-**		protect, and tree.
+**      Side Effects:
+**              deletes protection constraint. Activity on 'relation', 
+**              protect, and tree.
 **
-**	Requires:
-**		i_cat()
-**		del_all()
-**		del_int()
-**		chk_const()
-**		tree_prot()
-**		prot_protree()
+**      Requires:
+**              i_cat()
+**              del_all()
+**              del_int()
+**              chk_const()
+**              tree_prot()
+**              prot_protree()
 **
-**	Called By:
-**		dest_const
+**      Called By:
+**              dest_const
 **
-**	Trace Flags:
-**		13, 2
+**      Trace Flags:
+**              13, 2
 **
-**	Diagnostics:
-**		5204	no protection constraint by given id
+**      Diagnostics:
+**              5204    no protection constraint by given id
 **
-**	History:
-**		1/10/79 -- (marc) written
+**      History:
+**              1/10/79 -- (marc) written
 */
 
 
 dest_prot(desc, intv)
-struct descriptor	*desc;
-char			*intv[];
+struct descriptor       *desc;
+char                    *intv[];
 {
-	register struct descriptor	*d;
-	extern struct descriptor	Prodes;
-	struct protect			tuple, key;
-	struct tree			tkey;
-	register			i, j;
-	int				propermid;
-	int				prot_protree();
-	int				tree_prot();
+	register struct descriptor      *d;
+	extern struct descriptor        Prodes;
+	struct protect                  tuple, key;
+	struct tree                     tkey;
+	register                        i, j;
+	int                             propermid;
+	int                             prot_protree();
+	int                             tree_prot();
 
 	d = desc;
-#	ifdef xZTR1
+#       ifdef xZTR1
 	if (tTf(13, 2))
 		printf("dest_prot((%s, %s)...)\n", d->relid, d->relowner);
-#	endif
+#       endif
 
 	i_cat("protect", &Prodes, &key, d->relid, PRORELID, d->relowner,
 	PRORELOWN, mdPROT, &tkey);
@@ -327,57 +326,57 @@ char			*intv[];
 /*
 **  I_CAT -- prepare catalogs for deletin of constraint
 **
-**	Initializes treerelid, treeowner, and treetype fields
-**	of tree key. Also relation id and owner fields of
-**	appropriate catalog c_desc, with key 'key'.
+**      Initializes treerelid, treeowner, and treetype fields
+**      of tree key. Also relation id and owner fields of
+**      appropriate catalog c_desc, with key 'key'.
 **
-**	Parameters:
-**		c_name -- name of catalog for opencatalog
-**		c_desc -- descriptor of catalog
-**		key -- key for catalog
-**		relid -- relation.relid for relation to be de-constrained
-**		id_attno -- attno of relid in constraint catalog c_desc
-**		relowner -- relation.relowner for rel to be de-constrained
-**		own_attno -- attno of owner in constrain catalog
-**		type -- treetype for tree tuple (depends on catalog)
-**		tkey -- key for tree catalog
+**      Parameters:
+**              c_name -- name of catalog for opencatalog
+**              c_desc -- descriptor of catalog
+**              key -- key for catalog
+**              relid -- relation.relid for relation to be de-constrained
+**              id_attno -- attno of relid in constraint catalog c_desc
+**              relowner -- relation.relowner for rel to be de-constrained
+**              own_attno -- attno of owner in constrain catalog
+**              type -- treetype for tree tuple (depends on catalog)
+**              tkey -- key for tree catalog
 **
-**	Returns:
-**		none
+**      Returns:
+**              none
 **
-**	Side Effects:
-**		opencatalogs the constraint catalog c_desc, and the "tree" rel
-**		for READ/WRITE. Sets keys.
+**      Side Effects:
+**              opencatalogs the constraint catalog c_desc, and the "tree" rel
+**              for READ/WRITE. Sets keys.
 **
-**	Called By:
-**		dest_prot()
-**		dest_int()
+**      Called By:
+**              dest_prot()
+**              dest_int()
 **
-**	Trace Flags:
-**		13, 3
+**      Trace Flags:
+**              13, 3
 **
-**	History:
-**		1/10/79 -- (marc) written
+**      History:
+**              1/10/79 -- (marc) written
 */
 
 i_cat(c_name, c_desc, key, relid, id_attno, relowner, own_attno, type, tkey)
-char			*c_name;
-struct descriptor	*c_desc;
-char			*key;
-char			*relid;
-int			id_attno;
-char			*relowner;
-int			own_attno;
-int			type;
-struct tree		*tkey;
+char                    *c_name;
+struct descriptor       *c_desc;
+char                    *key;
+char                    *relid;
+int                     id_attno;
+char                    *relowner;
+int                     own_attno;
+int                     type;
+struct tree             *tkey;
 {
-	extern struct descriptor	Treedes;
+	extern struct descriptor        Treedes;
 
-#	ifdef xZTR1
+#       ifdef xZTR1
 	if (tTf(13, 3))
 		printf("i_cat(c_name \"%s\", relid %s id_attno %d relowner %s own_attno %d type %d)\n",
 		c_name, relid, id_attno, relowner, own_attno, type);
-#	endif
+#       endif
 
 	opencatalog("tree", 2);
 	setkey(&Treedes, tkey, relid, TREERELID);
@@ -392,64 +391,64 @@ struct tree		*tkey;
 /*
 **  DEL_ALL -- delete all constraints for a given relation
 **
-**	Deletes all constraints of a given type given by a constraint
-**	catalog 'c_desc'. Note that Protection constraints 0 & 1, given
-**	by relation.relstat field are not deleted here.
+**      Deletes all constraints of a given type given by a constraint
+**      catalog 'c_desc'. Note that Protection constraints 0 & 1, given
+**      by relation.relstat field are not deleted here.
 **
-**	Parameters:
-**		r_desc -- descriptor for relation to de-constrain (for
-**			r_relstat)
-**		c_desc -- constraint catalog descriptor
-**		key -- c_desc's key
-**		tuple -- c_desc's tuple (needed because sizeof tuple is not
-**			known here, so must be allocated beforehand)
-**		tkey -- tree key with TREERELID and TREERELOWNER setkeyed
-**		bit -- bits in relstat to reset after deleting all constraints
-**		tree_pred -- called with constraint tuple to determine
-**			wether a tree tuple is present or not (as can happen
-**			for protect catalog)
-**		tree_field -- should return the treeid from tuple
+**      Parameters:
+**              r_desc -- descriptor for relation to de-constrain (for
+**                      r_relstat)
+**              c_desc -- constraint catalog descriptor
+**              key -- c_desc's key
+**              tuple -- c_desc's tuple (needed because sizeof tuple is not
+**                      known here, so must be allocated beforehand)
+**              tkey -- tree key with TREERELID and TREERELOWNER setkeyed
+**              bit -- bits in relstat to reset after deleting all constraints
+**              tree_pred -- called with constraint tuple to determine
+**                      wether a tree tuple is present or not (as can happen
+**                      for protect catalog)
+**              tree_field -- should return the treeid from tuple
 **
-**	Returns:
-**		none
+**      Returns:
+**              none
 **
-**	Side Effects:
-**		tree and constraint catalog activity
+**      Side Effects:
+**              tree and constraint catalog activity
 **
-**	Requires:
-**		del_tree()
-**		r_relstat()
+**      Requires:
+**              del_tree()
+**              r_relstat()
 **
-**	Called By:
-**		dest_????
+**      Called By:
+**              dest_????
 **
-**	Trace Flags:
-**		13, 4
+**      Trace Flags:
+**              13, 4
 **
-**	Syserrs:
-**		bad find, get, delete, flush_rel
+**      Syserrs:
+**              bad find, get, delete, flush_rel
 **
-**	History:
-**		1/10/79 -- (marc) written
+**      History:
+**              1/10/79 -- (marc) written
 */
 
 del_all(r_desc, c_desc, key, tuple, tkey, bit, tree_pred, tree_field)
-struct descriptor	*r_desc;
-struct descriptor	*c_desc;
-char			*key;
-char			*tuple;
-struct tree		*tkey;
-int			bit;
-int			(*tree_pred)();
-int			(*tree_field)();
+struct descriptor       *r_desc;
+struct descriptor       *c_desc;
+char                    *key;
+char                    *tuple;
+struct tree             *tkey;
+int                     bit;
+int                     (*tree_pred)();
+int                     (*tree_field)();
 {
-	struct tup_id		lotid, hitid;
-	register		i;
+	struct tup_id           lotid, hitid;
+	register                i;
 
-#	ifdef xZTR1
+#       ifdef xZTR1
 	if (tTf(13, 4))
 		printf("del_all(bit=0%o)\n", bit);
-#	endif
+#       endif
 
 	if (i = find(c_desc, EXACTKEY, &lotid, &hitid, key))
 		syserr("del_all: find %d", i);
@@ -478,58 +477,58 @@ int			(*tree_field)();
 /*
 **  DEL_INT -- delete from a constraint catalog a constraint
 **
-**	Parameters:
-**		c_desc -- catalog descriptor
-**		key -- catalog key
-**		tuple -- catalog tuple (needed because tuple size unknown here)
-**		tkey -- tree key with TREERELID and TREERELOWNER setkeyed
-**		constid -- integer constraint id in string form
-**		constattno -- attno of comstraint number in c_desc
-**		tree_pred -- predicate on existence of tree tuple 
-**		tree_field -- returns treeid from constrain tuple
+**      Parameters:
+**              c_desc -- catalog descriptor
+**              key -- catalog key
+**              tuple -- catalog tuple (needed because tuple size unknown here)
+**              tkey -- tree key with TREERELID and TREERELOWNER setkeyed
+**              constid -- integer constraint id in string form
+**              constattno -- attno of comstraint number in c_desc
+**              tree_pred -- predicate on existence of tree tuple 
+**              tree_field -- returns treeid from constrain tuple
 **
-**	Returns:
-**		none
+**      Returns:
+**              none
 **
-**	Side Effects:
-**		constraint and tree catalog activity.
-**		*constid set to 0 if constraint id exists.
+**      Side Effects:
+**              constraint and tree catalog activity.
+**              *constid set to 0 if constraint id exists.
 **
-**	Requires:
-**		del_tree()
+**      Requires:
+**              del_tree()
 **
-**	Called By:
-**		dest_????
+**      Called By:
+**              dest_????
 **
-**	Trace Flags:
-**		13, 5
+**      Trace Flags:
+**              13, 5
 **
-**	Syserrs:
-**		bad atoi (parser error), getequal, delete, flush_rel
+**      Syserrs:
+**              bad atoi (parser error), getequal, delete, flush_rel
 **
-**	History:
-**		1/10/79 -- (marc) written
+**      History:
+**              1/10/79 -- (marc) written
 */
 
 del_int(c_desc, key, tuple, tkey, constid, constattno, tree_pred, tree_field)
-struct descriptor	*c_desc;
-char			*key;
-char			*tuple;
-struct tree		*tkey;
-char			*constid;
-int			constattno;
-int			(*tree_pred)();
-int			(*tree_field)();
+struct descriptor       *c_desc;
+char                    *key;
+char                    *tuple;
+struct tree             *tkey;
+char                    *constid;
+int                     constattno;
+int                     (*tree_pred)();
+int                     (*tree_field)();
 {
-	struct tup_id		tid;
-	register		i;
-	int			constnum;
+	struct tup_id           tid;
+	register                i;
+	int                     constnum;
 
-#	ifdef xZTR1
+#       ifdef xZTR1
 	if (tTf(13, 5))
 		printf("del_int(constid=%s, constattno=%d)\n", 
-	 	constid, constattno);
-#	endif
+		constid, constattno);
+#       endif
 
 	if (i = atoi(constid, &constnum))
 		syserr("del_int: bad atoi \"%s\" %d", constid, i);
@@ -551,46 +550,46 @@ int			(*tree_field)();
 /*
 **  DEST_TREE -- destroy a tree tuple with for a given treeid
 **
-**	Deletes all tuples from tree with 'treeid' and previously set
-**	keys.
+**      Deletes all tuples from tree with 'treeid' and previously set
+**      keys.
 **
-**	Parameters:
-**		key -- tre key
-**		treeid -- integer treeid
+**      Parameters:
+**              key -- tre key
+**              treeid -- integer treeid
 **
-**	Returns:
-**		none
+**      Returns:
+**              none
 **
-**	Side Effects:
-**		tree activity
+**      Side Effects:
+**              tree activity
 **
-**	Called By:
-**		del_int, del_all
+**      Called By:
+**              del_int, del_all
 **
-**	Trace Flags:
-**		13, 6
+**      Trace Flags:
+**              13, 6
 **
-**	Syserrs:
-**		bad find, get, delete, flush_rel, no tuple qualified.
+**      Syserrs:
+**              bad find, get, delete, flush_rel, no tuple qualified.
 **
-**	History:
-**		1/10/79 -- (marc) written
+**      History:
+**              1/10/79 -- (marc) written
 */
 
 del_tree(key, treeid)
-struct tree		*key;
-int			treeid;
+struct tree             *key;
+int                     treeid;
 {
-	struct tree			tuple;
-	struct tup_id			lotid, hitid;
-	register			i;
-	register			flag;
-	extern struct descriptor	Treedes;
+	struct tree                     tuple;
+	struct tup_id                   lotid, hitid;
+	register                        i;
+	register                        flag;
+	extern struct descriptor        Treedes;
 
-#	ifdef xZTR1
+#       ifdef xZTR1
 	if (tTf(13, 6))
 		printf("del_tree(treeid=%d)\n", treeid);
-#	endif
+#       endif
 
 	setkey(&Treedes, key, &treeid, TREEID);
 	if (i = find(&Treedes, EXACTKEY, &lotid, &hitid, key))
@@ -617,60 +616,60 @@ int			treeid;
 /*
 **  CHK_CONST -- check constraint catlg for tuples for a rel, and reset relatin.relstat
 **
-**	Parameters:
-**		r_desc -- relation desc for de-constrained relation
-**		c_desc -- catalog desc
-**		key -- catalog key (here unknown size)
-**		tuple -- " tuple space " " " " "
-**		relid -- relation name
-**		id_attno -- attno of relid
-**		relowner -- relation owner
-**		own_attno -- relowner attno
-**		bit -- bits to reset in relstat if there are no constraints left
+**      Parameters:
+**              r_desc -- relation desc for de-constrained relation
+**              c_desc -- catalog desc
+**              key -- catalog key (here unknown size)
+**              tuple -- " tuple space " " " " "
+**              relid -- relation name
+**              id_attno -- attno of relid
+**              relowner -- relation owner
+**              own_attno -- relowner attno
+**              bit -- bits to reset in relstat if there are no constraints left
 **
-**	Returns:
-**		none
+**      Returns:
+**              none
 **
-**	Side Effects:
-**		reads catalog, maybe changes relstat field of relation relations's
-**		r_desc tuple
+**      Side Effects:
+**              reads catalog, maybe changes relstat field of relation relations's
+**              r_desc tuple
 **
-**	Requires:
-**		r_relstat
+**      Requires:
+**              r_relstat
 **
-**	Called By:
-**		dest_????
+**      Called By:
+**              dest_????
 **
-**	Trace Flags:
-**		13, 7
+**      Trace Flags:
+**              13, 7
 **
-**	Syserrs:
-**		bad getequal
+**      Syserrs:
+**              bad getequal
 **
-**	History:
-**		1/10/79 -- (marc) written
+**      History:
+**              1/10/79 -- (marc) written
 */
 
 chk_const(r_desc, c_desc, key, tuple, relid, id_attno, relowner, own_attno, bit)
-struct descriptor	*r_desc;
-struct descriptor	*c_desc;
-char			*key;
-char			*tuple;
-char			*relid;
-int			id_attno;
-char			*relowner;
-int			own_attno;
-int			bit;
+struct descriptor       *r_desc;
+struct descriptor       *c_desc;
+char                    *key;
+char                    *tuple;
+char                    *relid;
+int                     id_attno;
+char                    *relowner;
+int                     own_attno;
+int                     bit;
 {
-	struct tup_id		tid;
-	register		i;
+	struct tup_id           tid;
+	register                i;
 
 
-#	ifdef xZTR1
+#       ifdef xZTR1
 	if (tTf(13, 7))
 		printf("chk_const: relid %s id_attno %d relowner %s own_attno %d bit 0%o)\n",
 		relid, id_attno, relowner, own_attno, bit);
-#	endif
+#       endif
 
 	clearkeys(c_desc);
 	setkey(c_desc, key, relid, id_attno);
@@ -684,50 +683,50 @@ int			bit;
 /*
 **  R_RELSTAT -- set or reset bits in the relation.relstat field
 **
-**	Does the above for relation described by desc.
+**      Does the above for relation described by desc.
 **
-**	Parameters:
-**		desc -- relation to have relation.relstat field changed
-**		bit -- bits to set or reset
-**		action -- 0 reset, 1 set
+**      Parameters:
+**              desc -- relation to have relation.relstat field changed
+**              bit -- bits to set or reset
+**              action -- 0 reset, 1 set
 **
-**	Returns:
-**		none
+**      Returns:
+**              none
 **
-**	Side Effects:
-**		relation is opened for READ/WRITE, relstat changed
+**      Side Effects:
+**              relation is opened for READ/WRITE, relstat changed
 **
-**	Called By:
-**		everyone
+**      Called By:
+**              everyone
 **
-**	Trace Flags:
-**		13, 8
+**      Trace Flags:
+**              13, 8
 **
-**	Syserrs:
-**		bad getequal, replace, flush_rel
+**      Syserrs:
+**              bad getequal, replace, flush_rel
 **
-**	History:
-**		1/10/79 -- (marc) written
+**      History:
+**              1/10/79 -- (marc) written
 */
 
 
 r_relstat(desc, bit, action)
-struct descriptor		*desc;
-int				bit;
-int				action;
+struct descriptor               *desc;
+int                             bit;
+int                             action;
 {
-	struct relation			tuple, key;
-	struct tup_id			tid;
-	register			i;
-	extern struct descriptor	Reldes;
-	register struct descriptor	*d;
+	struct relation                 tuple, key;
+	struct tup_id                   tid;
+	register                        i;
+	extern struct descriptor        Reldes;
+	register struct descriptor      *d;
 
 	d = desc;
-#	ifdef xZTR1
+#       ifdef xZTR1
 	if (tTf(13, 8))
 		printf("r_relstat(bit=0%o, action %d)\n",
 		bit, action);
-#	endif
+#       endif
 
 	opencatalog("relation", 2);
 	clearkeys(&Reldes);
@@ -757,36 +756,36 @@ int				action;
 /*
 **  TREE_CONST -- True predicate
 **
-**	Called indirectly by routines wishing to know if
-**	a integrity constraint has an associated tree tuple.
-**	As this is always the case, returns TRUE always.
+**      Called indirectly by routines wishing to know if
+**      a integrity constraint has an associated tree tuple.
+**      As this is always the case, returns TRUE always.
 **
-**	Parameters:
-**		i -- integrity tuple
+**      Parameters:
+**              i -- integrity tuple
 **
-**	Returns:
-**		TRUE
+**      Returns:
+**              TRUE
 **
-**	Side Effects:
-**		none
+**      Side Effects:
+**              none
 **
-**	Called By:
-**		sent to del_int, del_all, by dest_int
+**      Called By:
+**              sent to del_int, del_all, by dest_int
 **
-**	Trace Flags:
-**		13, 9
+**      Trace Flags:
+**              13, 9
 **
-**	History:
-**		1/11/79 -- (marc) written
+**      History:
+**              1/11/79 -- (marc) written
 */
 
 tree_const(i)
-struct integrity	*i;
+struct integrity        *i;
 {
-#	ifdef xZTR1
+#       ifdef xZTR1
 	if (tTf(13, 9))
 		printf("tree_const()\n");
-#	endif
+#       endif
 
 	return (TRUE);
 }
@@ -794,36 +793,36 @@ struct integrity	*i;
 /*
 **  TREE_PROT -- Protection tuple tree predicate
 **
-**	Called indirectly by routines wishing to know if
-**	a protection constraint has an associated tree tuple.
+**      Called indirectly by routines wishing to know if
+**      a protection constraint has an associated tree tuple.
 **
-**	Parameters:
-**		p -- protect tuple
+**      Parameters:
+**              p -- protect tuple
 **
-**	Returns:
-**		TRUE -- if p->protree != -1
-**		FLASE -- otherwise
+**      Returns:
+**              TRUE -- if p->protree != -1
+**              FLASE -- otherwise
 **
-**	Side Effects:
-**		none
+**      Side Effects:
+**              none
 **
-**	Called By:
-**		sent to del_int, del_all, by dest_prot
+**      Called By:
+**              sent to del_int, del_all, by dest_prot
 **
-**	Trace Flags:
-**		13, 9
+**      Trace Flags:
+**              13, 9
 **
-**	History:
-**		1/11/79 -- (marc) written
+**      History:
+**              1/11/79 -- (marc) written
 */
 
 tree_prot(p)
-struct protect		*p;
+struct protect          *p;
 {
-#	ifdef xZTR1
+#       ifdef xZTR1
 	if (tTf(13, 9))
 		printf("tree_prot(p->protree=%d)\n", p->protree);
-#	endif
+#       endif
 
 	if (p->protree == -1)
 		return (FALSE);
@@ -834,32 +833,32 @@ struct protect		*p;
 /*
 **  PROT_PROTREE -- get protree field of a protection tuple
 **
-**	Parameters:
-**		p -- protect tuple
+**      Parameters:
+**              p -- protect tuple
 **
-**	Returns:
-**		p->protree
+**      Returns:
+**              p->protree
 **
-**	Side Effects:
-**		none
+**      Side Effects:
+**              none
 **
-**	Called By:
-**		Indirectly. Passed to del_int, del_all by dest_prot
+**      Called By:
+**              Indirectly. Passed to del_int, del_all by dest_prot
 **
-**	Trace Flags:
-**		13, 9
+**      Trace Flags:
+**              13, 9
 **
-**	History:
-**		1/11/79 -- (marc) written
+**      History:
+**              1/11/79 -- (marc) written
 */
 
 prot_protree(p)
-struct protect	*p;
+struct protect  *p;
 {
-#	ifdef xZTR1
+#       ifdef xZTR1
 	if (tTf(13, 9))
 		printf("prot_protree(protree=%d)\n", p->protree);
-#	endif
+#       endif
 
 	return (p->protree);
 }
@@ -867,32 +866,32 @@ struct protect	*p;
 /*
 **  INT_INTTREE -- get inttree field of a integrity tuple
 **
-**	Parameters:
-**		i -- integrity tuple
+**      Parameters:
+**              i -- integrity tuple
 **
-**	Returns:
-**		i->inttree
+**      Returns:
+**              i->inttree
 **
-**	Side Effects:
-**		none
+**      Side Effects:
+**              none
 **
-**	Called By:
-**		Indirectly. Passed to del_int, del_all by dest_int
+**      Called By:
+**              Indirectly. Passed to del_int, del_all by dest_int
 **
-**	Trace Flags:
-**		13, 9
+**      Trace Flags:
+**              13, 9
 **
-**	History:
-**		1/11/79 -- (marc) written
+**      History:
+**              1/11/79 -- (marc) written
 */
 
 int_inttree(i)
-struct integrity	*i;
+struct integrity        *i;
 {
-#	ifdef xZTR1
+#       ifdef xZTR1
 	if (tTf(13, 9))
 		printf("int_inttree(inttree=%d)\n", i->inttree);
-#	endif
+#       endif
 
 	return (i->inttree);
 }

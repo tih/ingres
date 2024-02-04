@@ -1,55 +1,55 @@
-# include	"../ingres.h"
-# include	"../access.h"
-# include	"../aux.h"
-# include	"../lock.h"
-# include	"../unix.h"
+# include       "../unix.h"
+# include       "../ingres.h"
+# include       "../access.h"
+# include       "../aux.h"
+# include       "../lock.h"
 
 
 /*
-**	access method buffers and other data areas for buffer maintenance
+**      access method buffers and other data areas for buffer maintenance
 */
 
-struct accbuf	Acc_buf[NACCBUFS];	/* the buffers */
-struct accbuf	*Acc_head;		/* head of usage list */
-struct accbuf	*Acc_tail;		/* tail of usage list */
-struct lockreq	Lock;
+struct accbuf   Acc_buf[NACCBUFS];      /* the buffers */
+struct accbuf   *Acc_head;              /* head of usage list */
+struct accbuf   *Acc_tail;              /* tail of usage list */
+struct lockreq  Lock;
 
 /*
-**	structs for admin file data
+**      structs for admin file data
 */
 
-struct admin	Admin;
+struct admin    Admin;
 
 /*
-**	global flag indicating if access methods
-**	have been initialized.
+**      global flag indicating if access methods
+**      have been initialized.
 */
 
-int	Acc_init	FALSE;
+int     Acc_init        FALSE;
 
-/* tTf flag 80	TTF	resetacc()*/
+/* tTf flag 80  TTF     resetacc()*/
 
 resetacc(buf)
-struct accbuf	*buf;
+struct accbuf   *buf;
 
 /*
-**	Flush the indicated page and reset all
-**	important information including the name
+**      Flush the indicated page and reset all
+**      important information including the name
 */
 
 {
-	register struct accbuf	*b;
-	register int		i;
+	register struct accbuf  *b;
+	register int            i;
 
 	b = buf;
 	if (b == 0)
 		b = Acc_head;
-#	ifdef xATR3
+#       ifdef xATR3
 	if (tTf(80, 0))
 		printf("RESETACC: (%u=%s)\n", b, locv(b->rel_tupid));
-#	endif
+#       endif
 
-	i = pageflush(b);	/* write the page if necessary */
+	i = pageflush(b);       /* write the page if necessary */
 	b->rel_tupid = -1;
 	b->filedesc = -1;
 	b->thispage = -1;
@@ -59,25 +59,25 @@ struct accbuf	*buf;
 
 
 /*
-**	initialize access method data areas
+**      initialize access method data areas
 */
 
-/* tTf flag 81	TTF	acc_init()	*/
+/* tTf flag 81  TTF     acc_init()      */
 
 acc_init()
 {
-	register int		i;
-	register struct accbuf	*last;
-	register struct accbuf	*b;
-	struct stat		stbuf;
-	extern int		errno;
+	register int            i;
+	register struct accbuf  *last;
+	register struct accbuf  *b;
+	struct stat             stbuf;
+	extern int              errno;
 
-#	ifdef xATR3
+#       ifdef xATR3
 	tTfp(81, 0, "ACC_INIT=%d\n", Acc_init);
-#	endif
+#       endif
 
 	if (Acc_init)
-		return (0);	/* already initialized */
+		return (0);     /* already initialized */
 	last = 0;
 	for (b = Acc_buf; b < &Acc_buf[NACCBUFS]; )
 	{
@@ -104,7 +104,7 @@ acc_init()
 	Lockrel = (Admin.adhdr.adflags & A_DBCONCUR) != 0;
 	if (Lockrel && Alockdes < 0)
 		Alockdes = open("/dev/lock", 1);
-	errno = 0;	/* clear in case /dev/lock isn't available */
+	errno = 0;      /* clear in case /dev/lock isn't available */
 	Acclock = TRUE;
 	stat(".", &stbuf);
 	bmove(&stbuf, Lock.dbnode, 4);
@@ -114,13 +114,13 @@ acc_init()
 
 
 /*
-**	place buffer at top of LRU list
+**      place buffer at top of LRU list
 */
 
 top_acc(buf)
-struct accbuf	*buf;
+struct accbuf   *buf;
 {
-	register struct accbuf	*b;
+	register struct accbuf  *b;
 
 	b = buf;
 
@@ -139,22 +139,22 @@ struct accbuf	*buf;
 }
 
 flush_rel(d1, resetflag)
-struct descriptor	*d1;
-int			resetflag;
+struct descriptor       *d1;
+int                     resetflag;
 
 /*
 ** Flush_rel -- flush all pages associated with the relation
-**	described by the descriptor. If resetflag is TRUE,
-**	then the buffers are reset so the pages will not be
-**	found on subsequent calls to find_page().
+**      described by the descriptor. If resetflag is TRUE,
+**      then the buffers are reset so the pages will not be
+**      found on subsequent calls to find_page().
 **
-**	Returns "or'ed" result from calls to pageflush.
+**      Returns "or'ed" result from calls to pageflush.
 */
 
 {
-	register struct descriptor	*d;
-	register struct accbuf		*b;
-	register int			i;
+	register struct descriptor      *d;
+	register struct accbuf          *b;
+	register int                    i;
 
 	d = d1;
 	i = 0;
@@ -175,31 +175,31 @@ int			resetflag;
 
 
 /*
-**	CHOOSE_BUF -- Try to find an empty buffer for assignment.
-**		If there is no empty buffer, pick the last buffer
-**		in the LRU queue and make sure it is flushed.
+**      CHOOSE_BUF -- Try to find an empty buffer for assignment.
+**              If there is no empty buffer, pick the last buffer
+**              in the LRU queue and make sure it is flushed.
 **
-**		Choose_buf guarantees that the buffer will be reset
-**		if it was used previously for a different relation.
+**              Choose_buf guarantees that the buffer will be reset
+**              if it was used previously for a different relation.
 */
 
-/* tTf flag 82.8	TTF	choose_buf() */
+/* tTf flag 82.8        TTF     choose_buf() */
 
-struct accbuf	*choose_buf(dx, pageid)
-struct descriptor	*dx;
-long			pageid;
+struct accbuf   *choose_buf(dx, pageid)
+struct descriptor       *dx;
+long                    pageid;
 
 /*
-**	Choose_buf -- choose a buffer for use with the given relation on
-**	the given page. The current algorithm is to allow only one buffer
-**	per relation. If a relation does not have a buffer, it is given a
-**	free one (if any) or else the Least Recently Used.
+**      Choose_buf -- choose a buffer for use with the given relation on
+**      the given page. The current algorithm is to allow only one buffer
+**      per relation. If a relation does not have a buffer, it is given a
+**      free one (if any) or else the Least Recently Used.
 */
 
 {
-	register struct accbuf		*b, *free;
-	register struct descriptor	*d;
-	struct accbuf			*mine;
+	register struct accbuf          *b, *free;
+	register struct descriptor      *d;
+	struct accbuf                   *mine;
 
 	d = dx;
 	free = mine = NULL;
@@ -226,13 +226,13 @@ long			pageid;
 	** There is no buffer with the currently requested page
 	*/
 
-#	ifdef xATR3
+#       ifdef xATR3
 	tTfp(82, 9, "choosebuf free %l,mine %l\n", free, mine);
-#	endif
+#       endif
 
 	/* no current buffer. Choose a free one or LRU */
 	if (free == NULL)
-		free = resetacc(Acc_tail) ? NULL : Acc_tail;	/* error if can't reset the LRU */
+		free = resetacc(Acc_tail) ? NULL : Acc_tail;    /* error if can't reset the LRU */
 	if (free)
 	{
 		/* copy relevent material (in this order in case of rubout */
@@ -240,24 +240,24 @@ long			pageid;
 		free->rel_tupid = d->reltid;
 	}
 
-#	ifdef xATR1
+#       ifdef xATR1
 	if (tTf(82, 8))
 		printf("choosebuf:rets %l\n", free);
-#	endif
+#       endif
 	return (free);
 }
 
 /*
-**	ACC_CLOSE -- flush any buffers left around
-**		and then close the files for relation & attribute.
-**		The relation and attribute relation are normally left open
-**		until the end of an INGRES session but must be closed
-**		and re-opened in the dbu's whenever a new overlay is loaded.
+**      ACC_CLOSE -- flush any buffers left around
+**              and then close the files for relation & attribute.
+**              The relation and attribute relation are normally left open
+**              until the end of an INGRES session but must be closed
+**              and re-opened in the dbu's whenever a new overlay is loaded.
 */
 
 acc_close()
 {
-	register int	i;
+	register int    i;
 
 	if (i = pageflush(0))
 		syserr("acc_close: pageflush %d, i");

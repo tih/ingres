@@ -1,18 +1,18 @@
-# include	"/usr/sys/ildr.h"
-# define	I1MASK	0377
+# include       "/sys/hd/ildr.h"
+# define        I1MASK  0377
 struct {
-	char	name[8];
-	int	type;
-	char	*value;
+	char    name[8];
+	int     type;
+	char    *value;
 } nl[3];
-int	ildev, mem;
+int     ildev, mem;
 main()
 {
-	int	res,k;
-	int	ind;		/* index in Locktable */
-	char	opt;		/* option flag */
-	struct Lockreq	buf;
-	char	*sp;
+	int     res,k;
+	int     ind;            /* index in Locktable */
+	char    opt;            /* option flag */
+	struct Lockreq  buf;
+	char    *sp;
 
 	givehelp();
 	ildev = open("/dev/lock",1);
@@ -69,7 +69,7 @@ main()
 		  case 'e':
 			exit();
 			break;
-		  
+
 		  default:
 			printf( " bad option \n");
 		}
@@ -78,21 +78,21 @@ main()
 givehelp()
 {
 	printf(" the following options are supported: \n");
-	printf("	a-dump all entries\n");
-	printf("	w-write to locktable, e-end\n");
-	printf("	r-release all locks, h-help\n");
+	printf("        a-dump all entries\n");
+	printf("        w-write to locktable, e-end\n");
+	printf("        r-release all locks, h-help\n");
 }
-/*	test support for ILOCK driver.
+/*      test support for ILOCK driver.
  *
  */
 dumptable(ll)
-struct	Lockform	*ll;
+struct  Lockform        *ll;
 {
-	register int	j;
+	register int    j;
 
 	printf(" pid %d wflag %d type %d mod %d \nkey ", ll->l_pid,
 		ll->l_wflag,ll->l_type,
-		ll->l_mod);    
+		ll->l_mod);
 
 	for (j = 0; j < KEYSIZE; j++)
 	{
@@ -102,9 +102,9 @@ struct	Lockform	*ll;
 }
 dumpall()
 {
-	int	k;
-	char	tabbuf[KEYSIZE + 5];
-	char	*ll;
+	int     k;
+	char    tabbuf[KEYSIZE + 5];
+	char    *ll;
 	int nlox[4];
 
 	seek(mem,nl[0].value,0);
@@ -121,7 +121,7 @@ dumpall()
 	printf("\n");
 }
 /*
- *	read in one int number
+ *      read in one int number
  */
 readint()
 { int l;
@@ -139,10 +139,10 @@ readint()
 	return(l);
 	}
 /*
- *	read in a string of characters
+ *      read in a string of characters
  */
 readstring(p)
-char	*p;
+char    *p;
 {
 
 
@@ -160,9 +160,9 @@ char *p, *s;
 	while (*p++ = *s++);
 }
 readkey(s)
-char	*s;
+char    *s;
 {
-	int	i,j,k;
+	int     i,j,k;
 	printf(" length ");
 	i = readint();
 	for (k = 0; k < i; k++)
