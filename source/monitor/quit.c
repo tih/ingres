@@ -1,4 +1,10 @@
-# include	<stdio.h>
+/*
+ * @(#)		quit.c	1.1	(2.11BSD)	1996/3/22
+*/
+
+#include	<stdio.h>
+#include	<signal.h>
+#include	<string.h>
 
 # include	"../ingres.h"
 # include	"../aux.h"
@@ -19,25 +25,7 @@
 **		3/2/79 (eric) -- Changed to close Trapfile.
 */
 
-/* list of fatal signals */
-char	*Siglist[] =
-{
-	"Signal 0",
-	"hangup",
-	"interrupt",
-	"quit",
-	"illegal instruction",
-	"trace trap",
-	"IOT",
-	"EMT",
-	"floating point exception",
-	"killed",
-	"bus error",
-	"segmentation violation",
-	"bad system call",
-	"broken pipe",
-	"alarm",
-};
+extern	char	*sys_siglist[];
 
 quit()
 {
@@ -49,9 +37,8 @@ quit()
 	int		pidlist[50];
 	extern int	(*Exitfn)();
 	extern		exit();
-	extern int	sys_nerr;
-	extern char	*sys_errlist[];
 	char		indexx[0400];
+	char		*cp;
 
 #	ifdef xMTR1
 	if (tTf(1, -1))
@@ -79,8 +66,7 @@ quit()
 	err = 0;
 
 	/* clear out the system error index table */
-	for (ndx = 0; ndx < 0400; ndx++)
-		indexx[ndx] = 0;
+	bzero(indexx, sizeof (indexx));
 
 	/* wait for all process to terminate */
 	while ((ndx = wait(&status)) != -1)
@@ -95,10 +81,10 @@ quit()
 		{
 			printf("%d: ", ndx);
 			ndx = status & 0177;
-			if (ndx > sizeof Siglist / sizeof Siglist[0])
+			if (ndx > NSIG)
 				printf("Abnormal Termination %d", ndx);
 			else
-				printf("%s", Siglist[ndx]);
+				printf("%s", sys_siglist[ndx]);
 			if ((status & 0200) != 0)
 				printf(" -- Core Dumped");
 			printf("\n");
@@ -124,16 +110,16 @@ quit()
 	{
 		if (indexx[ndx] == 0)
 			continue;
-		if (ndx <= sys_nerr)
-		{
-			if (err == 0)
-				printf("\nUNIX error dictionary:\n");
-			printf("%3d: %s\n", ndx, sys_errlist[ndx]);
-		}
+		cp = syserrlst(ndx);
+		if (!cp)
+			break;
+		if (err == 0)
+			printf("\nUNIX error dictionary:\n");
+		printf("%3d: %s\n", ndx, cp);
 		if (err == 0)
 			err = ndx;
 	}
-	if (err > 0 && err <= sys_nerr)
+	if (err)
 		printf("\n");
 
 	/* PRINT LOGOUT CUE ? */

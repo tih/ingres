@@ -1,3 +1,8 @@
+/*
+ *	@(#)	ingres.c	1.1	(2.11BSD)	1996/3/22
+*/
+
+#include	<errno.h>
 # include	"../ingres.h"
 # include	"../aux.h"
 # include	"../access.h"
@@ -187,11 +192,6 @@ int		Nopts;
 int		No_exec;		/* if set, don't execute */
 char		*User_ovrd;		/* override usercode from -u flag */
 
-/* system error messages, etc. */
-extern int	sys_nerr;
-extern char	*sys_errlist[];
-extern int	errno;
-
 main(argc, argv)
 int	argc;
 char	**argv;
@@ -342,7 +342,7 @@ char	**argv;
 	/* open and read the process table */
 	if ((fd = open(proctab, 0)) < 0)
 	{
-		printf("Proctab %s: %s\n", proctab, sys_errlist[errno]);
+		printf("Proctab %s: %s\n", proctab, strerror(errno));
 		goto usage;
 	}
 
