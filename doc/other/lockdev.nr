@@ -361,7 +361,7 @@ after unix has been rebooted.
 Execute the command:
 
 .nf
-	/etc/mknod  /dev/ingreslock  c  major  0
+	mknod  /dev/ingreslock  c  major  0
 
 .fi
 where "major" is the major device number.
