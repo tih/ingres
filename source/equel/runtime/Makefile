@@ -12,7 +12,7 @@ OBJS=	IIw_left.o IIw_right.o IIcvar.o IIgettup.o IIn_get.o IIn_ret.o \
 	IIconcatv.o IIbmove.o IIlength.o IIatoi.o IIsequal.o
 
 libq.a: $(OBJS)
-	$(AR) rvuc libq.a $(OBJS)
+	$(AR) rvc libq.a $(OBJS)
 	ranlib libq.a
 
 install: libq.a

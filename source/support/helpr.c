@@ -101,7 +101,7 @@ char 	*argv[];
 				av++;
 				while ((p = *av++) != NULL)
 				{
-					if ((i = (int) qmtest(p)) != NULL)
+					if ((i = (int) qmtest(p)) != 0)
 					{
 						/* change of qmtest result */
 						qm = (char *) i;

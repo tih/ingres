@@ -3,19 +3,19 @@ LIB=	$(INGRES)/lib
 CC=	cc
 CFLAGS=	-O
 AR=	ar
-ARFLAGS=rvuc
+ARFLAGS=rvc
 
 
 OBJS=	parser.o yylex.o inout.o name.o number.o operator.o string.o symtab.o \
 	comment.o cmap.o
 
-scanner: $(OBJS)
-	-$(AR) $(ARFLAGS) scanner $(OBJS)
-	ranlib scanner
+libscanner.a: $(OBJS)
+	-$(AR) $(ARFLAGS) libscanner.a $(OBJS)
+	ranlib libscanner.a
 
-install: scanner
-	install -c -m 644 scanner $(LIB)/scanner
-	ranlib $(LIB)/scanner
+install: libscanner.a
+	install -c -m 644 libscanner.a $(LIB)
+	ranlib $(LIB)/libscanner.a
 
 clean:
-	rm -f scanner *.o *.core a.out
+	rm -f libscanner.a *.o *.core a.out

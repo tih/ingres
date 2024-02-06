@@ -1,7 +1,7 @@
 CC=	cc
 CFLAGS=	-O
 AR=	ar
-ARFLAGS=rvuc
+ARFLAGS=rvc
 LIB=	../../lib
 
 OBJS=	opencatalog.o closecatalog.o catalog_desc.o inpcloser.o closer.o \
@@ -12,13 +12,13 @@ OBJS=	opencatalog.o closecatalog.o catalog_desc.o inpcloser.o closer.o \
 	last_page.o page.o compare.o add_prim.o utility.o cleanrel.o \
 	readadmin.o
 
-access: $(OBJS)
-	-$(AR) $(ARFLAGS) access $(OBJS)
-	ranlib access
+libaccess.a: $(OBJS)
+	-$(AR) $(ARFLAGS) libaccess.a $(OBJS)
+	ranlib libaccess.a
 
-install: access
-	install -c -m 644 access $(LIB)/access
-	ranlib $(LIB)/access
+install: libaccess.a
+	install -c -m 644 libaccess.a $(LIB)
+	ranlib $(LIB)/libaccess.a
 
 clean:
-	rm -f access *.o *.core a.out
+	rm -f libaccess.a *.o *.core a.out

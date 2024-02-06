@@ -5,15 +5,15 @@ LDFLAGS= -i
 
 LIB=	$(INGRES)/lib
 BIN =	$(INGRES)/bin
-ACCESS=	$(LIB)/access
-GUTIL=	$(LIB)/gutil
-IUTIL=	$(LIB)/iutil
-OVQP=	$(LIB)/ovqplib
-DBU=	$(LIB)/dbulib
+ACCESS=	-laccess
+GUTIL=	-lgutil
+IUTIL=	-liutil
+OVQP=	-lovqp
+DBU=	-ldbu
 
-LIB40=	$(DBU) $(ACCESS) $(IUTIL) $(GUTIL)
+LIB40=	-L$(LIB) $(DBU) $(ACCESS) $(IUTIL) $(GUTIL)
 
-LIB70=	$(OVQP) $(DBU) $(ACCESS) $(IUTIL) $(GUTIL)
+LIB70=	-L$(LIB) $(OVQP) $(DBU) $(ACCESS) $(IUTIL) $(GUTIL)
 
 OBJS=	main.o ageval.o aggregate.o byeval.o \
 	decision.o decomp.o error.o exec_sq.o lockit.o \
@@ -28,11 +28,11 @@ OBJ70=	call_dbu70.o call_ovqp70.o $(OBJS)
 
 all: decomp decomp70
 
-decomp: $(OBJ40) $(LIB40)
-	$(CC) $(LDFLAGS) -o decomp $(OBJ40) $(LIB40) -lm
+decomp: $(OBJ40)
+	$(CC) $(LDFLAGS) -o decomp $(OBJ40) $(LIB40)
 
-decomp70: $(OBJ70) $(LIB70)
-	$(CC) $(LDFLAGS) -o decomp70 $(OBJ70) $(LIB70) -lm
+decomp70: $(OBJ70)
+	$(CC) $(LDFLAGS) -o decomp70 $(OBJ70) $(LIB70)
 
 install: decomp decomp70
 	install -c -m 700 decomp $(BIN)/decomp

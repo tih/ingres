@@ -31,7 +31,7 @@ struct nodbuffer
 	int		err_num;	/* error code on overflow */
 	int		(*err_func)();	/* error function on overflow */
 	char		*xfree;		/* next free byte */
-	char		buffer [];	/*beginning of buffer area */
+	char		*buffer;	/*beginning of buffer area */
 };
 
 /*

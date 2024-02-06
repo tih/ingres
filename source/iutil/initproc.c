@@ -66,8 +66,9 @@ int		W_front;	/* pipe descriptor: write to front end */
 int		W_err;		/* pipe descriptor: write error message (usually W_up */
 int		Equel;		/* flag set if running an EQUEL program */
 int		Rublevel;	/* rubout level, set to -1 if turned off */
-struct out_arg	Out_arg;	/* output arguments */
 int		Standalone;	/* not standalone */
+
+extern struct out_arg	Out_arg;	/* output arguments */
 
 initproc(procname, argv)
 char	*procname;
@@ -119,7 +120,7 @@ char	**argv;
 	Xparams = q;
 
 	/* process flags */
-	for (; (p = *q) != -1 && p != NULL; q++)
+	for (; (p = *q) != (char *) -1 && p != NULL; q++)
 	{
 		if (p[0] != '-')
 			continue;

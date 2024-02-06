@@ -47,14 +47,14 @@ struct  key		*key;
 			{
 				if (s->relop == opEQ && s->att == d)
 				{
-					k->keysym = s->const;
+					k->keysym = s->cnst;
 					k->dnumber = (a->sec_index == TRUE) ? i+1 : d;
 					k++;
 #					ifdef xOTR1
 					if (tTf(25, 1))
 					{
 						printf("exact key on dom %d\tvalue=", d);
-						prsym(s->const);
+						prsym(s->cnst);
 					}
 #					endif
 					break;
@@ -134,7 +134,7 @@ struct key		*h;
 						if (tTf(25, 6))
 							printf("low key on dom %d\t", d);
 #						endif
-						low->keysym = s->const;
+						low->keysym = s->cnst;
 						low->dnumber = sec_indx ? i+1 : d;
 						low++;
 					}
@@ -145,13 +145,13 @@ struct key		*h;
 						if  (tTf(25, 6))
 							printf("high key on dom %d\t", d);
 #						endif
-						high->keysym = s->const;
+						high->keysym = s->cnst;
 						high->dnumber = sec_indx ? i+1 : d;
 						high++;
 					}
 #					ifdef xOTR1
 					if (tTf(25, 6))
-						prsym(s->const);
+						prsym(s->cnst);
 #					endif
 					if (i == 0)
 						success = TRUE;

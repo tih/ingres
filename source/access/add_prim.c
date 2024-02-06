@@ -31,7 +31,7 @@ struct tup_id		*tidx;
 	b->thispage = b->mainpg;
 	b->mainpg = 0;
 	b->ovflopg = 0;
-	b->linetab[0] = b->firstup - b;
+	b->linetab[0] = b->firstup - (char *) b;
 	b->nxtlino = 0;
 	b->bufstatus |= BUF_DIRTY;
 

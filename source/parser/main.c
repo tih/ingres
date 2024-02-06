@@ -1,3 +1,9 @@
+#ifdef MINIX
+# include	<sys/types.h>
+# include	<unistd.h>
+#endif
+# include	<stdio.h>
+
 # include	"../ingres.h"
 # include	"../aux.h"
 # include	"../pipes.h"
@@ -66,6 +72,10 @@ char	*argv1[];
 	**	the database has query modification turned on.
 	*/
 	Qrymod = ((Admin.adhdr.adflags & A_QRYMOD) == A_QRYMOD);
+
+	if (!isatty(1))
+		setbuf(stdout, NULL);
+
 	setexit();
 
 	/* EXECUTE */

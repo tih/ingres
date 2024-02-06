@@ -12,7 +12,7 @@ struct symbol
 {
 	char	type;			/* type codes in symbol.h */
 	char	len;			/* length in bytes of value field */
-	int	value[];		/* variable length (0 - 255 bytes) */
+	int	value[1];		/* variable length (0 - 255 bytes) */
 };
 
 /*
@@ -119,3 +119,5 @@ struct srcid
 	char	srcown[2];		/* relation owner usercode */
 	int	srcstat;		/* relstat field */
 };
+
+struct querytree *tree();

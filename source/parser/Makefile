@@ -1,7 +1,7 @@
 CC=cc
 LIB=../../lib
 BIN=../../bin
-LIBS=$(LIB)/scanner $(LIB)/access $(LIB)/gutil $(LIB)/iutil -lm
+LIBS=-L$(LIB) -lscanner -laccess -liutil -lgutil
 CFLAGS=-O
 LDFLAGS=-i
 YACC=$(BIN)/yyyacc
@@ -11,12 +11,12 @@ AR= ar
 OBJS=	attfcn.o xdot.o main.o rngfcn.o tree.o norml.o call_p.o call_tree.o \
 	control.o format.o p_util.o getscr.o
 
-parser: y.tab.o parlib
-	$(CC) $(LDFLAGS) -o parser y.tab.o parlib $(LIBS)
+parser: y.tab.o libparser.a
+	$(CC) $(LDFLAGS) -o parser y.tab.o -L. -lparser $(LIBS)
 
-parlib: $(OBJS)
-	-$(AR) rvuc parlib $(OBJS)
-	ranlib parlib
+libparser.a: $(OBJS)
+	-$(AR) rvc libparser.a $(OBJS)
+	ranlib libparser.a
 
 y.tab.c: grammar.y yyerror.y tables.y
 	$(YACC) $(YFLAGS) grammar.y
@@ -24,10 +24,10 @@ y.tab.c: grammar.y yyerror.y tables.y
 grammar.y: master.grammar
 	grep -v "DDD" master.grammar > grammar.y 
 
-install: parlib parser
-	install -c -m 644  parlib $(LIB)/parlib
-	ranlib $(LIB)/parlib
+install: libparser.a parser
+	install -c -m 644 libparser.a $(LIB)
+	ranlib $(LIB)/libparser.a
 	install -c -m 700 parser $(BIN)/parser
 
 clean:
-	rm -f parser parlib grammar.y y.tab.c *.o *.core a.out
+	rm -f parser libparser.a grammar.y y.tab.c *.o *.core a.out

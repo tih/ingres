@@ -1,10 +1,21 @@
+#ifdef MINIX
+# include	<sys/types.h>
+# include	<unistd.h>
+#endif
 # include	<stdio.h>
+
+#ifdef MINIX
+#define _file _fd
+#endif
 
 # include	"../ingres.h"
 # include	"../aux.h"
 # include	"../unix.h"
 # include	"../pipes.h"
+# include	"../access.h"
 # include	"monitor.h"
+
+struct admin	Admin;
 
 # define	ERRDELIM	'~'
 
@@ -157,6 +168,12 @@ char	*argv[];
 	/* get user input from terminal */
 	Input = stdin;
 	setbuf(stdin, NULL);
+
+	if (!isatty(1)) {
+		fflush(stdout);
+		setbuf(stdout, NULL);
+	}
+
 	setexit();
 	xwait();
 	monitor();

@@ -5,6 +5,7 @@
 # include	"../symbol.h"
 # include	"qrymod.h"
 
+static int writesym();
 
 /*
 **  WRITETREE.C -- query tree output routines
@@ -143,7 +144,7 @@ int	(*wrfn)();
 **	a 'value' of zero will not be written.
 */
 
-writesym(typ, len, value, wrfn)
+static int writesym(typ, len, value, wrfn)
 int	typ;
 int	len;
 char	*value;

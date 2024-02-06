@@ -54,7 +54,7 @@ char	**pv;
 	opencatalog("relation", 2);
 	opencatalog("attribute", 2);
 
-	for (ret = 0; (name = *pv++) != -1; )
+	for (ret = 0; (name = *pv++) != (char *) -1; )
 	{
 		if (i = des(name))
 			ret = i;

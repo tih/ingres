@@ -65,7 +65,8 @@ char	**argv;
 	int				attxtra[MAXDOM], indattx[MAXKEYS];
 	int				xcount;
 	int				j;
-	extern				*Exitfn, exitfn;
+	extern void			(*Exitfn)();
+	void				exitfn();
 	char				line[100];
 ##	char				*uover;
 

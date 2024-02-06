@@ -3,7 +3,7 @@ long	lg;
 {
 	register char	*a;
 	register char	*j;
-	static char	b[11];
+	static char	b[16];
 
 	a = b;
 	if (lg < 0)
@@ -11,7 +11,7 @@ long	lg;
 		*a++ = '-';
 		lg = -lg;
 	}
-	j = &b[10];
+	j = &b[15];
 	*j-- = 0;
 	do
 	{

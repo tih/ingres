@@ -20,7 +20,7 @@ char	**pv;
 	long				lnum;
 
 	opencatalog("relation", 2);
-	while (*pv != -1)
+	while (*pv != (char *) -1)
 	{
 		if (openr(&desc, -1, *pv))
 			syserr("RESETREL: openr %s", *pv);

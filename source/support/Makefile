@@ -1,6 +1,6 @@
 BIN=	../../bin
 LIB=	../../lib
-LIBS=	$(LIB)/dbulib $(LIB)/access $(LIB)/iutil $(LIB)/gutil
+LIBS=	-L$(LIB) -ldbu -laccess -liutil -lgutil
 CFLAGS= -O
 LDFLAGS=-i
 OBJS=	error.o
@@ -41,7 +41,7 @@ usersetup: usersetup.o
 
 copydb: copydb.q
 	equel copydb.q
-	$(CC) $(LDFLAGS) -o copydb copydb.c $(LIB)/gutil $(LIB)/libq.a
+	$(CC) $(LDFLAGS) -o copydb copydb.c -L$(LIB) -lgutil -lq
 
 install: creatdb destroydb helpr ingres printr restore sysmod purge usersetup
 	install -c -m 0700 usersetup $(BIN)/usersetup

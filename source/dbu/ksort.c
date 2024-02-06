@@ -581,3 +581,9 @@ int	err;
 {
 	return (err);
 }
+
+rubproc()
+{
+	printf("ksort interrupted\n");
+	exit(1);
+}

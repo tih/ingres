@@ -39,7 +39,9 @@ int	Dmsize[12] =
 {
 	31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31
 };
+# ifndef MINIX
 # include	"sys/timeb.h"
+# endif
 # endif
 # ifndef xV7_UNIX
 # define	Dmsize		dmsize
@@ -62,7 +64,11 @@ char	**parmv;
 	extern int			timezone;	/* defined in ctime(3) */
 #	endif
 #	ifdef xV7_UNIX
+#	ifdef MINIX
+	extern int			_timezone;
+#	else
 	struct timeb			timeb;
+#	endif
 #	endif
 	extern int			dysize();	/* defined in ctime(3) */
 
@@ -105,8 +111,12 @@ char	**parmv;
 
 	/* adjust to local time */
 #	ifdef xV7_UNIX
+#	ifdef MINIX
+	date += _timezone;
+#	else
 	ftime(&timeb);
 	date += ((long) timeb.timezone) * 60;
+#	endif
 #	endif
 #	ifndef xV7_UNIX
 	date += timezone;

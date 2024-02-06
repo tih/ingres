@@ -2,7 +2,7 @@ INGRES=	../..
 CC=	cc
 CFLAGS=	-O
 AR=	ar
-ARFLAGS=rvuc
+ARFLAGS=rvc
 LIB=	$(INGRES)/lib
 
 OBJS=	atof.o atoi.o atol.o bequal.o bitcnt.o bitpos.o bmove.o cat.o \
@@ -11,16 +11,16 @@ OBJS=	atof.o atoi.o atol.o bequal.o bitcnt.o bitpos.o bmove.o cat.o \
 	pad.o pmove.o prargs.o scompare.o sequal.o setflag.o smove.o syserr.o \
 	tTf.o trace.o xputchar.o ztack.o
 
-gutil:	$(OBJS)
-	-$(AR) $(ARFLAGS) gutil $(OBJS)	
-	ranlib gutil
+libgutil.a:	$(OBJS)
+	-$(AR) $(ARFLAGS) libgutil.a $(OBJS)	
+	ranlib libgutil.a
 
 .s.o:
 	as -o $@ $<
 
-install: gutil
-	install -c -m 644 gutil $(LIB)/gutil
-	ranlib $(LIB)/gutil
+install: libgutil.a
+	install -c -m 644 libgutil.a $(LIB)/libgutil.a
+	ranlib $(LIB)/libgutil.a
 
 clean:
-	rm -f gutil *.o *.core a.out
+	rm -f libgutil.a *.o *.core a.out

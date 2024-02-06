@@ -16,10 +16,10 @@ long			n;
 		return (-2);
 	buf.rel_tupid = d->reltid;
 	buf.filedesc = d->relfp;
-	for (p = (char *)&buf; p <= buf.linetab; p++)
+	for (p = (char *) &buf; (short *) p <= buf.linetab; p++)
 		*p = NULL;
 	buf.nxtlino = 0;
-	buf.linetab[0] = buf.firstup - &buf;
+	buf.linetab[0] = buf.firstup - (char *) &buf;
 	buf.ovflopg = 0;
 	for (buf.mainpg = 1; buf.mainpg < n; (buf.mainpg)++)
 	{

@@ -208,7 +208,7 @@ char	*argv[];
 		printf("modifying %s\n", Modtabl[i].rname);
 		av = Modtabl[i].parvec + 3;
 		j = 0;
-		while (*av != -1)
+		while (*av != (char *) -1)
 		{
 			j++;
 			av++;

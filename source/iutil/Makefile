@@ -2,7 +2,7 @@ INGRES=	../..
 CC=	cc
 CFLAGS=	-O
 AR=	ar
-ARFLAGS=rvuc
+ARFLAGS=rvc
 LIB=	$(INGRES)/lib
 
 OBJS=	printup.o resyncpipes.o rdpipe.o proc_error.o copypipes.o \
@@ -11,15 +11,15 @@ OBJS=	printup.o resyncpipes.o rdpipe.o proc_error.o copypipes.o \
 	end_job.o ingresname.o printdesc.o paramd.o typeconv.o \
 	typeunconv.o rub.o cslocks.o rllocks.o pglocks.o \
 	clr_tuple.o trim_relname.o trbuild.o globals.o \
-	version.o reset.o
+	version.o reset.o gamma.o
 
-iutil:	$(OBJS)
-	-$(AR) $(ARFLAGS) iutil $(OBJS)
-	ranlib iutil
+libiutil.a:	$(OBJS)
+	-$(AR) $(ARFLAGS) libiutil.a $(OBJS)
+	ranlib libiutil.a
 
-install: iutil
-	install -c -m 644 iutil $(LIB)/iutil
-	ranlib $(LIB)/iutil
+install: libiutil.a
+	install -c -m 644 libiutil.a $(LIB)
+	ranlib $(LIB)/libiutil.a
 
 clean:
-	rm -f iutil *.o *.core a.out
+	rm -f libiutil.a *.o *.core a.out

@@ -185,12 +185,12 @@ struct cvar	*Cvarp, *Fieldp;		/* to process C variables */
 
 
 
-struct optab 		Kwrdtab [];	/* table of key words [tokens.y] */
-struct optab 		Optab [];	/* table of operators [tokens.y] */
+extern struct optab	Kwrdtab [];	/* table of key words [tokens.y] */
+extern struct optab	Optab [];	/* table of operators [tokens.y] */
 struct special		Tokens;		/* holds yacc generated lex codes
 					 * [tokens.y]
 					 */
-char			Cmap [];	/* a type for each character [cmap.c] */
+extern char		Cmap [];	/* a type for each character [cmap.c] */
 struct cvar		*C_globals;	/* Global C-variable tree */
 struct cvar		*C_locals;	/* Local C-variable tree */
 struct cvar		*F_locals;	/* Local structure fields */

@@ -62,7 +62,7 @@ struct tup_id		*tid;
 	b->mainpg = mpage;
 	b->ovflopg = 0;
 	b->thispage = newpage;
-	b->linetab[0] = b->firstup - b;
+	b->linetab[0] = b->firstup - (char *) b;
 	b->nxtlino = 0;
 	b->bufstatus |= BUF_DIRTY;
 	if (pageflush(b))

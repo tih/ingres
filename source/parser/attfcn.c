@@ -206,6 +206,7 @@ attalloc()
 	aptr = Freeatt;
 	Freeatt = Freeatt->atbnext;
 	aptr->atbnext = NULL;
+	return aptr;
 }
 
 /*

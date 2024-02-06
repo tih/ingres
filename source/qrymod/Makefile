@@ -4,23 +4,24 @@ CC=cc
 CFLAGS=-O
 LDFLAGS= -i
 AR=ar
-LIBS=$(LIB)/parlib $(LIB)/access $(LIB)/iutil $(LIB)/gutil
+LIBS=-L. -lqm -L$(LIB) -lparser -laccess -liutil -lgutil
 
-OBJS=	main.o readtree.o qrymod.o issue.o define.o d_view.o d_integ.o \
+OBJS=	readtree.o qrymod.o issue.o define.o d_view.o d_integ.o \
 	d_prot.o fillprotup.o view.o integrity.o protect.o writetree.o \
 	range.o tree.o trscan.o treepr.o util.o catalog_desc.o
 
-qrymod: qmlib
-	$(CC) $(LDFLAGS) -o qrymod qmlib $(LIBS)
+qrymod: main.o libqm.a
+	$(CC) $(LDFLAGS) -o qrymod main.o -L. -lqm ../parser/norml.o -L$(LIB) -laccess -liutil -lgutil
+#	$(CC) $(LDFLAGS) -o qrymod main.o $(LIBS)
 
-qmlib: $(OBJS)
-	-$(AR) cruv qmlib $(OBJS)
-	ranlib qmlib
+libqm.a: $(OBJS)
+	-$(AR) crv libqm.a $(OBJS)
+	ranlib libqm.a
 
-install: qmlib qrymod
-	install -c -m 644 qmlib $(LIB)/qmlib
-	ranlib $(LIB)/qmlib
+install: libqm.a qrymod
+	install -c -m 644 libqm.a $(LIB)
+	ranlib $(LIB)/libqm.a
 	install -c -m 700 qrymod $(BIN)/qrymod
 
 clean: 
-	rm -f qrymod qmlib *.o *.core a.out
+	rm -f qrymod libqm.a *.o *.core a.out

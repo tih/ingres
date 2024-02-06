@@ -3,6 +3,8 @@
 # include	"../ingres.h"
 # include	"../aux.h"
 
+char *fgetline();
+
 /*
 **  GET LINE FROM USER FILE
 **
@@ -25,14 +27,14 @@ char	buf[];
 	register char	c;
 	register char	*bp;
 	
-	if (code == 0)
+	if (code == (char *) 0)
 	{
 		if (userf != NULL)
 			fclose(userf);
 		userf = NULL;
 		return (0);
 	}
-	if (code == -1)
+	if (code == (char *) -1)
 	{
 		userf = NULL;
 		return (0);

@@ -29,7 +29,6 @@
 
 
 
-
 /*
 **  UNIX version flags.
 **	The following flags define what version of UNIX is being run.
@@ -65,7 +64,7 @@
 **  Must match 'NOFILE' entry in /usr/sys/param.h
 */
 
-# define	MAXFILES	30
+# define	MAXFILES	20
 
 
 /*

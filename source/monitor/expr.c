@@ -290,7 +290,7 @@ exprfind()
 
 	  case ' ':
 	  case '\n':
-	  case '/t':
+	  case '\t':
 	  case '\0':
 		printf("Expression expected: end of expression found.\n");
 		ExprError = TRUE;

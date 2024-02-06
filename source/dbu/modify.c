@@ -287,7 +287,7 @@ struct modtab		*mp;
 	sort_only = FALSE;
 	cp = *pv;
 
-	if (cp == -1 || *cp == NULL)
+	if (cp == (char *) -1 || *cp == '\0')
 	{
 		/* no key information. default as needed */
 		if (mp->yeskeys)
@@ -315,10 +315,10 @@ struct modtab		*mp;
 
 
 	/* scan for attribute names */
-	for ( ; cp != -1; cp = *pv++)
+	for ( ; cp != (char *) -1; cp = *pv++)
 	{
 		/* check for separator between keys & options */
-		if (*cp == NULL)
+		if (*cp == '\0')
 		{
 			pv++;	/* point two past NULL */
 			break;
@@ -444,7 +444,7 @@ struct modinfo	*mp;
 	err = 0;
 	fill_flag = min_flag = max_flag = FALSE;
 
-	while ((p1 = *pv++) != -1)
+	while ((p1 = *pv++) != (char *) -1)
 	{
 		p2 = *pv++;
 		if (sequal(p1, "fillfactor"))
@@ -827,7 +827,7 @@ struct descriptor	*dx;
 		dirbuf.ovflopg = start;
 		dirbuf.mainpg = level;
 		dirbuf.thispage = stop + 1;
-		offset = dirbuf.linetab[0] = dirbuf.firstup - &dirbuf;
+		offset = dirbuf.linetab[0] = dirbuf.firstup - (char *) &dirbuf;
 		dirbuf.bufstatus = BUF_DIRTY | BUF_DIRECT;
 
 		dirbuf.nxtlino = 0;
@@ -885,7 +885,7 @@ struct descriptor	*dx;
 				dirbuf.thispage++;
 				newstop = dirbuf.thispage;
 				dirbuf.ovflopg = pageid;
-				offset = dirbuf.linetab[0] = dirbuf.firstup - &dirbuf;
+				offset = dirbuf.linetab[0] = dirbuf.firstup - (char *) &dirbuf;
 				dirbuf.bufstatus = BUF_DIRTY;
 				dirbuf.nxtlino = 0;
 			}

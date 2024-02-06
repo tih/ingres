@@ -29,7 +29,7 @@ char	**parmv;
 	ret = 0;
 	pv = parmv;
 	getuser(-1);	/* init getuser for modes 1 & 2 */
-	while (*pv != -1)
+	while (*pv != (char *) -1)
 	{
 
 		if (atoi(*pv++, &mode))
@@ -78,7 +78,7 @@ char	**parmv;
 
 	/* now rescan for error messages */
 	pv = parmv;
-	while (*pv != -1)
+	while (*pv != (char *) -1)
 	{
 		atoi(*pv++, &mode);
 

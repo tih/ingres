@@ -480,7 +480,7 @@ tlelm:		NAME is afcn =
 		{
 			if (Opflag == mdREPL)
 				/* ALL not defined for REPLACE */
-				yyerror(REPALL, $1->varname, 0);
+				yyerror(REPALL, ((struct rngtab *)$1)->varname, 0);
 			/* makes set of new resdom entries for targ list */
 			$$ = xdot($1);
 		}
@@ -569,7 +569,7 @@ targdom:	afcn =
 attrib:		var PERIOD NAME =
 		{
 #			ifdef	xPTR2
-			tTfp(37, 0, "attrib %s.%s found\n", $1->varname, $3);
+			tTfp(37, 0, "attrib %s.%s found\n", ((struct rngtab *)$1)->varname, $3);
 #			endif
 
 			/* remember attribute name */
@@ -577,7 +577,7 @@ attrib:		var PERIOD NAME =
 
 			/* look up attribute */
 			aptr = attlookup($1, Trname);
-			$$ = tree(NULL, NULL, VAR, 6, $1->rentno, aptr);
+			$$ = tree(NULL, NULL, VAR, 6, ((struct rngtab *)$1)->rentno, aptr);
 		}
 ;
 var:		NAME =

@@ -1,3 +1,9 @@
+#ifdef MINIX
+# include	<sys/types.h>
+# include	<unistd.h>
+#endif
+# include	<stdio.h>
+
 # include	"../ingres.h"
 # include	"../aux.h"
 # include	"../pipes.h"
@@ -135,6 +141,9 @@ char	**argv;
 	pmove(tty, Terminal, 2, ' ');
 	Terminal[2] = '\0';
 #	endif
+
+	if (!isatty(1))
+		setbuf(stdout, NULL);
 
 	setexit();
 #	ifdef xQTR3

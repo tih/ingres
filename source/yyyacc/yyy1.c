@@ -274,14 +274,15 @@ sunion( a, b, c ) int *a, *b, *c; {
   return( sub );
   }
 
-prlook( pp ) int *pp;{
+prlook( pp ) struct looksets *pp;{
 	int j;
-	pp = pp->lset;
-	if( pp == 0 ) fprintf(Fout, "\tNULL");
+	int *ip;
+	ip = pp->lset;
+	if( ip == NULL ) fprintf(Fout, "\tNULL");
 	else {
 		fprintf(Fout, " { " );
 		for( j=1; j<=nterms; ++j ){
-			if( (pp[j>>4]>>(j&017) )&01 != 0 ) fprintf(Fout,  "%s ", symnam(j) );
+			if( (ip[j>>4]>>(j&017) )&01 != 0 ) fprintf(Fout,  "%s ", symnam(j) );
 			}
 		fprintf(Fout,  "}" );
 		}

@@ -4,7 +4,7 @@ struct simp
 {
 	int		relop;	/* value of relop in simp clause*/
 	int		att;	/* attno of attribute */
-	struct symbol *const;	/* pointer to constant value symbol */
+	struct symbol	*cnst;	/* pointer to constant value symbol */
 }	Simp[NSIMP];
 
 int	Nsimp;		/* Current no. entries in Simp vector */

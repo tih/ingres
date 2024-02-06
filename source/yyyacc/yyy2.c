@@ -51,9 +51,9 @@ setup(argc,argv) int argc; char *argv[];
 	if (Foutput == 0)
 		Foutput = copen("/dev/null", 'w');
 	ftable = copen( oflag ? "yacc.tmp" : "y.tab.c" , 'w' );
-	if( ftable<0 ) error( "cannot open table file" );
+	if( ftable == 0 ) error( "cannot open table file" );
 	if( argc > 1 ) cin = copen( argv[1], 'r' );
-	if( cin < 0 ) error( "cannot open input" );
+	if( cin == 0 ) error( "cannot open input" );
 	settab();
 	fprintf(Fout, "#\n");
 	ctokn = "$end";

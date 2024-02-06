@@ -1,5 +1,10 @@
 # define	MAXDIG		25
 
+#ifdef MINIX
+#define ecvt _ecvt
+#define fcvt _fcvt
+#endif
+
 /*
 **  FLOATING POINT TO ASCII CONVERSION
 **

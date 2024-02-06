@@ -1,4 +1,5 @@
 # include	<stdio.h>
+# include	<errno.h>
 
 # include	"../ingres.h"
 # include	"../aux.h"
@@ -73,7 +74,9 @@ char	*label;
 	register char	c;
 
 	smove(label, target);
-	if (rewind(Input))
+	errno = 0;
+	rewind(Input);
+	if (errno != 0)
 	{
 		printf("Cannot branch on a terminal\n");
 		return (1);

@@ -266,8 +266,8 @@ struct symbol	*sym;
 }
 
 
-struct symbol *cpsym(const, len, op)
-struct symbol	*const;
+struct symbol *cpsym(cnst, len, op)
+struct symbol	*cnst;
 int		len;
 int		op;
 
@@ -294,7 +294,7 @@ int		op;
 	s = (struct symbol *) need(Ovqpbuf, op == opLTLE ? i + 3 : i + 2);
 	s->type = CHAR;
 	sp = (char *) s->value;
-	cp = (char *) const->value;
+	cp = (char *) cnst->value;
 
 	while (i--)
 	{
@@ -335,14 +335,14 @@ int		op;
 	}
 	if (op == opLTLE)
 		*sp++ = 0177;
-	s->len = sp - s->value;
+	s->len = sp - (char *) s->value;
 
 	return (s);
 }
 
 
-add_simp(const, rel, attno)
-struct symbol	*const;
+add_simp(cnst, rel, attno)
+struct symbol	*cnst;
 int		rel;
 int		attno;
 
@@ -362,7 +362,7 @@ int		attno;
 	s = (struct symbol *) &Simp[Nsimp++];
 
 	((struct simp *)s)->att = attno;
-	((struct simp *)s)->const = const;
+	((struct simp *)s)->cnst = cnst;
 	((struct simp *)s)->relop = rel;
 
 #	ifdef xOTR1
@@ -382,6 +382,6 @@ struct simp	*ss;
 
 	s = ss;
 	printf("simp:relop=%d,att=%d,val=", s->relop, s->att);
-	prsym(s->const);
+	prsym(s->cnst);
 #	endif
 }

@@ -1,3 +1,9 @@
+#ifdef MINIX
+# include	<sys/types.h>
+# include	<unistd.h>
+#endif
+# include	<stdio.h>
+
 # include	"../ingres.h"
 # include	"../aux.h"
 # include	"../symbol.h"
@@ -38,6 +44,9 @@ char	*argv[];
 	** init_decomp is defined in either call_ovqp or call_ovqp70.
 	*/
 	init_decomp();
+
+	if (!isatty(1))
+		setbuf(stdout, NULL);
 
 	setexit();
 

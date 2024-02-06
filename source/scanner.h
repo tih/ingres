@@ -69,8 +69,8 @@ struct lastok
 
 /* declarations */
 struct special	Tokens;			/* special tokens table */
-struct optab	Optab[];		/* operator table */
-struct optab	Keyword[];		/* keyword table */
+extern struct optab	Optab[];		/* operator table */
+extern struct optab	Keyword[];		/* keyword table */
 struct lastok	Lastok;
 int		Opcode;			/* opcode for current token */
 int		Lcase;			/* UPPER->lower conversion flag */

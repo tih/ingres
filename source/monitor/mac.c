@@ -883,7 +883,7 @@ struct macro	*mac;
 	/* clear out the macro call */
 	bufflush(&e->mbuf);
 
-	if (s <= NPRIMS)
+	if (s <= (char *) NPRIMS)
 	{
 		/* it is a primitive */
 		macload(macprim(s), 0);
@@ -1583,7 +1583,7 @@ char	*name;
 	}
 
 	/* find macro */
-	while (name == 0 ? ((m = Machead)->substitute > NPRIMS) : ((m = macmlkup(cname)) != 0))
+	while (name == 0 ? ((m = Machead)->substitute > (char *) NPRIMS) : ((m = macmlkup(cname)) != 0))
 	{
 		/* remove macro from list */
 		mp = &Machead;
@@ -1900,7 +1900,7 @@ char	*name;
 	{
 		if (n == 0 || macmmatch(n, m->template, 0))
 		{
-			if (m->substitute <= NPRIMS)
+			if (m->substitute <= (char *) NPRIMS)
 				continue;
 			p = macmocv(m->template);
 			macload("`{rawdefine; ", 0);
@@ -1947,7 +1947,7 @@ char	*m;
 		lastbuf = 0;
 	}
 
-	if (p <= NPRIMS)
+	if (p <= (char *) NPRIMS)
 	{
 		/* we have a primitive */
 		p = "Primitive xxx";

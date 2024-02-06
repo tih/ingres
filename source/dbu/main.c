@@ -1,3 +1,9 @@
+#ifdef MINIX
+# include	<sys/types.h>
+# include	<unistd.h>
+#endif
+# include	<stdio.h>
+
 # include	"../ingres.h"
 # include	"../pipes.h"
 # include	"../aux.h"
@@ -185,6 +191,9 @@ char	**argv;
 
 	/* initialize the process table */
 	init_proctab(Xparams[1], Cur_id);
+
+	if (!isatty(1))
+		setbuf(stdout, NULL);
 
 	setexit();
 

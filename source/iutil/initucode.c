@@ -6,6 +6,8 @@
 # include	"../access.h"
 # include	"../lock.h"
 
+char *fgetline();
+
 /*
 **  INITUCODE -- initialize standalone process
 **

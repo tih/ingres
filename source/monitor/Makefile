@@ -3,11 +3,11 @@ CC=	cc
 CFLAGS=	-O
 LDFLAGS=-i
 AR=	ar
-ARFLAGS=rvuc
+ARFLAGS=rvc
 LIB=	$(INGRES)/lib
 BIN=	$(INGRES)/bin
 
-LIBS= $(LIB)/iutil $(LIB)/gutil
+LIBS= -liutil -lgutil
 
 OBJS=	branch.o buf.o clear.o clrline.o edit.o eval.o expr.o getch.o \
 	getfilename.o go.o include.o mac.o main.o mcall.o monitor.o\
@@ -15,7 +15,7 @@ OBJS=	branch.o buf.o clear.o clrline.o edit.o eval.o expr.o getch.o \
 	xwait.o
 
 monitor: $(OBJS)
-	$(CC) $(LDFLAGS) -o monitor $(OBJS) $(LIBS)
+	$(CC) $(LDFLAGS) -o monitor $(OBJS) -L$(LIB) $(LIBS)
 
 install: monitor
 	install -c -m 751 monitor $(BIN)/monitor

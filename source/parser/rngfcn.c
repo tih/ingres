@@ -34,6 +34,7 @@ rnginit()
 	atptr = Attable;
 	for (i = 0; i < MAXATT - 1; i++)
 	{
+		smove("", atptr->atbname);
 		atptr->atbnext = atptr + 1;
 		atptr++;
 	}

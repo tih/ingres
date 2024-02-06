@@ -2,6 +2,10 @@
 # include	<sys/types.h>
 # include	<sys/dir.h>
 
+# ifdef MINIX
+# include	<dirent.h>
+# endif
+
 # include	"../ingres.h"
 # include	"../aux.h"
 # include	"../access.h"

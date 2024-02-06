@@ -1,3 +1,9 @@
+#ifdef MINIX
+# include	<sys/types.h>
+# include	<unistd.h>
+#endif
+# include	<stdio.h>
+
 # include	"../ingres.h"
 # include	"../aux.h"
 # include	"../unix.h"
@@ -27,6 +33,9 @@ char	**argv;
 	W_decomp = W_down;
 	Batchupd = setflag(argv, 'b', 1);
 	acc_init();	/* init access methods */
+
+	if (!isatty(1))
+		setbuf(stdout, NULL);
 
 	setexit();
 

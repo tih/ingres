@@ -25,7 +25,7 @@ int	def;
 	register int	rtval;
 
 	rtval = -1;
-	for (p = &argv[1]; *p != 0 && *p != -1; p++)
+	for (p = &argv[1]; *p != (char *) 0 && *p != (char *) -1; p++)
 	{
 		q = *p;
 		if (q[1] != flagch)

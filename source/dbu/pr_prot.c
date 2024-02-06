@@ -315,7 +315,7 @@ int		relstat;
 		pr_time(p->protodbgn, p->protodend);
 		pr_day(p->prodowbgn, p->prodowend);
 	}
-	if (t && t->right != QLEND)
+	if (t && t->right != (QTREE *) QLEND)
 	{
 		printf("\nwhere ");
 		pr_qual(t->right);

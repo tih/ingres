@@ -145,7 +145,7 @@ struct querytree	*p1;
 	char				*bmove();
 
 	p = p1;
-	printf("addr=%l, l=%l, r=%l, typ=%d, len=%d:\n", p, p->left, p->right, p->sym.type, p->sym.len);
+	printf("addr=%u, l=%u, r=%u, typ=%d, len=%d:\n", p, p->left, p->right, p->sym.type, p->sym.len);
 	switch (p->sym.type)
 	{
 	  case VAR:

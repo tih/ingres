@@ -406,12 +406,12 @@ char	*string;
 		{
 			if (In_quote)
 			{
-				puts("\");\nIIwrite(\"", Out_file);
+				fputs("\");\nIIwrite(\"", Out_file);
 				Charcnt = 9;
 			}
 			else
 			{
-				puts("\\\n", Out_file);
+				fputs("\\\n", Out_file);
 				Charcnt = 0;
 			}
 		}
@@ -424,6 +424,7 @@ char	*string;
 	}
 }
 
+#if 0
 /*
 **  PUTS -- put a string on an output file using putc()
 **
@@ -440,3 +441,4 @@ FILE	*file;
 	for (sp = s; *sp; )
 		putc(*sp++, f);
 }
+#endif
